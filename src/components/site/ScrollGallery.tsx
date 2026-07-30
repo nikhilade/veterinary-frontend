@@ -1,25 +1,25 @@
 import { useEffect, useRef, useState } from "react";
-import vetCat from "@/assets/67447b6085bfcd89ce398084_veterinarian-taking-care-pet-1-p-500.webp.asset.json";
-import kidDog from "@/assets/67447b608bfcbd9f85ed0665_medium-shot-kid-cleaning-dog-1-p-500.webp.asset.json";
-import elderlyCorgi from "@/assets/67447b607a5550821b1472d1_elderly-person-spendng-tim-with-their-pets-1.webp.asset.json";
-import girlDog from "@/assets/67447b60fa15c36baeb8fc53_medium-shot-smiley-girl-holding-cute-dog-1.webp.asset.json";
-import womanPhone from "@/assets/67456aa8468107880fcbc97b_woman-posing-while-holding-dog-smartphone_1.webp.asset.json";
-import siamese from "@/assets/6746b9cb8fbb4801eee6a9b4_pretty-woman-playing-with-siamese-cat-1-p-500.webp.asset.json";
-import doctorCat from "@/assets/6746b9cb4b51a1c9b8676033_full-shot-doctor-holding-cat-with-leg-injury-1.webp.asset.json";
-import pawCircle from "@/assets/paw-circle.png.asset.json";
+import vetCat from "@/assets/67447b6085bfcd89ce398084_veterinarian-taking-care-pet-1-p-500.webp";
+import kidDog from "@/assets/67447b608bfcbd9f85ed0665_medium-shot-kid-cleaning-dog-1-p-500.webp";
+import elderlyCorgi from "@/assets/67447b607a5550821b1472d1_elderly-person-spendng-tim-with-their-pets-1.webp";
+import girlDog from "@/assets/67447b60fa15c36baeb8fc53_medium-shot-smiley-girl-holding-cute-dog-1.webp";
+import womanPhone from "@/assets/67456aa8468107880fcbc97b_woman-posing-while-holding-dog-smartphone_1.webp";
+import siamese from "@/assets/6746b9cb8fbb4801eee6a9b4_pretty-woman-playing-with-siamese-cat-1-p-500.webp";
+import doctorCat from "@/assets/6746b9cb4b51a1c9b8676033_full-shot-doctor-holding-cat-with-leg-injury-1.webp";
+import pawCircle from "@/assets/paw-circle.png";
 
 
 const leftColumn = [
-  { src: vetCat.url, alt: "Veterinarian listening to a fluffy cat's heartbeat" },
-  { src: kidDog.url, alt: "Child gently brushing a dog at home" },
-  { src: elderlyCorgi.url, alt: "Woman hugging her corgi on the sofa" },
+  { src: vetCat, alt: "Veterinarian listening to a fluffy cat's heartbeat" },
+  { src: kidDog, alt: "Child gently brushing a dog at home" },
+  { src: elderlyCorgi, alt: "Woman hugging her corgi on the sofa" },
 ];
 
 const rightColumn = [
-  { src: girlDog.url, alt: "Smiling woman holding a small brown dog" },
-  { src: womanPhone.url, alt: "Woman carrying a jack russell terrier" },
-  { src: siamese.url, alt: "Woman cradling a siamese cat" },
-  { src: doctorCat.url, alt: "Veterinary nurse caring for a cat with a bandaged leg" },
+  { src: girlDog, alt: "Smiling woman holding a small brown dog" },
+  { src: womanPhone, alt: "Woman carrying a jack russell terrier" },
+  { src: siamese, alt: "Woman cradling a siamese cat" },
+  { src: doctorCat, alt: "Veterinary nurse caring for a cat with a bandaged leg" },
 ];
 
 function Column({
@@ -86,7 +86,7 @@ export function ScrollGallery() {
       aria-label="Moments from our clinic"
     >
       <img
-        src={pawCircle.url}
+        src={pawCircle}
         alt=""
         aria-hidden="true"
         loading="lazy"

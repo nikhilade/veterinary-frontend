@@ -4,15 +4,15 @@ import { ScrollGallery } from "./ScrollGallery";
 import { InstagramSection } from "./InstagramSection";
 import { Reveal } from "./Reveal";
 
-import dogsHero from "@/assets/dogs-hero.webp.asset.json";
-import dogHead from "@/assets/dog-head.webp.asset.json";
-import dogFace from "@/assets/dog-face.png.asset.json";
-import dogLeft from "@/assets/dog-left.png.asset.json";
-import frameArrow from "@/assets/frame-arrow.svg.asset.json";
-import logo1 from "@/assets/logo-1.svg.asset.json";
-import logo2 from "@/assets/logo-2.svg.asset.json";
-import logo3 from "@/assets/logo-3.svg.asset.json";
-import logo4 from "@/assets/logo-4.svg.asset.json";
+import dogsHero from "@/assets/dogs-hero.webp";
+import dogHead from "@/assets/dog-head.webp";
+import dogFace from "@/assets/dog-face.png";
+import dogLeft from "@/assets/dog-left.png";
+import frameArrow from "@/assets/frame-arrow.svg";
+import logo1 from "@/assets/logo-1.svg";
+import logo2 from "@/assets/logo-2.svg";
+import logo3 from "@/assets/logo-3.svg";
+import logo4 from "@/assets/logo-4.svg";
 import aboutVet from "@/assets/about-vet.jpg";
 import serviceVet from "@/assets/service-vet.jpg";
 import serviceGrooming from "@/assets/service-grooming.jpg";
@@ -69,7 +69,7 @@ const posts = [
   { title: "Creating a Calm Sleep Space for Kittens", author: "Noah Fletcher", date: "January 15, 2025", img: blog8 },
 ];
 
-const sponsors = [logo4.url, logo1.url, logo3.url, logo2.url];
+const sponsors = [logo4, logo1, logo3, logo2];
 
 export function Home() {
   return (
@@ -101,12 +101,12 @@ export function Home() {
 
             <div className="relative flex items-end justify-center">
               <img
-                src={dogHead.url}
+                src={dogHead}
                 alt="Illustrated dog head"
                 className="pointer-events-none absolute left-[46%] top-[2%] w-[28%] animate-wiggle"
               />
               <img
-                src={dogsHero.url}
+                src={dogsHero}
                 alt="Illustrated husky, great dane, dalmatian and bulldog sitting together"
                 className="w-full max-w-2xl"
               />
@@ -125,7 +125,7 @@ export function Home() {
               Do Best
             </h2>
             <img
-              src={frameArrow.url}
+              src={frameArrow}
               alt=""
               className="hidden h-24 w-auto shrink-0 lg:block"
               aria-hidden="true"
@@ -354,12 +354,12 @@ export function Home() {
       {/* FOOTER */}
       <div aria-hidden className="relative z-10 -mb-px block bg-background leading-[0]">
         <img
-          src={dogLeft.url}
+          src={dogLeft}
           alt=""
           className="absolute bottom-2 left-0 z-0 w-36 lg:w-36"
         />
         <img
-          src={dogFace.url}
+          src={dogFace}
           alt=""
           className="absolute bottom-2 right-0 z-0 w-24 translate-x-0 lg:w-24"
         />

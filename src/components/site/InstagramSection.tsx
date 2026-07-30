@@ -1,16 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 import { Instagram } from "lucide-react";
-import img1 from "@/assets/67459a3305d203a41fce8b5c_Mask-group-2.webp.asset.json";
-import img2 from "@/assets/67459a33ff2837ab08e7f16c_Mask-group-1.webp.asset.json";
-import img3 from "@/assets/67459a332f75502739bca3b7_Mask-group.webp.asset.json";
-import img4 from "@/assets/67459a34be315ca7f02b1874_image-1.webp.asset.json";
+import img1 from "@/assets/67459a3305d203a41fce8b5c_Mask-group-2.webp";
+import img2 from "@/assets/67459a33ff2837ab08e7f16c_Mask-group-1.webp";
+import img3 from "@/assets/67459a332f75502739bca3b7_Mask-group.webp";
+import img4 from "@/assets/67459a34be315ca7f02b1874_image-1.webp";
 
 // x / y are the final offsets from the centre of the section (vw / vh)
 const items = [
-  { src: img1.url, alt: "Woman holding two white pomeranian puppies", x: -38, y: -20, rot: -14 },
-  { src: img2.url, alt: "Pomeranian dog sitting with golden baubles", x: 38, y: -22, rot: 12 },
-  { src: img3.url, alt: "Woman kissing her husky", x: -36, y: 18, rot: 10 },
-  { src: img4.url, alt: "Smiling woman cuddling her akita", x: 36, y: 20, rot: -12 },
+  { src: img1, alt: "Woman holding two white pomeranian puppies", x: -38, y: -20, rot: -14 },
+  { src: img2, alt: "Pomeranian dog sitting with golden baubles", x: 38, y: -22, rot: 12 },
+  { src: img3, alt: "Woman kissing her husky", x: -36, y: 18, rot: 10 },
+  { src: img4, alt: "Smiling woman cuddling her akita", x: 36, y: 20, rot: -12 },
 ];
 
 export function InstagramSection() {
