@@ -30,7 +30,7 @@ function MyAppointments() {
   const [newDate, setNewDate] = useState("");
 
   useEffect(() => {
-    apiClient.get<Appointment[]>(endpoints.appointments.mine).then(setItems).catch(() => setItems([]));
+    apiClient.post<Appointment[]>(endpoints.appointments.mine, { scope: "MINE" }).then(setItems).catch(() => setItems([]));
   }, []);
 
   function replace(updated: Appointment) {

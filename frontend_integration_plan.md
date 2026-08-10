@@ -21,22 +21,6 @@ The frontend `endpoints.ts` must be updated to point to the correct backend path
 
 *Note: You must prefix almost all other standard endpoints with `/api/v1/` (e.g., `/api/v1/pets`, `/api/v1/pet-owners`).*
 
-### Missing APIs (Require Backend Development)
-The following endpoints are requested by the frontend but currently have **no corresponding feature or mapping in the backend**. If these features are required, they must be built in the Java backend first:
-
-- **Auth Signup / Registration**: `/auth/signup` (Only login/password-reset exists)
-- **Vaccines Module**: `/vaccines`, `/vaccines/due`, `/pets/{id}/vaccines` (No `VaccineController` exists)
-- **Advanced Analytics**: 
-  - `/reports/overview`
-  - `/analytics/kpis`
-  - `/analytics/revenue/daily`, `/analytics/revenue/by-service`
-  - `/analytics/doctor-performance`, `/analytics/inventory-alerts`
-  - `/analytics/payment-modes`, `/analytics/appointment-heatmap`, `/analytics/pending-invoices`
-- **Tenant Administration**: `/admin/tenants`, `/tenants/provision`
-- **Subscriptions**: `/subscriptions/plans`, `/subscriptions/{id}/upgrade`
-- **Payments / Billing**: `/payments/reconcile`, `/refunds`, `/credit-notes`
-- **Pet Owner Assets**: `/pet-owners/{id}/documents`, `/pet-owners/{id}/communications`
-
 ---
 
 ## 2. Variable Name & Data Model Changes

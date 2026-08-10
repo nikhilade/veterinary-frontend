@@ -1,5 +1,6 @@
 import type { ApiResponse } from "./api/types";
 import { handleMockRequest } from "./mock/handlers";
+import { adaptInbound, adaptOutbound, toMockPath } from "./api/adapter";
 
 /**
  * Typed API client. Every component talks to the backend through this module.
@@ -51,7 +52,7 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<A
   let payload: ApiResponse<T>;
 
   if (USING_MOCKS) {
-    payload = (await handleMockRequest(path, method, body ?? {}, search)) as ApiResponse<T>;
+    payload = (await handleMockRequest(toMockPath(path), method, body ?? {}, search)) as ApiResponse<T>;
   } else {
     const token = readToken();
     const url = `${BASE_URL}${path}${search.toString() ? `?${search}` : ""}`;
@@ -62,9 +63,10 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<A
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...(headers ?? {}),
       },
-      body: body ? JSON.stringify(body) : undefined,
+      body: body ? JSON.stringify(adaptOutbound(body)) : undefined,
     });
-    payload = (await res.json()) as ApiResponse<T>;
+    const raw = (await res.json()) as ApiResponse<unknown>;
+    payload = { ...raw, data: adaptInbound<T>(raw.data) } as ApiResponse<T>;
   }
 
   if (!payload.success) {

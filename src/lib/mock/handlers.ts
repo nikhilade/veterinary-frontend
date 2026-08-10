@@ -1,6 +1,5 @@
 import type { ApiResponse, LoginResponse, Role } from "../api/types";
 import { ROLES } from "../api/types";
-import { endpoints } from "../api/endpoints";
 import {
   appointments,
   branches,
@@ -365,10 +364,10 @@ const routes: { pattern: RegExp; handler: Handler }[] = [
   },
   { pattern: /^\/branches$/, handler: () => envelope(branches) },
 
-  { pattern: new RegExp(`^${endpoints.auth.login}$`), handler: ({ body }) => login(body) },
-  { pattern: new RegExp(`^${endpoints.auth.signup}$`), handler: ({ body }) => login(body) },
+  { pattern: /^\/auth\/login$/, handler: ({ body }) => login(body) },
+  { pattern: /^\/auth\/signup$/, handler: ({ body }) => login(body) },
   {
-    pattern: new RegExp(`^${endpoints.auth.logout}$`),
+    pattern: /^\/auth\/logout$/,
     handler: () => envelope({ ok: true }),
   },
   {
