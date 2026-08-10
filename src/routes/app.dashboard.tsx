@@ -56,7 +56,7 @@ function StaffDashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  {stats.upcoming.map((a) => (
+                  {(stats.upcoming || []).map((a) => (
                     <tr key={a.id} className="border-t border-border">
                       <td className="py-3 font-medium">{a.petName}</td>
                       <td className="py-3 text-foreground/70">{a.ownerName}</td>

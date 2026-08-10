@@ -67,7 +67,8 @@ export function Loading() {
   );
 }
 
-export function formatDate(iso: string) {
+export function formatDate(iso: string | null | undefined) {
+  if (!iso) return "N/A";
   return new Date(iso).toLocaleString(undefined, {
     month: "short",
     day: "numeric",
@@ -77,6 +78,7 @@ export function formatDate(iso: string) {
   });
 }
 
-export function formatMoney(amount: number) {
-  return `$${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+export function formatMoney(amount: number | null | undefined) {
+  const safeAmount = amount ?? 0;
+  return `$${safeAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
