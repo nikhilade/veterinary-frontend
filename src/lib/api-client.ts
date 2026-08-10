@@ -1,5 +1,5 @@
 import type { ApiResponse } from "./api/types";
-import { adaptInbound, adaptOutbound, toMockPath } from "./api/adapter";
+
 
 /**
  * Typed API client. Every component talks to the backend through this module.
@@ -58,10 +58,10 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<A
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(headers ?? {}),
     },
-    body: body ? JSON.stringify(adaptOutbound(body)) : undefined,
+    body: body ? JSON.stringify(body) : undefined,
   });
   const raw = (await res.json()) as ApiResponse<unknown>;
-  payload = { ...raw, data: adaptInbound<T>(raw.data) } as ApiResponse<T>;
+  payload = { ...raw, data: raw.data } as ApiResponse<T>;
 
   if (!payload.success) {
     throw new ApiError(

@@ -119,7 +119,7 @@ function NewOwnerPage() {
                 <p className="font-medium">{`${match.firstName} ${match.lastName}`}</p>
                 <p className="text-foreground/70">{match.phoneNumber}</p>
                 <p className="text-foreground/70">{match.email || "No email on file"}</p>
-                <p className="text-foreground/60">{match.petsCount} pet(s) registered</p>
+                <p className="text-foreground/60">{match.pets?.length || match.petsCount || 0} pet(s) registered</p>
               </div>
             </div>
             <p className="mt-4 text-sm text-foreground/70">

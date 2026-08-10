@@ -96,7 +96,7 @@ function Playground() {
               { key: "name", header: "Owner", cell: (o) => `${o.firstName} ${o.lastName}`, sortValue: (o) => `${o.firstName} ${o.lastName}` },
               { key: "phone", header: "Phone", cell: (o) => o.phoneNumber },
               { key: "email", header: "Email", cell: (o) => o.email },
-              { key: "pets", header: "Pets", cell: (o) => o.petsCount, sortValue: (o) => o.petsCount, className: "text-right" },
+              { key: "pets", header: "Pets", cell: (o) => o.pets?.length || o.petsCount || 0, sortValue: (o) => o.pets?.length || o.petsCount || 0, className: "text-right" },
             ]}
           />
         </Story>

@@ -94,7 +94,7 @@ export function OwnerSearchCombobox({
       </div>
       {value && !open ? (
         <p className="mt-1.5 text-xs text-foreground/60">
-          {value.phone} · {value.petsCount} pet{value.petsCount === 1 ? "" : "s"}
+          {value.phone} · {value.pets?.length || value.petsCount || 0} pet{(value.pets?.length || value.petsCount || 0) === 1 ? "" : "s"}
         </p>
       ) : null}
 

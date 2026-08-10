@@ -36,7 +36,7 @@ const columns: DataTableColumn<PetOwner>[] = [
   },
   { key: "phone", header: "Phone", sortValue: (o) => o.phoneNumber, cell: (o) => o.phoneNumber },
   { key: "email", header: "Email", cell: (o) => o.email || "—" },
-  { key: "pets", header: "Pets", sortValue: (o) => o.petsCount, cell: (o) => o.petsCount },
+  { key: "pets", header: "Pets", sortValue: (o) => o.pets?.length || o.petsCount || 0, cell: (o) => o.pets?.length || o.petsCount || 0 },
 ];
 
 function OwnersPage() {

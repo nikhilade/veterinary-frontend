@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ArrowLeft, Activity, Pencil, Syringe } from "lucide-react";
+import { SpeciesName, BreedName } from "@/components/app/MasterData";
 import { StaffLayout } from "@/components/app/StaffLayout";
 import { EmptyState, Loading, Panel, formatDate } from "@/components/app/ui";
 import { PetForm } from "@/components/app/kit/PetForm";
@@ -105,11 +106,11 @@ function PetDetailPage() {
                   <dl className="grid grid-cols-2 gap-3 text-sm">
                     <div>
                       <dt className="text-foreground/60">Species</dt>
-                      <dd>{pet.speciesId}</dd>
+                      <dd><SpeciesName id={pet.speciesId} /></dd>
                     </div>
                     <div>
                       <dt className="text-foreground/60">Breed</dt>
-                      <dd>{pet.breedId}</dd>
+                      <dd><BreedName id={pet.breedId} /></dd>
                     </div>
                     <div>
                       <dt className="text-foreground/60">Age</dt>

@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { PawPrint, Plus } from "lucide-react";
+import { Shield, Syringe, Clock, Calendar, PawPrint, Plus } from "lucide-react";
+import { SpeciesName, BreedName } from "@/components/app/MasterData";
 import { PortalLayout } from "@/components/app/PortalLayout";
 import { EmptyState, Loading, Panel } from "@/components/app/ui";
 import { PetForm } from "@/components/app/kit/PetForm";
@@ -74,11 +75,11 @@ function MyPets() {
                 <dl className="grid grid-cols-2 gap-3 text-sm">
                   <div>
                     <dt className="text-foreground/60">Species</dt>
-                    <dd>{p.speciesId}</dd>
+                    <dd><SpeciesName id={p.speciesId} /></dd>
                   </div>
                   <div>
                     <dt className="text-foreground/60">Breed</dt>
-                    <dd>{p.breedId}</dd>
+                    <dd><BreedName id={p.breedId} /></dd>
                   </div>
                   <div>
                     <dt className="text-foreground/60">Age</dt>

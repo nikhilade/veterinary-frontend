@@ -54,7 +54,8 @@ export interface PetOwner {
   email: string;
   phoneNumber: string;
   address: string;
-  petsCount: number;
+  pets?: Pet[];
+  petsCount?: number;
   createdAt: string;
 }
 
