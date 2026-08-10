@@ -81,7 +81,7 @@ function PetDetailPage() {
             >
               {editing ? (
                 <PetForm
-                  ownerId={pet.owner_id}
+                  ownerId={pet.ownerId}
                   pet={pet}
                   submitLabel="Save changes"
                   onSaved={(p) => {
@@ -92,40 +92,40 @@ function PetDetailPage() {
               ) : (
                 <div className="space-y-4">
                   <div className="flex items-center gap-4">
-                    {pet.photo_url ? (
-                      <img src={pet.photo_url} alt={`${pet.name}`} className="size-20 rounded-2xl object-cover" />
+                    {pet.photoUrl ? (
+                      <img src={pet.photoUrl} alt={`${pet.petName}`} className="size-20 rounded-2xl object-cover" />
                     ) : null}
                     <div>
-                      <p className="text-lg font-medium">{pet.name}</p>
-                      <Link to="/app/owners/$id" params={{ id: pet.owner_id }} className="text-sm text-forest underline underline-offset-4">
-                        {pet.owner_name}
+                      <p className="text-lg font-medium">{pet.petName}</p>
+                      <Link to="/app/owners/$id" params={{ id: pet.ownerId }} className="text-sm text-forest underline underline-offset-4">
+                        {pet.ownerId}
                       </Link>
                     </div>
                   </div>
                   <dl className="grid grid-cols-2 gap-3 text-sm">
                     <div>
                       <dt className="text-foreground/60">Species</dt>
-                      <dd>{pet.species}</dd>
+                      <dd>{pet.speciesId}</dd>
                     </div>
                     <div>
                       <dt className="text-foreground/60">Breed</dt>
-                      <dd>{pet.breed}</dd>
+                      <dd>{pet.breedId}</dd>
                     </div>
                     <div>
                       <dt className="text-foreground/60">Age</dt>
-                      <dd>{pet.age_years} yrs</dd>
+                      <dd>{pet.age} yrs</dd>
                     </div>
                     <div>
                       <dt className="text-foreground/60">Weight</dt>
-                      <dd>{pet.weight_kg} kg</dd>
+                      <dd>{pet.weight} kg</dd>
                     </div>
                     <div>
                       <dt className="text-foreground/60">Sex</dt>
-                      <dd>{pet.sex}</dd>
+                      <dd>{pet.gender}</dd>
                     </div>
                     <div>
                       <dt className="text-foreground/60">Microchip</dt>
-                      <dd>{pet.microchip_id ?? "—"}</dd>
+                      <dd>{pet.microchipNumber ?? "—"}</dd>
                     </div>
                     <div className="col-span-2">
                       <dt className="text-foreground/60">Allergies</dt>
@@ -143,9 +143,9 @@ function PetDetailPage() {
                 <ul className="space-y-2 text-sm">
                   {vaccines.map((v) => (
                     <li key={v.id} className="rounded-2xl border border-border px-4 py-3">
-                      <p className="font-medium">{v.vaccine_name}</p>
+                      <p className="font-medium">{v.vaccineName}</p>
                       <p className="text-xs text-foreground/60">
-                        Given {v.vaccination_date} · next due {v.next_due_date}
+                        Given {v.vaccinationDate} · next due {v.nextDueDate}
                       </p>
                     </li>
                   ))}
@@ -170,11 +170,11 @@ function PetDetailPage() {
                       <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${typeTone[e.type]}`}>
                         {e.type.toLowerCase()}
                       </span>
-                      <span className="text-xs text-foreground/50">{formatDate(e.occurred_at)}</span>
+                      <span className="text-xs text-foreground/50">{formatDate(e.occurredAt)}</span>
                     </div>
                     <p className="mt-1 font-medium">{e.title}</p>
                     <p className="text-sm text-foreground/70">{e.detail}</p>
-                    <p className="mt-0.5 text-xs text-foreground/50">{e.doctor_name}</p>
+                    <p className="mt-0.5 text-xs text-foreground/50">{e.doctorName}</p>
                   </li>
                 ))}
               </ol>

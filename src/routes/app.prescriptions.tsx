@@ -31,13 +31,13 @@ const labelCls = "block text-xs font-medium uppercase tracking-wide text-foregro
 const frequencies = ["Once daily", "Twice daily", "Three times daily", "Every 8 hours", "Every 12 weeks", "As needed"];
 
 const blankItem = (): PrescriptionItem => ({
-  medicine_id: "",
+  medicineId: "",
   name: "",
   strength: "",
   form: "",
   dosage: "",
   frequency: "Twice daily",
-  duration_days: 5,
+  durationDays: 5,
   notes: "",
 });
 
@@ -141,10 +141,10 @@ function PrescriptionsPage() {
     setCreatedId(null);
     try {
       const created = await apiClient.post<PrescriptionDetail>(endpoints.prescriptions.create, {
-        pet_id: pet?.id,
-        doctor_name: user?.name ?? "Clinic doctor",
+        petId: pet?.id,
+        doctorName: user?.name ?? "Clinic doctor",
         items,
-        refills_left: Number(refills) || 0,
+        refillsLeft: Number(refills) || 0,
         instructions,
       });
       setCreatedId(created.id);
@@ -186,14 +186,14 @@ function PrescriptionsPage() {
                     <div className="mt-1.5">
                       <MedicineAutocomplete
                         value={item.name}
-                        onText={(text) => patchItem(i, { name: text, medicine_id: "" })}
+                        onText={(text) => patchItem(i, { name: text, medicineId: "" })}
                         onPick={(m) =>
                           patchItem(i, {
-                            medicine_id: m.id,
+                            medicineId: m.id,
                             name: m.name,
                             strength: m.strength,
                             form: m.form,
-                            dosage: item.dosage || m.default_dosage,
+                            dosage: item.dosage || m.defaultDosage,
                           })
                         }
                       />
@@ -222,8 +222,8 @@ function PrescriptionsPage() {
                       id={`dur-${i}`}
                       inputMode="numeric"
                       className={`${field} mt-1.5`}
-                      value={item.duration_days}
-                      onChange={(e) => patchItem(i, { duration_days: Number(e.target.value) || 0 })}
+                      value={item.durationDays}
+                      onChange={(e) => patchItem(i, { durationDays: Number(e.target.value) || 0 })}
                     />
                   </div>
                   <div>
@@ -282,15 +282,15 @@ function PrescriptionsPage() {
               {list.map((p) => (
                 <div key={p.id} className="rounded-[1.25rem] border border-border p-4">
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <p className="font-medium">{p.pet_name}</p>
+                    <p className="font-medium">{p.petName}</p>
                     <p className="text-xs text-foreground/50">
-                      {formatDate(p.issued_at)} · {p.doctor_name}
+                      {formatDate(p.issuedAt)} · {p.doctorName}
                     </p>
                   </div>
                   <ul className="mt-2 space-y-1 text-sm text-foreground/75">
                     {(p.items.length ? p.items : []).map((it, i) => (
                       <li key={i}>
-                        {it.name} {it.strength} — {it.dosage}, {it.frequency}, {it.duration_days} days
+                        {it.name} {it.strength} — {it.dosage}, {it.frequency}, {it.durationDays} days
                       </li>
                     ))}
                     {p.items.length === 0 ? <li>{p.medication} — {p.dosage}</li> : null}

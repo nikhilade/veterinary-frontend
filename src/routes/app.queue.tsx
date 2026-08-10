@@ -33,7 +33,7 @@ function QueuePage() {
 
   const load = useCallback(() => {
     apiClient
-      .get<Appointment[]>(endpoints.appointments.queue, { branch_id: "br_1" })
+      .get<Appointment[]>(endpoints.appointments.queue, { branchId: "br_1" })
       .then(setItems)
       .catch(() => setItems([]));
   }, []);
@@ -73,7 +73,7 @@ function QueuePage() {
     <StaffLayout title="Reception & Queue" subtitle="Today's check-ins" permission="appointments:read">
       <div className="space-y-5">
         <div className="grid gap-4 sm:grid-cols-4">
-          <StatCard label="Now serving" value={serving?.token_number ? `#${serving.token_number}` : "—"} hint={serving?.pet_name} />
+          <StatCard label="Now serving" value={serving?.tokenNumber ? `#${serving.tokenNumber}` : "—"} hint={serving?.petName} />
           <StatCard label="Waiting" value={waiting.length} hint="Checked in, not called" />
           <StatCard label="Completed" value={done} hint="So far today" />
           <div className="flex items-center justify-center gap-2 rounded-[1.5rem] border border-border bg-card p-5">
@@ -118,12 +118,12 @@ function QueuePage() {
                   {list.map((a) => (
                     <tr key={a.id} className="border-t border-border">
                       <td className="py-3 font-mono text-base font-bold text-forest">
-                        {a.token_number ? `#${a.token_number}` : "—"}
+                        {a.tokenNumber ? `#${a.tokenNumber}` : "—"}
                       </td>
-                      <td className="py-3 text-foreground/70">{timeLabel(a.scheduled_at)}</td>
-                      <td className="py-3 font-medium">{a.pet_name}</td>
-                      <td className="py-3 text-foreground/70">{a.owner_name}</td>
-                      <td className="py-3 text-foreground/70">{a.doctor_name}</td>
+                      <td className="py-3 text-foreground/70">{timeLabel(a.scheduledAt)}</td>
+                      <td className="py-3 font-medium">{a.petName}</td>
+                      <td className="py-3 text-foreground/70">{a.ownerName}</td>
+                      <td className="py-3 text-foreground/70">{a.doctorName}</td>
                       <td className="py-3">
                         <StatusBadge status={a.status} />
                       </td>

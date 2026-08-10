@@ -27,16 +27,16 @@ const columns: DataTableColumn<PetOwner>[] = [
   {
     key: "name",
     header: "Name",
-    sortValue: (o) => o.name,
+    sortValue: (o) => `${o.firstName} ${o.lastName}`,
     cell: (o) => (
       <Link to="/app/owners/$id" params={{ id: o.id }} className="font-medium text-forest underline-offset-4 hover:underline">
-        {o.name}
+        {`${o.firstName} ${o.lastName}`}
       </Link>
     ),
   },
-  { key: "phone", header: "Phone", sortValue: (o) => o.phone, cell: (o) => o.phone },
+  { key: "phone", header: "Phone", sortValue: (o) => o.phoneNumber, cell: (o) => o.phoneNumber },
   { key: "email", header: "Email", cell: (o) => o.email || "—" },
-  { key: "pets", header: "Pets", sortValue: (o) => o.pets_count, cell: (o) => o.pets_count },
+  { key: "pets", header: "Pets", sortValue: (o) => o.petsCount, cell: (o) => o.petsCount },
 ];
 
 function OwnersPage() {

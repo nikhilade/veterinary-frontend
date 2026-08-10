@@ -41,7 +41,7 @@ function ConsultationsPage() {
   const [past, setPast] = useState<Consultation[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [soap, setSoap] = useState(emptySoap);
-  const [vitals, setVitals] = useState({ temperature_c: "", weight_kg: "", heart_rate: "", resp_rate: "" });
+  const [vitals, setVitals] = useState({ temperatureC: "", weightKg: "", heartRate: "", respRate: "" });
   const [error, setError] = useState("");
   const [saved, setSaved] = useState("");
   const [saving, setSaving] = useState(false);
@@ -68,13 +68,13 @@ function ConsultationsPage() {
     setSaved("");
     try {
       await apiClient.post<Consultation>(endpoints.consultations.create, {
-        appointment_id: selected.id,
+        appointmentId: selected.id,
         ...soap,
         vitals,
       });
-      setSaved(`Consultation saved for ${selected.pet_name}.`);
+      setSaved(`Consultation saved for ${selected.petName}.`);
       setSoap(emptySoap);
-      setVitals({ temperature_c: "", weight_kg: "", heart_rate: "", resp_rate: "" });
+      setVitals({ temperatureC: "", weightKg: "", heartRate: "", respRate: "" });
       setSelectedId(null);
       loadConsults();
       apiClient.get<Appointment[]>(endpoints.appointments.list).then(setAppointments).catch(() => {});
@@ -113,21 +113,21 @@ function ConsultationsPage() {
                     }`}
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <p className="font-medium">{a.pet_name}</p>
+                      <p className="font-medium">{a.petName}</p>
                       <StatusBadge status={a.status} />
                     </div>
-                    <p className="mt-1 text-sm text-foreground/60">{a.owner_name}</p>
+                    <p className="mt-1 text-sm text-foreground/60">{a.ownerName}</p>
                     <p className="mt-2 text-xs text-foreground/50">
-                      {a.service} · {formatDate(a.scheduled_at)}
+                      {a.service} · {formatDate(a.scheduledAt)}
                     </p>
-                    <p className="text-xs text-foreground/50">{a.doctor_name}</p>
+                    <p className="text-xs text-foreground/50">{a.doctorName}</p>
                   </button>
                 ))}
               </div>
             )}
           </Panel>
 
-          <Panel title={selected ? `SOAP note — ${selected.pet_name}` : "SOAP note"}>
+          <Panel title={selected ? `SOAP note — ${selected.petName}` : "SOAP note"}>
             {!selected ? (
               <p className="text-sm text-foreground/60">
                 Select a checked-in patient above to enable the editor.
@@ -137,10 +137,10 @@ function ConsultationsPage() {
                 <div className="grid gap-3 sm:grid-cols-4">
                   {(
                     [
-                      ["temperature_c", "Temp (°C)"],
-                      ["weight_kg", "Weight (kg)"],
-                      ["heart_rate", "Heart rate"],
-                      ["resp_rate", "Resp. rate"],
+                      ["temperatureC", "Temp (°C)"],
+                      ["weightKg", "Weight (kg)"],
+                      ["heartRate", "Heart rate"],
+                      ["respRate", "Resp. rate"],
                     ] as const
                   ).map(([key, label]) => (
                     <div key={key}>
@@ -192,7 +192,7 @@ function ConsultationsPage() {
                 {past.map((c) => (
                   <details key={c.id} className="rounded-[1.25rem] border border-border p-4">
                     <summary className="cursor-pointer text-sm font-medium">
-                      {c.pet_name} · {c.doctor_name} · {formatDate(c.created_at)}
+                      {c.petName} · {c.doctorName} · {formatDate(c.createdAt)}
                     </summary>
                     <dl className="mt-3 space-y-2 text-sm">
                       {sections.map((s) => (

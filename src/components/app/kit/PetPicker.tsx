@@ -21,7 +21,7 @@ export function PetPicker({ owner: ownerProp, onOwnerChange, value = null, onCha
   const [pets, setPets] = useState<Pet[]>([]);
   const [loading, setLoading] = useState(false);
   const [adding, setAdding] = useState(false);
-  const [draft, setDraft] = useState({ name: "", species: "Dog", breed: "", sex: "Male", age_years: "1" });
+  const [draft, setDraft] = useState({ name: "", species: "Dog", breed: "", sex: "Male", age: "1" });
 
   useEffect(() => {
     if (ownerProp !== undefined) setOwner(ownerProp);
@@ -48,13 +48,13 @@ export function PetPicker({ owner: ownerProp, onOwnerChange, value = null, onCha
     if (!owner || !draft.name.trim()) return;
     const created = await apiClient.post<Pet>(endpoints.pets.create, {
       ...draft,
-      owner_id: owner.id,
-      age_years: Number(draft.age_years) || 1,
+      ownerId: owner.id,
+      age: Number(draft.age) || 1,
     });
     setPets((p) => [...p, created]);
     onChange?.(created);
     setAdding(false);
-    setDraft({ name: "", species: "Dog", breed: "", sex: "Male", age_years: "1" });
+    setDraft({ name: "", species: "Dog", breed: "", sex: "Male", age: "1" });
   }
 
   return (
@@ -91,7 +91,7 @@ export function PetPicker({ owner: ownerProp, onOwnerChange, value = null, onCha
                 <span>
                   <span className="block font-medium">{p.name}</span>
                   <span className="block text-xs text-foreground/60">
-                    {p.species} · {p.breed} · {p.age_years}y
+                    {p.species} · {p.breed} · {p.age}y
                   </span>
                 </span>
               </button>
@@ -110,7 +110,7 @@ export function PetPicker({ owner: ownerProp, onOwnerChange, value = null, onCha
                     <option>Female</option>
                   </select>
                   <input className={field} placeholder="Breed" value={draft.breed} onChange={(e) => setDraft({ ...draft, breed: e.target.value })} />
-                  <input className={field} placeholder="Age (years)" value={draft.age_years} onChange={(e) => setDraft({ ...draft, age_years: e.target.value })} />
+                  <input className={field} placeholder="Age (years)" value={draft.age} onChange={(e) => setDraft({ ...draft, age: e.target.value })} />
                 </div>
                 <div className="flex gap-2">
                   <button type="button" onClick={addPet} className="rounded-full bg-forest px-4 py-2 text-sm text-primary-foreground">

@@ -10,7 +10,7 @@ export interface SlotPickerProps {
   doctorId: string;
   date: string; // yyyy-mm-dd
   onDateChange?: (date: string) => void;
-  value?: string | null; // ISO start_at
+  value?: string | null; // ISO startAt
   onChange?: (startAt: string) => void;
   /** Hide the built-in date input when the parent owns date state. */
   showDateInput?: boolean;
@@ -54,7 +54,7 @@ export function SlotPicker({
   const closedToday = (() => {
     if (!branch) return false;
     const d = new Date(`${date}T00:00:00`);
-    return branch.working_hours.closed_days.includes(d.getDay());
+    return branch.workingHours.closedDays.includes(d.getDay());
   })();
 
   const load = useCallback(() => {
@@ -62,8 +62,8 @@ export function SlotPicker({
     setSlots(null);
     apiClient
       .get<AppointmentSlot[]>(endpoints.appointments.availableSlots, {
-        branch_id: branchId,
-        doctor_id: doctorId,
+        branchId: branchId,
+        doctorId: doctorId,
         date,
       })
       .then((s) => {
@@ -98,8 +98,8 @@ export function SlotPicker({
 
       {branch ? (
         <p className="text-xs text-foreground/50">
-          {branch.name} · open {String(branch.working_hours.open_hour).padStart(2, "0")}:00–
-          {String(branch.working_hours.close_hour).padStart(2, "0")}:00
+          {branch.name} · open {String(branch.workingHours.openHour).padStart(2, "0")}:00–
+          {String(branch.workingHours.closeHour).padStart(2, "0")}:00
         </p>
       ) : null}
 
@@ -119,18 +119,18 @@ export function SlotPicker({
           className={`grid grid-cols-3 gap-2 sm:grid-cols-5 ${shake ? "animate-shake" : ""}`}
         >
           {slots.map((s) => {
-            const start = new Date(s.start_at);
+            const start = new Date(s.startAt);
             const label = start.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
             const past = start.getTime() < Date.now();
             const selectable = s.available && !past;
-            const selected = value === s.start_at;
+            const selected = value === s.startAt;
             return (
               <button
-                key={s.start_at}
+                key={s.startAt}
                 type="button"
                 disabled={!selectable}
                 title={past ? "This time has already passed" : !s.available ? "Already booked" : undefined}
-                onClick={() => onChange?.(s.start_at)}
+                onClick={() => onChange?.(s.startAt)}
                 className={`rounded-full border px-2 py-2 text-xs font-medium transition ${
                   selected
                     ? "border-forest bg-forest text-primary-foreground"

@@ -31,7 +31,7 @@ const blank = {
   name: "",
   city: "",
   gstin: "",
-  owner_name: "",
+  ownerName: "",
   owner_email: "",
   phone: "",
   branch_name: "",
@@ -62,7 +62,7 @@ function OnboardingPage() {
 
   function validate(current: number) {
     if (current === 0 && !form.name.trim()) return "Hospital name is required.";
-    if (current === 1 && (!form.owner_name.trim() || !form.owner_email.trim()))
+    if (current === 1 && (!form.ownerName.trim() || !form.owner_email.trim()))
       return "Owner name and email are required.";
     if (current === 2 && !form.branch_name.trim()) return "First branch name is required.";
     return "";
@@ -172,7 +172,7 @@ function OnboardingPage() {
             <>
               <label className="space-y-1.5 text-sm">
                 <span className="text-foreground/70">Owner name</span>
-                <input className={field} value={form.owner_name} onChange={(e) => set("owner_name", e.target.value)} />
+                <input className={field} value={form.ownerName} onChange={(e) => set("ownerName", e.target.value)} />
               </label>
               <label className="space-y-1.5 text-sm">
                 <span className="text-foreground/70">Owner email</span>
@@ -266,7 +266,7 @@ function OnboardingPage() {
               {[
                 ["Hospital", form.name],
                 ["City", form.city || "—"],
-                ["Owner", `${form.owner_name} · ${form.owner_email}`],
+                ["Owner", `${form.ownerName} · ${form.owner_email}`],
                 ["Phone", form.phone || "—"],
                 ["First branch", `${form.branch_name}${form.branch_address ? ` · ${form.branch_address}` : ""}`],
                 ["GPS", form.latitude && form.longitude ? `${form.latitude}, ${form.longitude}` : "Not set"],

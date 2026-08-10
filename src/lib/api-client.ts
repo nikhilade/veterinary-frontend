@@ -1,16 +1,14 @@
 import type { ApiResponse } from "./api/types";
-import { handleMockRequest } from "./mock/handlers";
 import { adaptInbound, adaptOutbound, toMockPath } from "./api/adapter";
 
 /**
  * Typed API client. Every component talks to the backend through this module.
  *
  * When VITE_API_BASE_URL is set, requests go over HTTP to the real backend.
- * Otherwise they are served by the local mock layer (src/lib/mock).
  */
 
 const BASE_URL = (import.meta.env["VITE_API_BASE_URL"] as string | undefined) ?? "";
-export const USING_MOCKS = BASE_URL === "";
+export const USING_MOCKS = false;
 
 const TOKEN_KEY = "petgood.auth";
 
@@ -51,23 +49,19 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<A
 
   let payload: ApiResponse<T>;
 
-  if (USING_MOCKS) {
-    payload = (await handleMockRequest(toMockPath(path), method, body ?? {}, search)) as ApiResponse<T>;
-  } else {
-    const token = readToken();
-    const url = `${BASE_URL}${path}${search.toString() ? `?${search}` : ""}`;
-    const res = await fetch(url, {
-      method,
-      headers: {
-        "Content-Type": "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        ...(headers ?? {}),
-      },
-      body: body ? JSON.stringify(adaptOutbound(body)) : undefined,
-    });
-    const raw = (await res.json()) as ApiResponse<unknown>;
-    payload = { ...raw, data: adaptInbound<T>(raw.data) } as ApiResponse<T>;
-  }
+  const token = readToken();
+  const url = `${BASE_URL}${path}${search.toString() ? `?${search}` : ""}`;
+  const res = await fetch(url, {
+    method,
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(headers ?? {}),
+    },
+    body: body ? JSON.stringify(adaptOutbound(body)) : undefined,
+  });
+  const raw = (await res.json()) as ApiResponse<unknown>;
+  payload = { ...raw, data: adaptInbound<T>(raw.data) } as ApiResponse<T>;
 
   if (!payload.success) {
     throw new ApiError(

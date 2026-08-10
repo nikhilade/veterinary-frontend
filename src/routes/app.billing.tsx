@@ -60,7 +60,7 @@ function BillingPage() {
 
   const outstanding = (invoices ?? [])
     .filter((i) => i.status === "DUE" || i.status === "OVERDUE")
-    .reduce((sum, i) => sum + (i.grand_total - i.amount_paid), 0);
+    .reduce((sum, i) => sum + (i.grand_total - i.amountPaid), 0);
 
   return (
     <StaffLayout title="Billing" subtitle="Invoices, line items and GST" permission="billing:read">
@@ -114,13 +114,13 @@ function BillingPage() {
                     <tr key={i.id} className="border-t border-border">
                       <td className="py-3 font-medium">{i.number}</td>
                       <td className="py-3 text-foreground/70">
-                        {i.owner_name}
-                        {i.pet_name ? <span className="text-foreground/45"> · {i.pet_name}</span> : null}
+                        {i.ownerName}
+                        {i.petName ? <span className="text-foreground/45"> · {i.petName}</span> : null}
                       </td>
-                      <td className="py-3 text-foreground/70">{new Date(i.issued_at).toLocaleDateString()}</td>
+                      <td className="py-3 text-foreground/70">{new Date(i.issuedAt).toLocaleDateString()}</td>
                       <td className="py-3 text-foreground/70">{i.line_items.length}</td>
                       <td className="py-3 tabular-nums">{INR(i.grand_total)}</td>
-                      <td className="py-3 tabular-nums text-foreground/70">{INR(i.amount_paid)}</td>
+                      <td className="py-3 tabular-nums text-foreground/70">{INR(i.amountPaid)}</td>
                       <td className="py-3">
                         <span className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${statusTone[i.status]}`}>
                           {i.status.toLowerCase()}
@@ -159,7 +159,7 @@ function InvoiceBuilder({
 }) {
   const locked = isLocked(invoice);
   const [owner, setOwner] = useState<PetOwner | null>(null);
-  const [petName, setPetName] = useState(invoice?.pet_name ?? "");
+  const [petName, setPetName] = useState(invoice?.petName ?? "");
   const [type, setType] = useState<LineItemType>("CONSULTATION");
   const [items, setItems] = useState<InvoiceLineItem[]>(invoice?.line_items ?? []);
   const [discount, setDiscount] = useState(invoice?.discount ?? 0);
@@ -176,7 +176,7 @@ function InvoiceBuilder({
       const existing = current.find((i) => i.label === entry.label && i.type === entry.type);
       if (existing) {
         return current.map((i) =>
-          i === existing ? { ...i, quantity: i.quantity + 1, amount: (i.quantity + 1) * i.unit_price } : i,
+          i === existing ? { ...i, quantity: i.quantity + 1, amount: (i.quantity + 1) * i.unitPrice } : i,
         );
       }
       return [
@@ -186,8 +186,8 @@ function InvoiceBuilder({
           type: entry.type,
           label: entry.label,
           quantity: 1,
-          unit_price: entry.unit_price,
-          amount: entry.unit_price,
+          unitPrice: entry.unitPrice,
+          amount: entry.unitPrice,
         },
       ];
     });
@@ -195,7 +195,7 @@ function InvoiceBuilder({
 
   function setQuantity(id: string, quantity: number) {
     setItems((current) =>
-      current.map((i) => (i.id === id ? { ...i, quantity, amount: Math.max(1, quantity) * i.unit_price } : i)),
+      current.map((i) => (i.id === id ? { ...i, quantity, amount: Math.max(1, quantity) * i.unitPrice } : i)),
     );
   }
 
@@ -204,9 +204,9 @@ function InvoiceBuilder({
     if (locked) throw new Error("This invoice can no longer be edited.");
     if (!items.length) throw new Error("Add at least one line item.");
     const payload = {
-      owner_id: invoice?.owner_id ?? owner?.id,
-      owner_name: invoice?.owner_name ?? owner?.name,
-      pet_name: petName || null,
+      ownerId: invoice?.ownerId ?? owner?.id,
+      ownerName: invoice?.ownerName ?? owner?.firstName,
+      petName: petName || null,
       line_items: items,
       discount,
       gst_rate: gstRate,
@@ -242,7 +242,7 @@ function InvoiceBuilder({
             {invoice ? (
               <div>
                 <p className="mb-1.5 text-xs font-medium text-foreground/60">Client</p>
-                <p className="rounded-2xl bg-muted px-4 py-2.5 text-sm">{invoice.owner_name}</p>
+                <p className="rounded-2xl bg-muted px-4 py-2.5 text-sm">{invoice.ownerName}</p>
               </div>
             ) : (
               <OwnerSearchCombobox value={owner} onChange={setOwner} />
@@ -284,7 +284,7 @@ function InvoiceBuilder({
                 className="flex items-center justify-between gap-3 rounded-2xl border border-border px-4 py-3 text-left text-sm transition-colors hover:border-forest disabled:opacity-50"
               >
                 <span>{c.label}</span>
-                <span className="shrink-0 tabular-nums text-foreground/60">{INR(c.unit_price)}</span>
+                <span className="shrink-0 tabular-nums text-foreground/60">{INR(c.unitPrice)}</span>
               </button>
             ))}
           </div>
@@ -311,7 +311,7 @@ function InvoiceBuilder({
                     <tr key={i.id} className="border-t border-border">
                       <td className="py-3 text-xs uppercase text-foreground/50">{i.type}</td>
                       <td className="py-3">{i.label}</td>
-                      <td className="py-3 tabular-nums text-foreground/70">{INR(i.unit_price)}</td>
+                      <td className="py-3 tabular-nums text-foreground/70">{INR(i.unitPrice)}</td>
                       <td className="py-3">
                         <input
                           type="number"

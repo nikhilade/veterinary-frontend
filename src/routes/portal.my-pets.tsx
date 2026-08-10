@@ -69,32 +69,32 @@ function MyPets() {
             />
           ) : (
             pets.map((p) => (
-              <Panel key={p.id} title={p.name}>
-                {p.photo_url ? <img src={p.photo_url} alt={p.name} className="mb-3 h-40 w-full rounded-2xl object-cover" /> : null}
+              <Panel key={p.id} title={p.petName}>
+                {p.photoUrl ? <img src={p.photoUrl} alt={p.petName} className="mb-3 h-40 w-full rounded-2xl object-cover" /> : null}
                 <dl className="grid grid-cols-2 gap-3 text-sm">
                   <div>
                     <dt className="text-foreground/60">Species</dt>
-                    <dd>{p.species}</dd>
+                    <dd>{p.speciesId}</dd>
                   </div>
                   <div>
                     <dt className="text-foreground/60">Breed</dt>
-                    <dd>{p.breed}</dd>
+                    <dd>{p.breedId}</dd>
                   </div>
                   <div>
                     <dt className="text-foreground/60">Age</dt>
-                    <dd>{p.age_years} yrs</dd>
+                    <dd>{p.age} yrs</dd>
                   </div>
                   <div>
                     <dt className="text-foreground/60">Weight</dt>
-                    <dd>{p.weight_kg} kg</dd>
+                    <dd>{p.weight} kg</dd>
                   </div>
                   <div>
                     <dt className="text-foreground/60">Sex</dt>
-                    <dd>{p.sex}</dd>
+                    <dd>{p.gender}</dd>
                   </div>
                   <div>
                     <dt className="text-foreground/60">Microchip</dt>
-                    <dd>{p.microchip_id ?? "—"}</dd>
+                    <dd>{p.microchipNumber ?? "—"}</dd>
                   </div>
                   {p.allergies ? (
                     <div className="col-span-2">

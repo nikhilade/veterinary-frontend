@@ -26,7 +26,7 @@ function NowServing() {
 
   const load = useCallback(() => {
     apiClient
-      .get<Appointment[]>(endpoints.appointments.queue, { branch_id: "br_1" })
+      .get<Appointment[]>(endpoints.appointments.queue, { branchId: "br_1" })
       .then(setItems)
       .catch(() => undefined);
   }, []);
@@ -42,7 +42,7 @@ function NowServing() {
   }, [load]);
 
   const serving = items.find((a) => a.status === "IN_PROGRESS") ?? null;
-  const waiting = items.filter((a) => a.status === "CHECKED_IN" && a.token_number).slice(0, 6);
+  const waiting = items.filter((a) => a.status === "CHECKED_IN" && a.tokenNumber).slice(0, 6);
 
   return (
     <main className="min-h-screen bg-forest px-8 py-10 text-primary-foreground">
@@ -56,10 +56,10 @@ function NowServing() {
       <section className="mt-10 rounded-[2.5rem] bg-primary-foreground/10 px-10 py-16 text-center">
         <h1 className="text-3xl uppercase tracking-[0.4em] opacity-80">Now serving</h1>
         <p className="mt-6 text-[10rem] font-black leading-none tabular-nums">
-          {serving?.token_number ? `#${serving.token_number}` : "—"}
+          {serving?.tokenNumber ? `#${serving.tokenNumber}` : "—"}
         </p>
         <p className="mt-6 text-4xl">
-          {serving ? `${serving.pet_name} · ${serving.doctor_name}` : "Please wait to be called"}
+          {serving ? `${serving.petName} · ${serving.doctorName}` : "Please wait to be called"}
         </p>
       </section>
 
@@ -71,9 +71,9 @@ function NowServing() {
           ) : (
             waiting.map((a) => (
               <div key={a.id} className="rounded-3xl bg-primary-foreground/10 px-8 py-6">
-                <p className="text-6xl font-black tabular-nums">#{a.token_number}</p>
-                <p className="mt-2 text-2xl opacity-80">{a.pet_name}</p>
-                <p className="text-xl opacity-60">{a.doctor_name}</p>
+                <p className="text-6xl font-black tabular-nums">#{a.tokenNumber}</p>
+                <p className="mt-2 text-2xl opacity-80">{a.petName}</p>
+                <p className="text-xl opacity-60">{a.doctorName}</p>
               </div>
             ))
           )}

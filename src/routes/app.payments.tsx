@@ -85,11 +85,11 @@ function PaymentsPage() {
     };
   }, [pending, load]);
 
-  const outstanding = selected ? selected.grand_total - selected.amount_paid : 0;
+  const outstanding = selected ? selected.grand_total - selected.amountPaid : 0;
 
   function choose(invoice: InvoiceDetail) {
     setSelected(invoice);
-    setAmount(Number((invoice.grand_total - invoice.amount_paid).toFixed(2)));
+    setAmount(Number((invoice.grand_total - invoice.amountPaid).toFixed(2)));
     setResolved(null);
     setError("");
   }
@@ -135,10 +135,10 @@ function PaymentsPage() {
                     >
                       <span>
                         <span className="block text-sm font-medium">{i.number}</span>
-                        <span className="block text-xs text-foreground/60">{i.owner_name}</span>
+                        <span className="block text-xs text-foreground/60">{i.ownerName}</span>
                       </span>
                       <span className="shrink-0 text-right">
-                        <span className="block text-sm tabular-nums">{INR(i.grand_total - i.amount_paid)}</span>
+                        <span className="block text-sm tabular-nums">{INR(i.grand_total - i.amountPaid)}</span>
                         <span className="block text-xs text-foreground/50">due</span>
                       </span>
                     </button>
@@ -231,7 +231,7 @@ function PaymentsPage() {
                       <span>
                         <span className="block font-medium">{p.invoice_number}</span>
                         <span className="block text-xs text-foreground/55">
-                          {p.method.toLowerCase()} · {new Date(p.created_at).toLocaleString()}
+                          {p.method.toLowerCase()} · {new Date(p.createdAt).toLocaleString()}
                         </span>
                       </span>
                       <span className="shrink-0 text-right">

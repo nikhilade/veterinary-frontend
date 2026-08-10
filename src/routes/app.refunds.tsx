@@ -46,7 +46,7 @@ function RefundsPage() {
   const load = useCallback(() => {
     apiClient
       .get<InvoiceDetail[]>(endpoints.billing.invoices)
-      .then((list) => setInvoices(list.filter((i) => i.amount_paid > 0)))
+      .then((list) => setInvoices(list.filter((i) => i.amountPaid > 0)))
       .catch(() => setInvoices([]));
     apiClient.get<Refund[]>(endpoints.refunds.list).then(setRefunds).catch(() => setRefunds([]));
     apiClient.get<CreditNote[]>(endpoints.creditNotes.list).then(setNotes).catch(() => setNotes([]));
@@ -128,14 +128,14 @@ function RefundsPage() {
                       onChange={(e) => {
                         setInvoiceId(e.target.value);
                         const next = invoices.find((i) => i.id === e.target.value);
-                        setAmount(next ? next.amount_paid : 0);
+                        setAmount(next ? next.amountPaid : 0);
                       }}
                       className="w-full rounded-2xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-forest"
                     >
                       <option value="">Select an invoice…</option>
                       {invoices.map((i) => (
                         <option key={i.id} value={i.id}>
-                          {i.number} · {i.owner_name} · paid {INR(i.amount_paid)}
+                          {i.number} · {i.ownerName} · paid {INR(i.amountPaid)}
                         </option>
                       ))}
                     </select>
@@ -202,7 +202,7 @@ function RefundsPage() {
                             {r.invoice_number} · {INR(r.amount)}
                           </p>
                           <p className="mt-0.5 text-xs text-foreground/60">
-                            {r.owner_name} — {r.reason}
+                            {r.ownerName} — {r.reason}
                           </p>
                           <p className="mt-1 text-xs text-foreground/45">
                             Requested by {r.requested_by} on {new Date(r.requested_at).toLocaleDateString()}
@@ -281,7 +281,7 @@ function RefundsPage() {
                       <tr key={n.id} className="border-t border-border">
                         <td className="py-3 font-medium">{n.number}</td>
                         <td className="py-3 text-foreground/70">{n.invoice_number}</td>
-                        <td className="py-3 text-foreground/70">{new Date(n.issued_at).toLocaleDateString()}</td>
+                        <td className="py-3 text-foreground/70">{new Date(n.issuedAt).toLocaleDateString()}</td>
                         <td className="py-3 tabular-nums text-foreground/70">{INR(n.tax)}</td>
                         <td className="py-3 tabular-nums">{INR(n.amount)}</td>
                       </tr>

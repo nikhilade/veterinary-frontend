@@ -39,8 +39,8 @@ function BranchesPage() {
           { key: "phone", label: "Phone" },
           { key: "latitude", label: "Latitude", type: "number" },
           { key: "longitude", label: "Longitude", type: "number" },
-          { key: "open_hour", label: "Opens (hour)", type: "number" },
-          { key: "close_hour", label: "Closes (hour)", type: "number" },
+          { key: "openHour", label: "Opens (hour)", type: "number" },
+          { key: "closeHour", label: "Closes (hour)", type: "number" },
           { key: "active", label: "Status", type: "boolean" },
         ]}
       />

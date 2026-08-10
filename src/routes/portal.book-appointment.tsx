@@ -75,13 +75,13 @@ function PortalBooking() {
     try {
       const created = await createAppointment(
         {
-          pet_id: petId,
-          doctor_id: doctorId,
-          branch_id: branchId,
+          petId: petId,
+          doctorId: doctorId,
+          branchId: branchId,
           service,
-          scheduled_at: slot,
+          scheduledAt: slot,
           notes,
-          source_channel: "ONLINE",
+          sourceChannel: "ONLINE",
         },
         headers,
         {
@@ -112,8 +112,8 @@ function PortalBooking() {
             <CheckCircle2 className="size-10 text-forest" />
             <h2 className="text-xl">You're booked!</h2>
             <p className="text-sm text-foreground/60">
-              {confirmed.pet_name} with {confirmed.doctor_name} on{" "}
-              {new Date(confirmed.scheduled_at).toLocaleString(undefined, {
+              {confirmed.petName} with {confirmed.doctorName} on{" "}
+              {new Date(confirmed.scheduledAt).toLocaleString(undefined, {
                 weekday: "short",
                 month: "short",
                 day: "numeric",
@@ -169,7 +169,7 @@ function PortalBooking() {
               <select value={petId} onChange={(e) => setPetId(e.target.value)} className={field}>
                 {pets.map((p) => (
                   <option key={p.id} value={p.id}>
-                    {p.name} ({p.species})
+                    {p.petName} ({p.speciesId})
                   </option>
                 ))}
               </select>

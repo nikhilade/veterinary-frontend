@@ -30,7 +30,7 @@ function ProfilePage() {
   const [owner, setOwner] = useState<PetOwner | null>(null);
   const [docs, setDocs] = useState<OwnerDocument[]>([]);
   const [loading, setLoading] = useState(true);
-  const [draft, setDraft] = useState({ name: "", email: "", phone: "", address: "" });
+  const [draft, setDraft] = useState({ firstName: "", email: "", phoneNumber: "", address: "" });
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
@@ -41,7 +41,7 @@ function ProfilePage() {
       .then(([o, d]) => {
         setOwner(o);
         setDocs(d);
-        setDraft({ name: o.name, email: o.email, phone: o.phone, address: o.address });
+        setDraft({ firstName: o.name, email: o.email, phoneNumber: o.phone, address: o.address });
       })
       .finally(() => setLoading(false));
   }, []);
@@ -57,7 +57,7 @@ function ProfilePage() {
     const created = await apiClient.post<OwnerDocument>(endpoints.petOwners.documents(OWNER_ID), {
       name: file.name,
       type: "Other",
-      size_kb: Math.round(file.size / 1024),
+      sizeKb: Math.round(file.size / 1024),
     });
     setDocs((d) => [...d, created]);
   }
@@ -74,13 +74,13 @@ function ProfilePage() {
                 <UserRound className="size-6" />
               </span>
               <div>
-                <p className="font-medium">{owner.name}</p>
-                <p className="text-xs text-foreground/60">Client since {formatDate(owner.created_at)}</p>
+                <p className="font-medium">{owner.firstName}</p>
+                <p className="text-xs text-foreground/60">Client since {formatDate(owner.createdAt)}</p>
               </div>
             </div>
             <div className="space-y-3">
-              <input className={field} value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} placeholder="Full name" />
-              <input className={field} value={draft.phone} onChange={(e) => setDraft({ ...draft, phone: e.target.value })} placeholder="Phone" />
+              <input className={field} value={draft.firstName} onChange={(e) => setDraft({ ...draft, firstName: e.target.value })} placeholder="Full name" />
+              <input className={field} value={draft.phoneNumber} onChange={(e) => setDraft({ ...draft, phoneNumber: e.target.value })} placeholder="Phone" />
               <input className={field} value={draft.email} onChange={(e) => setDraft({ ...draft, email: e.target.value })} placeholder="Email" />
               <textarea className={field} rows={3} value={draft.address} onChange={(e) => setDraft({ ...draft, address: e.target.value })} placeholder="Address" />
               {saved ? <p className="text-sm text-forest">Profile updated.</p> : null}
@@ -114,11 +114,11 @@ function ProfilePage() {
                       <span>
                         <span className="block font-medium">{d.name}</span>
                         <span className="block text-xs text-foreground/60">
-                          {d.type} · {d.size_kb} KB
+                          {d.type} · {d.sizeKb} KB
                         </span>
                       </span>
                     </span>
-                    <span className="text-xs text-foreground/60">{formatDate(d.uploaded_at)}</span>
+                    <span className="text-xs text-foreground/60">{formatDate(d.uploadedAt)}</span>
                   </li>
                 ))}
               </ul>

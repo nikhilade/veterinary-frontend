@@ -44,9 +44,9 @@ export function toMockPath(path: string): string {
 const FIELD_TO_BACKEND: Record<string, string> = {
   name: "petName", // only meaningful on pet payloads; see adaptOutbound
   sex: "gender",
-  age_years: "age",
-  weight_kg: "weight",
-  microchip_id: "microchipNumber",
+  age: "age",
+  weightKg: "weight",
+  microchipNumber: "microchipNumber",
   phone: "phoneNumber",
   species: "speciesId",
   breed: "breedId",
@@ -56,13 +56,13 @@ const FIELD_TO_BACKEND: Record<string, string> = {
 const FIELD_TO_FRONTEND: Record<string, string> = {
   petName: "name",
   gender: "sex",
-  age: "age_years",
-  weight: "weight_kg",
-  microchipNumber: "microchip_id",
+  age: "age",
+  weight: "weightKg",
+  microchipNumber: "microchipNumber",
   phoneNumber: "phone",
   speciesId: "species",
   breedId: "breed",
-  photoUrl: "photo_url",
+  photoUrl: "photoUrl",
 };
 
 const snakeToCamel = (k: string) => k.replace(/_([a-z0-9])/g, (_, c: string) => c.toUpperCase());
@@ -104,8 +104,8 @@ function mergeNames(value: Json): Json {
     if (("first_name" in obj || "last_name" in obj) && !("name" in obj)) {
       obj.name = [obj.first_name, obj.last_name].filter(Boolean).join(" ").trim();
     }
-    if (Array.isArray(obj.pets) && obj.pets_count === undefined) {
-      obj.pets_count = obj.pets.length;
+    if (Array.isArray(obj.pets) && obj.petsCount === undefined) {
+      obj.petsCount = obj.pets.length;
     }
     for (const [k, v] of Object.entries(obj)) obj[k] = mergeNames(v);
     return obj;

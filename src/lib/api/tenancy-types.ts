@@ -8,7 +8,7 @@ export interface Tenant {
   name: string;
   slug: string;
   city: string;
-  owner_name: string;
+  ownerName: string;
   owner_email: string;
   phone: string;
   plan_id: string;
@@ -19,7 +19,7 @@ export interface Tenant {
   trial_ends_at: string | null;
   renews_at: string | null;
   mrr: number;
-  created_at: string;
+  createdAt: string;
 }
 
 export interface SubscriptionPlan {
@@ -37,7 +37,7 @@ export interface SubscriptionPlan {
 export interface ProvisionTenantPayload {
   name: string;
   city: string;
-  owner_name: string;
+  ownerName: string;
   owner_email: string;
   phone: string;
   branch_name: string;
@@ -58,8 +58,8 @@ export interface BranchRecord {
   phone: string;
   latitude: number | null;
   longitude: number | null;
-  open_hour: number;
-  close_hour: number;
+  openHour: number;
+  closeHour: number;
   active: boolean;
 }
 
@@ -71,7 +71,7 @@ export interface StaffMember {
   email: string;
   phone: string;
   role: string;
-  branch_id: string;
+  branchId: string;
   branch_name: string;
   employee_code: string;
   joined_on: string;

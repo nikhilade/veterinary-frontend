@@ -27,18 +27,18 @@ const columns: DataTableColumn<Pet>[] = [
   {
     key: "name",
     header: "Pet",
-    sortValue: (p) => p.name,
+    sortValue: (p) => p.petName,
     cell: (p) => (
       <Link to="/app/pets/$id" params={{ id: p.id }} className="font-medium text-forest underline-offset-4 hover:underline">
-        {p.name}
+        {p.petName}
       </Link>
     ),
   },
-  { key: "owner", header: "Owner", sortValue: (p) => p.owner_name, cell: (p) => p.owner_name },
-  { key: "species", header: "Species", sortValue: (p) => p.species, cell: (p) => p.species },
-  { key: "breed", header: "Breed", cell: (p) => p.breed },
-  { key: "age", header: "Age", sortValue: (p) => p.age_years, cell: (p) => `${p.age_years} yrs` },
-  { key: "weight", header: "Weight", sortValue: (p) => p.weight_kg, cell: (p) => `${p.weight_kg} kg` },
+  { key: "owner", header: "Owner", sortValue: (p) => p.ownerId, cell: (p) => p.ownerId },
+  { key: "species", header: "Species", sortValue: (p) => p.speciesId, cell: (p) => p.speciesId },
+  { key: "breed", header: "Breed", cell: (p) => p.breedId },
+  { key: "age", header: "Age", sortValue: (p) => p.age, cell: (p) => `${p.age} yrs` },
+  { key: "weight", header: "Weight", sortValue: (p) => p.weight, cell: (p) => `${p.weight} kg` },
 ];
 
 function PetsPage() {

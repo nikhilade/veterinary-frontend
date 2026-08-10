@@ -45,10 +45,10 @@ export function DataTable<T>({ columns, fetchPage, rowKey, emptyMessage = "Nothi
   }, []);
 
   async function loadMore() {
-    if (!meta?.next_cursor) return;
+    if (!meta?.nextCursor) return;
     setLoading(true);
     try {
-      const r = await fetchPage(meta.next_cursor);
+      const r = await fetchPage(meta.nextCursor);
       setRows((prev) => [...prev, ...r.items]);
       setMeta(r.meta);
     } finally {
@@ -125,9 +125,9 @@ export function DataTable<T>({ columns, fetchPage, rowKey, emptyMessage = "Nothi
       <div className="flex items-center justify-between gap-3 text-xs text-foreground/60">
         <span>
           Showing {sorted.length}
-          {meta ? ` of ${meta.total_count}` : ""}
+          {meta ? ` of ${meta.totalCount}` : ""}
         </span>
-        {meta?.has_next_page ? (
+        {meta?.hasNextPage ? (
           <button
             type="button"
             onClick={loadMore}

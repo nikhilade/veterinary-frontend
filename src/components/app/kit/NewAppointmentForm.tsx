@@ -60,13 +60,13 @@ export function NewAppointmentForm({
     try {
       const created = await createAppointment(
         {
-          pet_id: pet.id,
-          doctor_id: doctorId,
-          branch_id: branchId,
+          petId: pet.id,
+          doctorId: doctorId,
+          branchId: branchId,
           service,
-          scheduled_at: slot,
+          scheduledAt: slot,
           notes,
-          source_channel: "WALK_IN",
+          sourceChannel: "WALK_IN",
         },
         headers,
         {

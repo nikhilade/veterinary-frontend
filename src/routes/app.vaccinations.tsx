@@ -39,7 +39,7 @@ function dueTone(date: string) {
 function VaccinationsPage() {
   const [version, setVersion] = useState(0);
   const [pet, setPet] = useState<Pet | null>(null);
-  const [form, setForm] = useState({ vaccine_name: "", batch_no: "", vaccination_date: today(), next_due_date: "", administered_by: "" });
+  const [form, setForm] = useState({ vaccineName: "", batchNo: "", vaccinationDate: today(), nextDueDate: "", administeredBy: "" });
   const [error, setError] = useState<string | null>(null);
   const [ok, setOk] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -54,16 +54,16 @@ function VaccinationsPage() {
   }, []);
 
   const columns: DataTableColumn<Vaccine>[] = [
-    { key: "pet", header: "Pet", sortValue: (v) => v.pet_name, cell: (v) => v.pet_name },
-    { key: "owner", header: "Owner", cell: (v) => v.owner_name },
-    { key: "vaccine", header: "Vaccine", sortValue: (v) => v.vaccine_name, cell: (v) => v.vaccine_name },
-    { key: "given", header: "Last given", sortValue: (v) => v.vaccination_date, cell: (v) => v.vaccination_date },
+    { key: "pet", header: "Pet", sortValue: (v) => v.petName, cell: (v) => v.petName },
+    { key: "owner", header: "Owner", cell: (v) => v.ownerName },
+    { key: "vaccine", header: "Vaccine", sortValue: (v) => v.vaccineName, cell: (v) => v.vaccineName },
+    { key: "given", header: "Last given", sortValue: (v) => v.vaccinationDate, cell: (v) => v.vaccinationDate },
     {
       key: "due",
       header: "Next due",
-      sortValue: (v) => v.next_due_date,
+      sortValue: (v) => v.nextDueDate,
       cell: (v) => (
-        <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${dueTone(v.next_due_date)}`}>{v.next_due_date}</span>
+        <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${dueTone(v.nextDueDate)}`}>{v.nextDueDate}</span>
       ),
     },
   ];
@@ -72,16 +72,16 @@ function VaccinationsPage() {
     setError(null);
     setOk(null);
     if (!pet) return setError("Select a pet first.");
-    if (!form.vaccine_name.trim()) return setError("Vaccine name is required.");
-    if (!form.next_due_date) return setError("Next due date is required.");
-    if (new Date(form.next_due_date) <= new Date(form.vaccination_date)) {
+    if (!form.vaccineName.trim()) return setError("Vaccine name is required.");
+    if (!form.nextDueDate) return setError("Next due date is required.");
+    if (new Date(form.nextDueDate) <= new Date(form.vaccinationDate)) {
       return setError("Next due date must be after the vaccination date.");
     }
     setSaving(true);
     try {
-      await apiClient.post<Vaccine>(endpoints.vaccines.create, { ...form, pet_id: pet.id });
-      setOk(`Vaccination recorded for ${pet.name}.`);
-      setForm({ vaccine_name: "", batch_no: "", vaccination_date: today(), next_due_date: "", administered_by: "" });
+      await apiClient.post<Vaccine>(endpoints.vaccines.create, { ...form, petId: pet.id });
+      setOk(`Vaccination recorded for ${pet.petName}.`);
+      setForm({ vaccineName: "", batchNo: "", vaccinationDate: today(), nextDueDate: "", administeredBy: "" });
       setVersion((v) => v + 1);
     } catch (e) {
       setError(e instanceof ApiError ? e.message : "Could not save the vaccination.");
@@ -108,19 +108,19 @@ function VaccinationsPage() {
         <Panel title="Record a vaccination">
           <div className="space-y-4">
             <PetPicker value={pet} onChange={setPet} />
-            <input className={field} placeholder="Vaccine name" value={form.vaccine_name} onChange={(e) => setForm({ ...form, vaccine_name: e.target.value })} />
-            <input className={field} placeholder="Batch number" value={form.batch_no} onChange={(e) => setForm({ ...form, batch_no: e.target.value })} />
+            <input className={field} placeholder="Vaccine name" value={form.vaccineName} onChange={(e) => setForm({ ...form, vaccineName: e.target.value })} />
+            <input className={field} placeholder="Batch number" value={form.batchNo} onChange={(e) => setForm({ ...form, batchNo: e.target.value })} />
             <div className="grid grid-cols-2 gap-2">
               <label className="text-xs text-foreground/60">
                 Vaccination date
-                <input type="date" className={`${field} mt-1`} value={form.vaccination_date} onChange={(e) => setForm({ ...form, vaccination_date: e.target.value })} />
+                <input type="date" className={`${field} mt-1`} value={form.vaccinationDate} onChange={(e) => setForm({ ...form, vaccinationDate: e.target.value })} />
               </label>
               <label className="text-xs text-foreground/60">
                 Next due date
-                <input type="date" className={`${field} mt-1`} value={form.next_due_date} min={form.vaccination_date} onChange={(e) => setForm({ ...form, next_due_date: e.target.value })} />
+                <input type="date" className={`${field} mt-1`} value={form.nextDueDate} min={form.vaccinationDate} onChange={(e) => setForm({ ...form, nextDueDate: e.target.value })} />
               </label>
             </div>
-            <input className={field} placeholder="Administered by" value={form.administered_by} onChange={(e) => setForm({ ...form, administered_by: e.target.value })} />
+            <input className={field} placeholder="Administered by" value={form.administeredBy} onChange={(e) => setForm({ ...form, administeredBy: e.target.value })} />
             {error ? <p className="text-sm text-destructive">{error}</p> : null}
             {ok ? <p className="text-sm text-forest">{ok}</p> : null}
             <button onClick={submit} disabled={saving} className="rounded-full bg-forest px-5 py-2.5 text-sm text-primary-foreground disabled:opacity-50">

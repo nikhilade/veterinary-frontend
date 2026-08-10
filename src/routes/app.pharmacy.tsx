@@ -50,11 +50,11 @@ function PharmacyPage() {
                 {items.map((p) => (
                   <tr key={p.id} className="border-t border-border">
                     <td className="py-3 font-medium">{p.medication}</td>
-                    <td className="py-3 text-foreground/70">{p.pet_name}</td>
-                    <td className="py-3 text-foreground/70">{p.doctor_name}</td>
+                    <td className="py-3 text-foreground/70">{p.petName}</td>
+                    <td className="py-3 text-foreground/70">{p.doctorName}</td>
                     <td className="py-3 text-foreground/70">{p.dosage}</td>
-                    <td className="py-3 text-foreground/70">{formatDate(p.issued_at)}</td>
-                    <td className="py-3 text-foreground/70">{p.refills_left}</td>
+                    <td className="py-3 text-foreground/70">{formatDate(p.issuedAt)}</td>
+                    <td className="py-3 text-foreground/70">{p.refillsLeft}</td>
                   </tr>
                 ))}
               </tbody>

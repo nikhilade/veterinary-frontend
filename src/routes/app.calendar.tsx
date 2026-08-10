@@ -78,19 +78,19 @@ function CalendarPage() {
     return Array.from({ length: 7 }, (_, i) => addDays(s, i));
   }, [view, anchor]);
 
-  const visible = (items ?? []).filter((a) => (a.branch_id ?? "br_1") === branchId);
+  const visible = (items ?? []).filter((a) => (a.branchId ?? "br_1") === branchId);
   const hours = Array.from({ length: HOUR_END - HOUR_START }, (_, i) => HOUR_START + i);
 
   function forCell(day: Date, hour: number) {
     return visible.filter((a) => {
-      const d = new Date(a.scheduled_at);
+      const d = new Date(a.scheduledAt);
       return isoDate(d) === isoDate(day) && d.getHours() === hour;
     });
   }
 
-  const closedOn = (day: Date) => !!branch && branch.working_hours.closed_days.includes(day.getDay());
+  const closedOn = (day: Date) => !!branch && branch.workingHours.closedDays.includes(day.getDay());
   const outsideHours = (day: Date, hour: number) =>
-    !!branch && (hour < branch.working_hours.open_hour || hour >= branch.working_hours.close_hour || closedOn(day));
+    !!branch && (hour < branch.workingHours.openHour || hour >= branch.workingHours.closeHour || closedOn(day));
 
   async function drop(day: Date, hour: number) {
     const id = dragId;
@@ -108,7 +108,7 @@ function CalendarPage() {
     }
     setBanner("");
     try {
-      await apiClient.post(endpoints.appointments.reschedule(id), { scheduled_at: target.toISOString() });
+      await apiClient.post(endpoints.appointments.reschedule(id), { scheduledAt: target.toISOString() });
       load();
     } catch (err) {
       setBanner(
@@ -271,10 +271,10 @@ function CalendarPage() {
                             >
                               <span className="flex items-center gap-1.5">
                                 <span className={`size-1.5 shrink-0 rounded-full ${statusAccent(a.status)}`} />
-                                <span className="truncate font-medium">{a.pet_name}</span>
+                                <span className="truncate font-medium">{a.petName}</span>
                               </span>
-                              <p className="truncate text-foreground/60">{timeLabel(a.scheduled_at)} · {a.service}</p>
-                              <p className="truncate text-foreground/50">{a.doctor_name}</p>
+                              <p className="truncate text-foreground/60">{timeLabel(a.scheduledAt)} · {a.service}</p>
+                              <p className="truncate text-foreground/50">{a.doctorName}</p>
                             </div>
                           ))}
                         </div>

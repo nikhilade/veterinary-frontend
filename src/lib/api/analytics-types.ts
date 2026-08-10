@@ -21,8 +21,8 @@ export interface ServiceRevenue {
 }
 
 export interface DoctorPerformance {
-  doctor_id: string;
-  doctor_name: string;
+  doctorId: string;
+  doctorName: string;
   patients: number;
   revenue: number;
   avg_visit_value: number;
@@ -31,8 +31,8 @@ export interface DoctorPerformance {
 export interface InventoryAlerts {
   low_stock_count: number;
   expiring_30d_count: number;
-  low_stock_items: { id: string; name: string; stock: number; reorder_level: number }[];
-  expiring_items: { id: string; name: string; batch_no: string; expiry_date: string; quantity: number }[];
+  lowStockItems: { id: string; name: string; stock: number; reorderLevel: number }[];
+  expiring_items: { id: string; name: string; batchNo: string; expiry_date: string; quantity: number }[];
 }
 
 export interface PaymentModeSplit {
@@ -42,7 +42,7 @@ export interface PaymentModeSplit {
 }
 
 export interface HeatmapCell {
-  day_of_week: number;
+  dayOfWeek: number;
   hour: number;
   count: number;
 }
@@ -50,11 +50,11 @@ export interface HeatmapCell {
 export interface PendingInvoice {
   id: string;
   number: string;
-  owner_name: string;
-  pet_name: string | null;
+  ownerName: string;
+  petName: string | null;
   outstanding: number;
-  issued_at: string;
-  due_at: string;
+  issuedAt: string;
+  dueAt: string;
   days_overdue: number;
   status: string;
 }

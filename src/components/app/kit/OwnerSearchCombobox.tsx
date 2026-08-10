@@ -94,7 +94,7 @@ export function OwnerSearchCombobox({
       </div>
       {value && !open ? (
         <p className="mt-1.5 text-xs text-foreground/60">
-          {value.phone} · {value.pets_count} pet{value.pets_count === 1 ? "" : "s"}
+          {value.phone} · {value.petsCount} pet{value.petsCount === 1 ? "" : "s"}
         </p>
       ) : null}
 
@@ -152,9 +152,9 @@ export function OwnerSearchCombobox({
                         className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left hover:bg-muted"
                       >
                         <span>
-                          <span className="block text-sm font-medium">{o.name}</span>
+                          <span className="block text-sm font-medium">{o.firstName}</span>
                           <span className="block text-xs text-foreground/60">
-                            {o.phone} · {o.email}
+                            {o.phoneNumber} · {o.email}
                           </span>
                         </span>
                         {value?.id === o.id ? <Check className="size-4 text-forest" /> : null}

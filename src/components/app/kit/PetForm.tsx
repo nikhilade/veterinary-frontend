@@ -26,18 +26,18 @@ export interface PetFormProps {
 /** Create / edit a pet. Uses POST /pets/lookup-or-create so duplicates are merged. */
 export function PetForm({ ownerId, pet = null, onSaved, submitLabel = "Save pet" }: PetFormProps) {
   const [form, setForm] = useState({
-    name: pet?.name ?? "",
-    species: (pet?.species ?? "Dog") as Pet["species"],
-    breed: pet?.breed ?? "",
-    sex: (pet?.sex ?? "Male") as Pet["sex"],
-    age_years: String(pet?.age_years ?? "1"),
-    weight_kg: String(pet?.weight_kg ?? ""),
-    microchip_id: pet?.microchip_id ?? "",
+    petName: pet?.name ?? "",
+    speciesId: (pet?.species ?? "Dog") as Pet["species"],
+    breedId: pet?.breed ?? "",
+    gender: (pet?.sex ?? "Male") as Pet["sex"],
+    age: String(pet?.age ?? "1"),
+    weight: String(pet?.weight ?? ""),
+    microchipNumber: pet?.microchipNumber ?? "",
     color: pet?.color ?? "",
     allergies: pet?.allergies ?? "",
     notes: pet?.notes ?? "",
   });
-  const [photo, setPhoto] = useState<string | null>(pet?.photo_url ?? null);
+  const [photo, setPhoto] = useState<string | null>(pet?.photoUrl ?? null);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -58,10 +58,10 @@ export function PetForm({ ownerId, pet = null, onSaved, submitLabel = "Save pet"
     try {
       const payload = {
         ...form,
-        owner_id: ownerId,
-        age_years: Number(form.age_years) || 0,
-        weight_kg: Number(form.weight_kg) || 0,
-        photo_url: photo,
+        ownerId: ownerId,
+        age: Number(form.age) || 0,
+        weight: Number(form.weight) || 0,
+        photoUrl: photo,
       };
       const saved = pet
         ? await apiClient.patch<Pet>(endpoints.pets.update(pet.id), payload)
@@ -87,39 +87,39 @@ export function PetForm({ ownerId, pet = null, onSaved, submitLabel = "Save pet"
           )}
           <input type="file" accept="image/*" className="hidden" onChange={(e) => onPhoto(e.target.files?.[0])} />
         </label>
-        <input className={field} placeholder="Pet name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+        <input className={field} placeholder="Pet name" value={form.name} onChange={(e) => setForm({ ...form, petName: e.target.value })} />
       </div>
 
       <div className="grid grid-cols-2 gap-2">
         <select
           className={field}
           value={form.species}
-          onChange={(e) => setForm({ ...form, species: e.target.value as Pet["species"], breed: "" })}
+          onChange={(e) => setForm({ ...form, speciesId: e.target.value as Pet["species"], breedId: "" })}
         >
           {SPECIES.map((s) => (
             <option key={s}>{s}</option>
           ))}
         </select>
-        <select className={field} value={form.breed} onChange={(e) => setForm({ ...form, breed: e.target.value })}>
+        <select className={field} value={form.breed} onChange={(e) => setForm({ ...form, breedId: e.target.value })}>
           <option value="">Select breed</option>
           {breeds.map((b) => (
             <option key={b}>{b}</option>
           ))}
         </select>
-        <select className={field} value={form.sex} onChange={(e) => setForm({ ...form, sex: e.target.value as Pet["sex"] })}>
+        <select className={field} value={form.sex} onChange={(e) => setForm({ ...form, gender: e.target.value as Pet["sex"] })}>
           <option>Male</option>
           <option>Female</option>
         </select>
         <input className={field} placeholder="Colour / markings" value={form.color} onChange={(e) => setForm({ ...form, color: e.target.value })} />
-        <input className={field} placeholder="Age (years)" value={form.age_years} onChange={(e) => setForm({ ...form, age_years: e.target.value })} />
-        <input className={field} placeholder="Weight (kg)" value={form.weight_kg} onChange={(e) => setForm({ ...form, weight_kg: e.target.value })} />
+        <input className={field} placeholder="Age (years)" value={form.age} onChange={(e) => setForm({ ...form, age: e.target.value })} />
+        <input className={field} placeholder="Weight (kg)" value={form.weight} onChange={(e) => setForm({ ...form, weight: e.target.value })} />
       </div>
 
       <input
         className={field}
         placeholder="Microchip ID (optional)"
-        value={form.microchip_id ?? ""}
-        onChange={(e) => setForm({ ...form, microchip_id: e.target.value })}
+        value={form.microchipNumber ?? ""}
+        onChange={(e) => setForm({ ...form, microchipNumber: e.target.value })}
       />
       <textarea
         className={field}

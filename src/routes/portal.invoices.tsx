@@ -41,7 +41,7 @@ function Invoices() {
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="text-lg">{inv.number}</p>
-                  <p className="mt-1 text-sm text-foreground/60">Due {formatDate(inv.due_at)}</p>
+                  <p className="mt-1 text-sm text-foreground/60">Due {formatDate(inv.dueAt)}</p>
                 </div>
                 <div className="text-right">
                   <p className="text-xl font-bold text-forest">{formatMoney(inv.amount)}</p>

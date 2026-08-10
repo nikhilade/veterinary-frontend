@@ -67,11 +67,11 @@ function AppointmentsPage() {
               <tbody>
                 {filtered.map((a) => (
                   <tr key={a.id} className="border-t border-border">
-                    <td className="py-3 font-medium">{a.pet_name}</td>
-                    <td className="py-3 text-foreground/70">{a.owner_name}</td>
-                    <td className="py-3 text-foreground/70">{a.doctor_name}</td>
+                    <td className="py-3 font-medium">{a.petName}</td>
+                    <td className="py-3 text-foreground/70">{a.ownerName}</td>
+                    <td className="py-3 text-foreground/70">{a.doctorName}</td>
                     <td className="py-3 text-foreground/70">{a.service}</td>
-                    <td className="py-3 text-foreground/70">{formatDate(a.scheduled_at)}</td>
+                    <td className="py-3 text-foreground/70">{formatDate(a.scheduledAt)}</td>
                     <td className="py-3">
                       <StatusPill status={a.status} />
                     </td>

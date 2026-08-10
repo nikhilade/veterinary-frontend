@@ -38,21 +38,21 @@ function Prescriptions() {
       ) : (
         <div className="space-y-4">
           {items.map((p) => (
-            <Panel key={p.id} title={p.pet_name}>
-              <p className="text-sm text-foreground/70">Prescribed by {p.doctor_name}</p>
+            <Panel key={p.id} title={p.petName}>
+              <p className="text-sm text-foreground/70">Prescribed by {p.doctorName}</p>
 
               <ul className="mt-3 space-y-3">
                 {(p.items.length
                   ? p.items
                   : [
                       {
-                        medicine_id: "",
+                        medicineId: "",
                         name: p.medication,
                         strength: "",
                         form: "",
                         dosage: p.dosage,
                         frequency: "",
-                        duration_days: 0,
+                        durationDays: 0,
                         notes: p.instructions,
                       },
                     ]
@@ -62,7 +62,7 @@ function Prescriptions() {
                       {it.name} {it.strength}
                     </p>
                     <p className="mt-1 text-sm text-foreground/70">
-                      {[it.dosage, it.frequency, it.duration_days ? `${it.duration_days} days` : ""]
+                      {[it.dosage, it.frequency, it.durationDays ? `${it.durationDays} days` : ""]
                         .filter(Boolean)
                         .join(" · ")}
                     </p>
@@ -72,7 +72,7 @@ function Prescriptions() {
               </ul>
 
               <p className="mt-3 text-xs text-foreground/50">
-                Issued {formatDate(p.issued_at)} · {p.refills_left} refills left · read-only
+                Issued {formatDate(p.issuedAt)} · {p.refillsLeft} refills left · read-only
               </p>
               <PrescriptionPdfButton prescriptionId={p.id} label="View / download PDF" className="mt-3" />
             </Panel>

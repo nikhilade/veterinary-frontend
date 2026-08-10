@@ -36,7 +36,7 @@ export function PrescriptionPdfButton({
     try {
       const result = await apiClient.get<PrescriptionPdf>(endpoints.prescriptions.pdf(prescriptionId));
       setPdf(result);
-      setHref(base64ToBlobUrl(result.content_base64, result.mime_type));
+      setHref(base64ToBlobUrl(result.contentBase64, result.mimeType));
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not generate the PDF.");
     } finally {

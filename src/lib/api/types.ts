@@ -7,9 +7,9 @@ export type ApiErrorPayload = {
 } | null;
 
 export interface ApiMeta {
-  total_count: number;
-  has_next_page: boolean;
-  next_cursor: string | null;
+  totalCount: number;
+  hasNextPage: boolean;
+  nextCursor: string | null;
   limit: number;
 }
 
@@ -39,7 +39,7 @@ export interface AuthUser {
   name: string;
   email: string;
   role: Role;
-  avatar_url: string | null;
+  avatarUrl: string | null;
 }
 
 export interface LoginResponse {
@@ -49,26 +49,26 @@ export interface LoginResponse {
 
 export interface PetOwner {
   id: string;
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
-  phone: string;
+  phoneNumber: string;
   address: string;
-  pets_count: number;
-  created_at: string;
+  petsCount: number;
+  createdAt: string;
 }
 
 export interface Pet {
   id: string;
-  owner_id: string;
-  owner_name: string;
-  name: string;
-  species: "Dog" | "Cat" | "Bird" | "Rabbit";
-  breed: string;
-  sex: "Male" | "Female";
-  age_years: number;
-  weight_kg: number;
-  photo_url: string | null;
-  microchip_id: string | null;
+  ownerId: string;
+  petName: string;
+  speciesId: string;
+  breedId: string;
+  gender: "Male" | "Female";
+  age: number;
+  weight: number;
+  photoUrl: string | null;
+  microchipNumber: string | null;
   allergies?: string;
   color?: string;
   notes?: string;
@@ -78,28 +78,28 @@ export interface Doctor {
   id: string;
   name: string;
   specialty: string;
-  available_slots: string[];
+  availableSlots: string[];
 }
 
 export interface AppointmentSlot {
-  start_at: string;
+  startAt: string;
   available: boolean;
 }
 
 export interface BranchWorkingHours {
   /** 24h clock, e.g. 9 = 09:00 */
-  open_hour: number;
-  close_hour: number;
-  slot_minutes: number;
+  openHour: number;
+  closeHour: number;
+  slotMinutes: number;
   /** 0 = Sunday … 6 = Saturday */
-  closed_days: number[];
+  closedDays: number[];
 }
 
 export interface Branch {
   id: string;
   name: string;
   address: string;
-  working_hours: BranchWorkingHours;
+  workingHours: BranchWorkingHours;
 }
 
 export type AppointmentStatus =
@@ -115,33 +115,36 @@ export type SourceChannel = "WALK_IN" | "PHONE" | "ONLINE";
 
 export interface Appointment {
   id: string;
-  pet_id: string;
-  pet_name: string;
-  owner_id: string;
-  owner_name: string;
-  doctor_id: string;
-  doctor_name: string;
+  petId: string;
+  petName: string;
+  ownerId: string;
+  ownerName: string;
+  doctorId: string;
+  doctorName: string;
   service: string;
-  scheduled_at: string;
+  scheduledAt: string;
+  appointmentDate: string;
+  startTime: string;
+  endTime: string;
   status: AppointmentStatus;
   notes: string;
-  branch_id?: string;
-  token_number?: number | null;
-  checked_in_at?: string | null;
-  source_channel?: SourceChannel;
+  branchId?: string;
+  tokenNumber?: number | null;
+  checkedInAt?: string | null;
+  sourceChannel?: SourceChannel;
 }
 
 
 export interface Prescription {
   id: string;
-  pet_id: string;
-  pet_name: string;
-  doctor_name: string;
+  petId: string;
+  petName: string;
+  doctorName: string;
   medication: string;
   dosage: string;
   instructions: string;
-  issued_at: string;
-  refills_left: number;
+  issuedAt: string;
+  refillsLeft: number;
 }
 
 export type InvoiceStatus = "PAID" | "DUE" | "OVERDUE";
@@ -149,12 +152,12 @@ export type InvoiceStatus = "PAID" | "DUE" | "OVERDUE";
 export interface Invoice {
   id: string;
   number: string;
-  owner_id: string;
-  owner_name: string;
+  ownerId: string;
+  ownerName: string;
   amount: number;
   status: InvoiceStatus;
-  issued_at: string;
-  due_at: string;
+  issuedAt: string;
+  dueAt: string;
   items: { label: string; amount: number }[];
 }
 
@@ -163,59 +166,59 @@ export interface InventoryItem {
   name: string;
   category: string;
   stock: number;
-  reorder_level: number;
-  unit_price: number;
+  reorderLevel: number;
+  unitPrice: number;
 }
 
 export interface DashboardStats {
-  appointments_today: number;
-  active_patients: number;
-  revenue_month: number;
-  pending_invoices: number;
-  low_stock_items: number;
+  appointmentsToday: number;
+  activePatients: number;
+  revenueMonth: number;
+  pendingInvoices: number;
+  lowStockItems: number;
   upcoming: Appointment[];
 }
 
 export interface OwnerDocument {
   id: string;
-  owner_id: string;
+  ownerId: string;
   name: string;
   type: "ID Proof" | "Consent Form" | "Insurance" | "Lab Report" | "Other";
-  size_kb: number;
-  uploaded_at: string;
+  sizeKb: number;
+  uploadedAt: string;
 }
 
 export interface CommunicationLog {
   id: string;
-  owner_id: string;
+  ownerId: string;
   channel: "SMS" | "Email" | "Call" | "WhatsApp";
   subject: string;
   body: string;
   direction: "OUTBOUND" | "INBOUND";
-  sent_at: string;
+  sentAt: string;
 }
 
 export interface MedicalEvent {
   id: string;
-  pet_id: string;
+  petId: string;
   type: "VISIT" | "VACCINE" | "LAB" | "SURGERY" | "PRESCRIPTION" | "GROOMING";
   title: string;
   detail: string;
-  doctor_name: string;
-  occurred_at: string;
+  doctorName: string;
+  occurredAt: string;
 }
 
 export interface Vaccine {
   id: string;
-  pet_id: string;
-  pet_name: string;
-  owner_id: string;
-  owner_name: string;
-  vaccine_name: string;
-  batch_no: string;
-  vaccination_date: string;
-  next_due_date: string;
-  administered_by: string;
+  petId: string;
+  petName: string;
+  ownerId: string;
+  ownerName: string;
+  vaccineName: string;
+  batchNo: string;
+  vaccinationDate: string;
+  nextDueDate: string;
+  administeredBy: string;
 }
 
 /* ---------- Clinical: doctors, consultations, prescriptions ---------- */
@@ -223,50 +226,50 @@ export interface Vaccine {
 export interface DoctorProfile extends Doctor {
   email: string;
   phone: string;
-  registration_no: string;
-  branch_id: string;
-  consultation_fee: number;
+  registrationNo: string;
+  branchId: string;
+  consultationFee: number;
   bio?: string;
   active: boolean;
 }
 
-/** Weekly recurring availability. day_of_week: 0 = Sunday … 6 = Saturday */
+/** Weekly recurring availability. dayOfWeek: 0 = Sunday … 6 = Saturday */
 export interface AvailabilityRule {
-  day_of_week: number;
-  start_hour: number;
-  end_hour: number;
+  dayOfWeek: number;
+  startHour: number;
+  endHour: number;
   enabled: boolean;
 }
 
 export interface DoctorLeave {
   id: string;
-  doctor_id: string;
-  start_date: string;
-  end_date: string;
+  doctorId: string;
+  startDate: string;
+  endDate: string;
   reason: string;
   type: "LEAVE" | "CONFERENCE" | "HALF_DAY";
 }
 
 export interface DoctorAvailability {
-  doctor_id: string;
+  doctorId: string;
   rules: AvailabilityRule[];
   leaves: DoctorLeave[];
 }
 
 export interface Consultation {
   id: string;
-  appointment_id: string;
-  pet_id: string;
-  pet_name: string;
-  owner_id: string;
-  doctor_id: string;
-  doctor_name: string;
+  appointmentId: string;
+  petId: string;
+  petName: string;
+  ownerId: string;
+  doctorId: string;
+  doctorName: string;
   subjective: string;
   objective: string;
   assessment: string;
   plan: string;
-  vitals: { temperature_c: string; weight_kg: string; heart_rate: string; resp_rate: string };
-  created_at: string;
+  vitals: { temperatureC: string; weightKg: string; heartRate: string; respRate: string };
+  createdAt: string;
 }
 
 export interface Medicine {
@@ -274,31 +277,31 @@ export interface Medicine {
   name: string;
   strength: string;
   form: "Tablet" | "Capsule" | "Syrup" | "Injection" | "Topical" | "Chew";
-  default_dosage: string;
+  defaultDosage: string;
   stock: number;
 }
 
 export interface PrescriptionItem {
-  medicine_id: string;
+  medicineId: string;
   name: string;
   strength: string;
   form: string;
   dosage: string;
   frequency: string;
-  duration_days: number;
+  durationDays: number;
   notes: string;
 }
 
 export interface PrescriptionDetail extends Prescription {
-  owner_id: string;
-  owner_name: string;
-  appointment_id: string | null;
-  consultation_id: string | null;
+  ownerId: string;
+  ownerName: string;
+  appointmentId: string | null;
+  consultationId: string | null;
   items: PrescriptionItem[];
 }
 
 export interface PrescriptionPdf {
   filename: string;
-  mime_type: string;
-  content_base64: string;
+  mimeType: string;
+  contentBase64: string;
 }

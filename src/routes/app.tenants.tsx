@@ -121,7 +121,7 @@ function TenantsPage() {
                         <p className="text-xs text-foreground/60">{t.city}</p>
                       </td>
                       <td className="py-3 pr-4">
-                        <p>{t.owner_name}</p>
+                        <p>{t.ownerName}</p>
                         <p className="text-xs text-foreground/60">{t.owner_email}</p>
                       </td>
                       <td className="py-3 pr-4">{t.plan_name}</td>

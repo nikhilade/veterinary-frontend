@@ -15,7 +15,7 @@ const SERVICES = [
 export function BookingForm({ ownerId = "own_1" }: { ownerId?: string }) {
   const [pets, setPets] = useState<Pet[] | null>(null);
   const [doctors, setDoctors] = useState<Doctor[] | null>(null);
-  const [form, setForm] = useState({ pet_id: "", doctor_id: "", service: SERVICES[0], scheduled_at: "", notes: "" });
+  const [form, setForm] = useState({ petId: "", doctorId: "", service: SERVICES[0], scheduledAt: "", notes: "" });
   const [status, setStatus] = useState<"idle" | "saving" | "done" | "error">("idle");
   const [message, setMessage] = useState("");
 
@@ -29,7 +29,7 @@ export function BookingForm({ ownerId = "own_1" }: { ownerId?: string }) {
         if (!active) return;
         setPets(p);
         setDoctors(d);
-        setForm((f) => ({ ...f, pet_id: p[0]?.id ?? "", doctor_id: d[0]?.id ?? "" }));
+        setForm((f) => ({ ...f, petId: p[0]?.id ?? "", doctorId: d[0]?.id ?? "" }));
       })
       .catch(() => active && setPets([]));
     return () => {
@@ -45,7 +45,7 @@ export function BookingForm({ ownerId = "own_1" }: { ownerId?: string }) {
     try {
       await apiClient.post(endpoints.appointments.create, {
         ...form,
-        scheduled_at: form.scheduled_at ? new Date(form.scheduled_at).toISOString() : new Date().toISOString(),
+        scheduledAt: form.scheduledAt ? new Date(form.scheduledAt).toISOString() : new Date().toISOString(),
       });
       setStatus("done");
       setMessage("Appointment requested — our team will confirm shortly.");
@@ -59,10 +59,10 @@ export function BookingForm({ ownerId = "own_1" }: { ownerId?: string }) {
 
   return (
     <form onSubmit={submit} className="space-y-4">
-      <select value={form.pet_id} onChange={(e) => setForm({ ...form, pet_id: e.target.value })} className={field}>
+      <select value={form.petId} onChange={(e) => setForm({ ...form, petId: e.target.value })} className={field}>
         {pets.map((p) => (
           <option key={p.id} value={p.id}>
-            {p.name} — {p.breed}
+            {p.petName} — {p.breedId}
           </option>
         ))}
       </select>
@@ -71,7 +71,7 @@ export function BookingForm({ ownerId = "own_1" }: { ownerId?: string }) {
           <option key={s}>{s}</option>
         ))}
       </select>
-      <select value={form.doctor_id} onChange={(e) => setForm({ ...form, doctor_id: e.target.value })} className={field}>
+      <select value={form.doctorId} onChange={(e) => setForm({ ...form, doctorId: e.target.value })} className={field}>
         {doctors.map((d) => (
           <option key={d.id} value={d.id}>
             {d.name} — {d.specialty}
@@ -81,8 +81,8 @@ export function BookingForm({ ownerId = "own_1" }: { ownerId?: string }) {
       <input
         required
         type="datetime-local"
-        value={form.scheduled_at}
-        onChange={(e) => setForm({ ...form, scheduled_at: e.target.value })}
+        value={form.scheduledAt}
+        onChange={(e) => setForm({ ...form, scheduledAt: e.target.value })}
         className={field}
       />
       <textarea

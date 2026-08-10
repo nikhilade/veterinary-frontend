@@ -54,9 +54,9 @@ function InventoryPage() {
     apiClient.get<Supplier[]>(endpoints.suppliers.list).then(setSuppliers).catch(() => setSuppliers([]));
   }, [load]);
 
-  const lowStock = useMemo(() => (items ?? []).filter((i) => i.stock <= i.reorder_level), [items]);
+  const lowStock = useMemo(() => (items ?? []).filter((i) => i.stock <= i.reorderLevel), [items]);
   const expiringIds = useMemo(() => new Set(expiring.map((i) => i.id)), [expiring]);
-  const stockValue = (items ?? []).reduce((sum, i) => sum + i.stock * i.unit_price, 0);
+  const stockValue = (items ?? []).reduce((sum, i) => sum + i.stock * i.unitPrice, 0);
 
   return (
     <StaffLayout title="Inventory" subtitle="Stock, batches and expiry" permission="inventory:read">
@@ -88,7 +88,7 @@ function InventoryPage() {
                   </thead>
                   <tbody>
                     {items.map((i) => {
-                      const low = i.stock <= i.reorder_level;
+                      const low = i.stock <= i.reorderLevel;
                       const soon = expiringIds.has(i.id);
                       return (
                         <tr key={i.id} className="border-t border-border align-top">
@@ -115,9 +115,9 @@ function InventoryPage() {
                           <td className={`py-3 tabular-nums ${low ? "font-semibold text-destructive" : "text-foreground/70"}`}>
                             {i.stock}
                           </td>
-                          <td className="py-3 tabular-nums text-foreground/70">{i.reorder_level}</td>
+                          <td className="py-3 tabular-nums text-foreground/70">{i.reorderLevel}</td>
                           <td className="py-3 text-foreground/70">{i.nearest_expiry ?? "—"}</td>
-                          <td className="py-3 tabular-nums text-foreground/70">{INR(i.unit_price)}</td>
+                          <td className="py-3 tabular-nums text-foreground/70">{INR(i.unitPrice)}</td>
                         </tr>
                       );
                     })}
@@ -162,7 +162,7 @@ function InventoryPage() {
                         <span>
                           <span className="block font-medium">{m.item_name}</span>
                           <span className="block text-xs text-foreground/55">
-                            {m.type.toLowerCase()} · {m.batch_no ?? "—"} · {m.reason}
+                            {m.type.toLowerCase()} · {m.batchNo ?? "—"} · {m.reason}
                           </span>
                         </span>
                         <span
@@ -193,7 +193,7 @@ function StockEntryForm({
   suppliers: Supplier[];
   onDone: () => void;
 }) {
-  const [form, setForm] = useState({ item_id: "", quantity: 0, batch_no: "", expiry_date: "", supplier_id: "" });
+  const [form, setForm] = useState({ item_id: "", quantity: 0, batchNo: "", expiry_date: "", supplier_id: "" });
 
   async function submit(headers: { "Idempotency-Key": string }) {
     return apiClient.post<StockItem>(endpoints.inventory.stockEntry, { ...form, reason: "Stock received" }, headers);
@@ -225,8 +225,8 @@ function StockEntryForm({
         <input
           className={field}
           placeholder="Batch no."
-          value={form.batch_no}
-          onChange={(e) => setForm({ ...form, batch_no: e.target.value })}
+          value={form.batchNo}
+          onChange={(e) => setForm({ ...form, batchNo: e.target.value })}
         />
       </div>
       <input
@@ -248,8 +248,8 @@ function StockEntryForm({
         ))}
       </select>
       <IdempotentSubmitButton
-        key={`${form.item_id}-${form.batch_no}`}
-        disabled={!form.item_id || form.quantity <= 0 || !form.batch_no || !form.expiry_date}
+        key={`${form.item_id}-${form.batchNo}`}
+        disabled={!form.item_id || form.quantity <= 0 || !form.batchNo || !form.expiry_date}
         onSubmit={submit}
         onSuccess={onDone}
       >
@@ -260,7 +260,7 @@ function StockEntryForm({
 }
 
 function StockAdjustForm({ items, onDone }: { items: StockItem[]; onDone: () => void }) {
-  const [form, setForm] = useState({ item_id: "", quantity: 0, batch_no: "", reason: "" });
+  const [form, setForm] = useState({ item_id: "", quantity: 0, batchNo: "", reason: "" });
   const item = items.find((i) => i.id === form.item_id);
 
   async function submit(headers: { "Idempotency-Key": string }) {
@@ -272,7 +272,7 @@ function StockAdjustForm({ items, onDone }: { items: StockItem[]; onDone: () => 
       <select
         className={field}
         value={form.item_id}
-        onChange={(e) => setForm({ ...form, item_id: e.target.value, batch_no: "" })}
+        onChange={(e) => setForm({ ...form, item_id: e.target.value, batchNo: "" })}
       >
         <option value="">Select item…</option>
         {items.map((i) => (
@@ -283,14 +283,14 @@ function StockAdjustForm({ items, onDone }: { items: StockItem[]; onDone: () => 
       </select>
       <select
         className={field}
-        value={form.batch_no}
-        onChange={(e) => setForm({ ...form, batch_no: e.target.value })}
+        value={form.batchNo}
+        onChange={(e) => setForm({ ...form, batchNo: e.target.value })}
         disabled={!item}
       >
         <option value="">Batch (earliest by default)…</option>
         {(item?.batches ?? []).map((b) => (
-          <option key={b.batch_no} value={b.batch_no}>
-            {b.batch_no} · {b.quantity} units · exp {b.expiry_date}
+          <option key={b.batchNo} value={b.batchNo}>
+            {b.batchNo} · {b.quantity} units · exp {b.expiry_date}
           </option>
         ))}
       </select>
@@ -308,7 +308,7 @@ function StockAdjustForm({ items, onDone }: { items: StockItem[]; onDone: () => 
         onChange={(e) => setForm({ ...form, reason: e.target.value })}
       />
       <IdempotentSubmitButton
-        key={`${form.item_id}-${form.batch_no}`}
+        key={`${form.item_id}-${form.batchNo}`}
         disabled={!form.item_id || !form.quantity || form.reason.trim().length < 3}
         onSubmit={submit}
         onSuccess={onDone}

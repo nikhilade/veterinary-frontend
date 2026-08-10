@@ -116,10 +116,10 @@ function NewOwnerPage() {
             <div className="flex items-start gap-3 rounded-2xl border border-forest/30 bg-forest/5 p-4">
               <CheckCircle2 className="mt-0.5 size-5 text-forest" />
               <div className="text-sm">
-                <p className="font-medium">{match.name}</p>
-                <p className="text-foreground/70">{match.phone}</p>
+                <p className="font-medium">{`${match.firstName} ${match.lastName}`}</p>
+                <p className="text-foreground/70">{match.phoneNumber}</p>
                 <p className="text-foreground/70">{match.email || "No email on file"}</p>
-                <p className="text-foreground/60">{match.pets_count} pet(s) registered</p>
+                <p className="text-foreground/60">{match.petsCount} pet(s) registered</p>
               </div>
             </div>
             <p className="mt-4 text-sm text-foreground/70">

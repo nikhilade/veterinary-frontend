@@ -37,7 +37,7 @@ const tone: Record<AttendanceStatus, string> = {
   ABSENT: "bg-destructive text-white",
 };
 
-const blank = { name: "", email: "", phone: "", role: "RECEPTIONIST", branch_id: "", employee_code: "", joined_on: "" };
+const blank = { name: "", email: "", phone: "", role: "RECEPTIONIST", branchId: "", employee_code: "", joined_on: "" };
 
 function StaffPage() {
   const { role } = useAuth();
@@ -80,7 +80,7 @@ function StaffPage() {
       return;
     }
     try {
-      await apiClient.post(endpoints.staff.create, { ...form, branch_id: form.branch_id || branches[0]?.id });
+      await apiClient.post(endpoints.staff.create, { ...form, branchId: form.branchId || branches[0]?.id });
       setForm(blank);
       setOpen(false);
       load();
@@ -160,8 +160,8 @@ function StaffPage() {
                 <span className="text-foreground/70">Branch</span>
                 <select
                   className={field}
-                  value={form.branch_id}
-                  onChange={(e) => setForm((s) => ({ ...s, branch_id: e.target.value }))}
+                  value={form.branchId}
+                  onChange={(e) => setForm((s) => ({ ...s, branchId: e.target.value }))}
                 >
                   <option value="">Select a branch</option>
                   {branches.map((b) => (

@@ -9,7 +9,7 @@ export interface ChargeableItem {
   id: string;
   type: LineItemType;
   label: string;
-  unit_price: number;
+  unitPrice: number;
   gst_rate: number;
 }
 
@@ -18,7 +18,7 @@ export interface InvoiceLineItem {
   type: LineItemType;
   label: string;
   quantity: number;
-  unit_price: number;
+  unitPrice: number;
   amount: number;
 }
 
@@ -27,9 +27,9 @@ export type InvoiceDetailStatus = "DRAFT" | "DUE" | "OVERDUE" | "PAID" | "CANCEL
 export interface InvoiceDetail {
   id: string;
   number: string;
-  owner_id: string;
-  owner_name: string;
-  pet_name: string | null;
+  ownerId: string;
+  ownerName: string;
+  petName: string | null;
   status: InvoiceDetailStatus;
   line_items: InvoiceLineItem[];
   subtotal: number;
@@ -38,11 +38,11 @@ export interface InvoiceDetail {
   inter_state: boolean;
   tax: number;
   grand_total: number;
-  amount_paid: number;
+  amountPaid: number;
   /** Once GST-finalised, corrections must go through a credit note. */
   gst_finalised: boolean;
-  issued_at: string;
-  due_at: string;
+  issuedAt: string;
+  dueAt: string;
 }
 
 export type PaymentMethod = "CASH" | "CARD" | "UPI" | "ONLINE";
@@ -57,7 +57,7 @@ export interface Payment {
   amount: number;
   status: PaymentStatus;
   reference: string;
-  created_at: string;
+  createdAt: string;
 }
 
 export type RefundStatus =
@@ -74,14 +74,14 @@ export interface CreditNote {
   refund_id: string;
   amount: number;
   tax: number;
-  issued_at: string;
+  issuedAt: string;
 }
 
 export interface Refund {
   id: string;
   invoice_id: string;
   invoice_number: string;
-  owner_name: string;
+  ownerName: string;
   amount: number;
   reason: string;
   status: RefundStatus;
@@ -99,7 +99,7 @@ export interface Refund {
 export const SUPER_ADMIN_REFUND_THRESHOLD = 10000;
 
 export interface StockBatch {
-  batch_no: string;
+  batchNo: string;
   quantity: number;
   expiry_date: string;
 }
@@ -109,8 +109,8 @@ export interface StockItem {
   name: string;
   category: string;
   stock: number;
-  reorder_level: number;
-  unit_price: number;
+  reorderLevel: number;
+  unitPrice: number;
   supplier_id: string | null;
   supplier_name: string | null;
   batches: StockBatch[];
@@ -125,8 +125,8 @@ export interface StockMovement {
   type: "ENTRY" | "ADJUST";
   quantity: number;
   reason: string;
-  batch_no: string | null;
-  created_at: string;
+  batchNo: string | null;
+  createdAt: string;
 }
 
 export interface Supplier {

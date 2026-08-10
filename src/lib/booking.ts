@@ -3,13 +3,13 @@ import { endpoints } from "@/lib/api/endpoints";
 import type { Appointment, SourceChannel } from "@/lib/api/types";
 
 export interface BookingPayload {
-  pet_id: string;
-  doctor_id: string;
-  branch_id: string;
+  petId: string;
+  doctorId: string;
+  branchId: string;
   service: string;
-  scheduled_at: string;
+  scheduledAt: string;
   notes?: string;
-  source_channel: SourceChannel;
+  sourceChannel: SourceChannel;
 }
 
 export interface BookingCallbacks {

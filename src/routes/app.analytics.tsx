@@ -230,8 +230,8 @@ function AnalyticsDashboard() {
                   </thead>
                   <tbody>
                     {doctorsPerf.data.map((d) => (
-                      <tr key={d.doctor_id} className="border-t border-border">
-                        <td className="py-3 font-medium">{d.doctor_name}</td>
+                      <tr key={d.doctorId} className="border-t border-border">
+                        <td className="py-3 font-medium">{d.doctorName}</td>
                         <td className="py-3 text-right tabular-nums text-foreground/70">{d.patients}</td>
                         <td className="py-3 text-right tabular-nums text-foreground/70">{INR(d.revenue)}</td>
                         <td className="py-3 text-right tabular-nums font-medium text-forest">
@@ -265,21 +265,21 @@ function AnalyticsDashboard() {
                   </div>
                 </div>
                 <ul className="space-y-2 text-sm">
-                  {inventory.data.low_stock_items.slice(0, 3).map((i) => (
+                  {inventory.data.lowStockItems.slice(0, 3).map((i) => (
                     <li key={`low-${i.id}`} className="flex items-center justify-between gap-3">
                       <span className="flex items-center gap-2 text-foreground/75">
                         <AlertTriangle className="size-3.5 text-destructive" />
                         {i.name}
                       </span>
                       <span className="tabular-nums text-xs text-foreground/60">
-                        {i.stock} / {i.reorder_level}
+                        {i.stock} / {i.reorderLevel}
                       </span>
                     </li>
                   ))}
                   {inventory.data.expiring_items.slice(0, 3).map((i) => (
-                    <li key={`exp-${i.id}-${i.batch_no}`} className="flex items-center justify-between gap-3">
+                    <li key={`exp-${i.id}-${i.batchNo}`} className="flex items-center justify-between gap-3">
                       <span className="text-foreground/75">
-                        {i.name} <span className="text-xs text-foreground/50">· {i.batch_no}</span>
+                        {i.name} <span className="text-xs text-foreground/50">· {i.batchNo}</span>
                       </span>
                       <span className="tabular-nums text-xs text-clay">{i.expiry_date}</span>
                     </li>
@@ -375,9 +375,9 @@ function AnalyticsDashboard() {
                   {pending.data.map((i) => (
                     <tr key={i.id} className="border-t border-border">
                       <td className="py-3 font-medium">{i.number}</td>
-                      <td className="py-3 text-foreground/70">{i.owner_name}</td>
-                      <td className="py-3 text-foreground/70">{i.pet_name ?? "—"}</td>
-                      <td className="py-3 text-foreground/70">{i.issued_at.slice(0, 10)}</td>
+                      <td className="py-3 text-foreground/70">{i.ownerName}</td>
+                      <td className="py-3 text-foreground/70">{i.petName ?? "—"}</td>
+                      <td className="py-3 text-foreground/70">{i.issuedAt.slice(0, 10)}</td>
                       <td className="py-3 text-right tabular-nums font-medium">{INR(i.outstanding)}</td>
                       <td className="py-3 text-right">
                         <span
@@ -438,7 +438,7 @@ function Kpi({
 function Heatmap({ cells }: { cells: HeatmapCell[] }) {
   const hours = [...new Set(cells.map((c) => c.hour))].sort((a, b) => a - b);
   const max = Math.max(1, ...cells.map((c) => c.count));
-  const lookup = new Map(cells.map((c) => [`${c.day_of_week}-${c.hour}`, c.count]));
+  const lookup = new Map(cells.map((c) => [`${c.dayOfWeek}-${c.hour}`, c.count]));
 
   return (
     <div className="overflow-x-auto">

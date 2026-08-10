@@ -47,7 +47,7 @@ function SchedulePage() {
   const [rules, setRules] = useState<AvailabilityRule[]>([]);
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
-  const [leave, setLeave] = useState({ start_date: today(), end_date: today(), reason: "", type: "LEAVE" });
+  const [leave, setLeave] = useState({ startDate: today(), endDate: today(), reason: "", type: "LEAVE" });
 
   useEffect(() => {
     apiClient
@@ -71,7 +71,7 @@ function SchedulePage() {
         setData(d);
         setRules(d.rules);
       })
-      .catch(() => setData({ doctor_id: id, rules: [], leaves: [] }));
+      .catch(() => setData({ doctorId: id, rules: [], leaves: [] }));
   }
 
   useEffect(() => {
@@ -79,12 +79,12 @@ function SchedulePage() {
   }, [doctorId]);
 
   const weeklyHours = useMemo(
-    () => rules.filter((r) => r.enabled).reduce((sum, r) => sum + Math.max(0, r.end_hour - r.start_hour), 0),
+    () => rules.filter((r) => r.enabled).reduce((sum, r) => sum + Math.max(0, r.endHour - r.startHour), 0),
     [rules],
   );
 
   function updateRule(dayIndex: number, patch: Partial<AvailabilityRule>) {
-    setRules((prev) => prev.map((r) => (r.day_of_week === dayIndex ? { ...r, ...patch } : r)));
+    setRules((prev) => prev.map((r) => (r.dayOfWeek === dayIndex ? { ...r, ...patch } : r)));
   }
 
   async function saveRules() {
@@ -110,7 +110,7 @@ function SchedulePage() {
     setStatus("");
     try {
       await apiClient.post(endpoints.doctors.leave(doctorId), leave);
-      setLeave({ start_date: today(), end_date: today(), reason: "", type: "LEAVE" });
+      setLeave({ startDate: today(), endDate: today(), reason: "", type: "LEAVE" });
       load(doctorId);
       setStatus("Leave recorded.");
     } catch (e) {
@@ -173,28 +173,28 @@ function SchedulePage() {
                 <div className="space-y-2">
                   {rules
                     .slice()
-                    .sort((a, b) => a.day_of_week - b.day_of_week)
+                    .sort((a, b) => a.dayOfWeek - b.dayOfWeek)
                     .map((r) => (
                       <div
-                        key={r.day_of_week}
+                        key={r.dayOfWeek}
                         className="flex flex-wrap items-center gap-3 rounded-[1.25rem] border border-border px-4 py-3"
                       >
                         <label className="flex w-36 items-center gap-2 text-sm font-medium">
                           <input
                             type="checkbox"
                             checked={r.enabled}
-                            onChange={(e) => updateRule(r.day_of_week, { enabled: e.target.checked })}
+                            onChange={(e) => updateRule(r.dayOfWeek, { enabled: e.target.checked })}
                             className="size-4 accent-[var(--color-forest)]"
-                            aria-label={`${dayNames[r.day_of_week]} available`}
+                            aria-label={`${dayNames[r.dayOfWeek]} available`}
                           />
-                          {dayNames[r.day_of_week]}
+                          {dayNames[r.dayOfWeek]}
                         </label>
                         <select
                           className="rounded-full border border-border bg-background px-3 py-1.5 text-sm disabled:opacity-40"
-                          value={r.start_hour}
+                          value={r.startHour}
                           disabled={!r.enabled}
-                          aria-label={`${dayNames[r.day_of_week]} start`}
-                          onChange={(e) => updateRule(r.day_of_week, { start_hour: Number(e.target.value) })}
+                          aria-label={`${dayNames[r.dayOfWeek]} start`}
+                          onChange={(e) => updateRule(r.dayOfWeek, { startHour: Number(e.target.value) })}
                         >
                           {Array.from({ length: 24 }, (_, h) => (
                             <option key={h} value={h}>{hourLabel(h)}</option>
@@ -203,16 +203,16 @@ function SchedulePage() {
                         <span className="text-sm text-foreground/50">to</span>
                         <select
                           className="rounded-full border border-border bg-background px-3 py-1.5 text-sm disabled:opacity-40"
-                          value={r.end_hour}
+                          value={r.endHour}
                           disabled={!r.enabled}
-                          aria-label={`${dayNames[r.day_of_week]} end`}
-                          onChange={(e) => updateRule(r.day_of_week, { end_hour: Number(e.target.value) })}
+                          aria-label={`${dayNames[r.dayOfWeek]} end`}
+                          onChange={(e) => updateRule(r.dayOfWeek, { endHour: Number(e.target.value) })}
                         >
                           {Array.from({ length: 24 }, (_, h) => (
                             <option key={h} value={h}>{hourLabel(h)}</option>
                           ))}
                         </select>
-                        {r.enabled && r.end_hour <= r.start_hour ? (
+                        {r.enabled && r.endHour <= r.startHour ? (
                           <span className="text-xs text-destructive">End must be after start</span>
                         ) : null}
                       </div>
@@ -227,11 +227,11 @@ function SchedulePage() {
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
                   <div>
                     <label className="block text-xs uppercase text-foreground/50" htmlFor="lv-start">From</label>
-                    <input id="lv-start" type="date" className={`${field} mt-1.5`} value={leave.start_date} onChange={(e) => setLeave({ ...leave, start_date: e.target.value })} />
+                    <input id="lv-start" type="date" className={`${field} mt-1.5`} value={leave.startDate} onChange={(e) => setLeave({ ...leave, startDate: e.target.value })} />
                   </div>
                   <div>
                     <label className="block text-xs uppercase text-foreground/50" htmlFor="lv-end">To</label>
-                    <input id="lv-end" type="date" className={`${field} mt-1.5`} value={leave.end_date} onChange={(e) => setLeave({ ...leave, end_date: e.target.value })} />
+                    <input id="lv-end" type="date" className={`${field} mt-1.5`} value={leave.endDate} onChange={(e) => setLeave({ ...leave, endDate: e.target.value })} />
                   </div>
                   <div>
                     <label className="block text-xs uppercase text-foreground/50" htmlFor="lv-type">Type</label>
@@ -259,7 +259,7 @@ function SchedulePage() {
                       <div key={l.id} className="flex items-center justify-between gap-3 rounded-[1.25rem] border border-border px-4 py-3">
                         <div>
                           <p className="text-sm font-medium">
-                            {l.start_date} → {l.end_date}
+                            {l.startDate} → {l.endDate}
                           </p>
                           <p className="text-xs text-foreground/60">
                             {l.type.replace(/_/g, " ").toLowerCase()} · {l.reason}

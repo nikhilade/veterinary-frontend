@@ -35,7 +35,7 @@ function OwnerDetailPage() {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [addingPet, setAddingPet] = useState(false);
-  const [draft, setDraft] = useState({ name: "", email: "", phone: "", address: "" });
+  const [draft, setDraft] = useState({ firstName: "", email: "", phoneNumber: "", address: "" });
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -49,7 +49,7 @@ function OwnerDetailPage() {
     setPets(p);
     setDocs(d);
     setLogs(c);
-    setDraft({ name: o.name, email: o.email, phone: o.phone, address: o.address });
+    setDraft({ firstName: o.firstName, email: o.email, phoneNumber: o.phoneNumber, address: o.address });
     setLoading(false);
   }, [id]);
 
@@ -68,13 +68,13 @@ function OwnerDetailPage() {
     const created = await apiClient.post<OwnerDocument>(endpoints.petOwners.documents(id), {
       name: file.name,
       type: "Other",
-      size_kb: Math.round(file.size / 1024),
+      sizeKb: Math.round(file.size / 1024),
     });
     setDocs((d) => [...d, created]);
   }
 
   return (
-    <StaffLayout title={owner?.name ?? "Owner"} subtitle="Client profile" permission="owners:read">
+    <StaffLayout title={owner ? `${owner.firstName} ${owner.lastName}` : "Owner" ?? "Owner"} subtitle="Client profile" permission="owners:read">
       <Link to="/app/owners" className="mb-4 inline-flex items-center gap-1.5 text-sm text-forest">
         <ArrowLeft className="size-4" /> Back to owners
       </Link>
@@ -93,8 +93,8 @@ function OwnerDetailPage() {
           >
             {editing ? (
               <div className="space-y-3">
-                <input className={field} value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} placeholder="Name" />
-                <input className={field} value={draft.phone} onChange={(e) => setDraft({ ...draft, phone: e.target.value })} placeholder="Phone" />
+                <input className={field} value={draft.firstName} onChange={(e) => setDraft({ ...draft, firstName: e.target.value })} placeholder="Name" />
+                <input className={field} value={draft.phoneNumber} onChange={(e) => setDraft({ ...draft, phoneNumber: e.target.value })} placeholder="Phone" />
                 <input className={field} value={draft.email} onChange={(e) => setDraft({ ...draft, email: e.target.value })} placeholder="Email" />
                 <textarea className={field} rows={3} value={draft.address} onChange={(e) => setDraft({ ...draft, address: e.target.value })} placeholder="Address" />
                 <button onClick={saveOwner} className="rounded-full bg-forest px-5 py-2.5 text-sm text-primary-foreground">
@@ -105,7 +105,7 @@ function OwnerDetailPage() {
               <dl className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <dt className="text-foreground/60">Phone</dt>
-                  <dd>{owner.phone}</dd>
+                  <dd>{owner.phoneNumber}</dd>
                 </div>
                 <div>
                   <dt className="text-foreground/60">Email</dt>
@@ -117,7 +117,7 @@ function OwnerDetailPage() {
                 </div>
                 <div>
                   <dt className="text-foreground/60">Client since</dt>
-                  <dd>{formatDate(owner.created_at)}</dd>
+                  <dd>{formatDate(owner.createdAt)}</dd>
                 </div>
                 <div>
                   <dt className="text-foreground/60">Pets</dt>
@@ -163,9 +163,9 @@ function OwnerDetailPage() {
                     >
                       <PawPrint className="size-4 text-clay" />
                       <span>
-                        <span className="block font-medium">{p.name}</span>
+                        <span className="block font-medium">{p.petName}</span>
                         <span className="block text-xs text-foreground/60">
-                          {p.species} · {p.breed} · {p.age_years}y
+                          {p.speciesId} · {p.breedId} · {p.age}y
                         </span>
                       </span>
                     </Link>
@@ -199,11 +199,11 @@ function OwnerDetailPage() {
                       <span>
                         <span className="block font-medium">{d.name}</span>
                         <span className="block text-xs text-foreground/60">
-                          {d.type} · {d.size_kb} KB
+                          {d.type} · {d.sizeKb} KB
                         </span>
                       </span>
                     </span>
-                    <span className="text-xs text-foreground/60">{formatDate(d.uploaded_at)}</span>
+                    <span className="text-xs text-foreground/60">{formatDate(d.uploadedAt)}</span>
                   </li>
                 ))}
               </ul>
@@ -227,7 +227,7 @@ function OwnerDetailPage() {
                     </div>
                     <p className="mt-1 text-foreground/70">{l.body}</p>
                     <p className="mt-1 text-xs text-foreground/50">
-                      {l.direction === "INBOUND" ? "Received" : "Sent"} · {formatDate(l.sent_at)}
+                      {l.direction === "INBOUND" ? "Received" : "Sent"} · {formatDate(l.sentAt)}
                     </p>
                   </li>
                 ))}

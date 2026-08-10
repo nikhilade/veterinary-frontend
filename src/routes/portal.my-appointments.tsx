@@ -57,7 +57,7 @@ function MyAppointments() {
     try {
       replace(
         await apiClient.post<Appointment>(endpoints.appointments.reschedule(a.id), {
-          scheduled_at: new Date(newDate).toISOString(),
+          scheduledAt: new Date(newDate).toISOString(),
         }),
       );
       setRescheduling(null);
@@ -71,8 +71,8 @@ function MyAppointments() {
   }
 
   const now = Date.now();
-  const upcoming = (items ?? []).filter((a) => new Date(a.scheduled_at).getTime() >= now && a.status !== "CANCELLED");
-  const past = (items ?? []).filter((a) => new Date(a.scheduled_at).getTime() < now || a.status === "CANCELLED");
+  const upcoming = (items ?? []).filter((a) => new Date(a.scheduledAt).getTime() >= now && a.status !== "CANCELLED");
+  const past = (items ?? []).filter((a) => new Date(a.scheduledAt).getTime() < now || a.status === "CANCELLED");
 
   const card = (a: Appointment, actions: boolean) => (
     <Panel key={a.id}>
@@ -80,9 +80,9 @@ function MyAppointments() {
         <div>
           <p className="text-lg">{a.service}</p>
           <p className="mt-1 text-sm text-foreground/70">
-            {a.pet_name} · {a.doctor_name}
+            {a.petName} · {a.doctorName}
           </p>
-          <p className="mt-1 text-sm text-clay">{formatDate(a.scheduled_at)}</p>
+          <p className="mt-1 text-sm text-clay">{formatDate(a.scheduledAt)}</p>
           {a.notes ? <p className="mt-2 text-sm text-foreground/60">{a.notes}</p> : null}
         </div>
         <StatusPill status={a.status} />

@@ -93,10 +93,10 @@ function Playground() {
               apiClient.list<PetOwner>(endpoints.petOwners.list, { limit: 2, cursor: cursor ?? undefined })
             }
             columns={[
-              { key: "name", header: "Owner", cell: (o) => o.name, sortValue: (o) => o.name },
-              { key: "phone", header: "Phone", cell: (o) => o.phone },
+              { key: "name", header: "Owner", cell: (o) => `${o.firstName} ${o.lastName}`, sortValue: (o) => `${o.firstName} ${o.lastName}` },
+              { key: "phone", header: "Phone", cell: (o) => o.phoneNumber },
               { key: "email", header: "Email", cell: (o) => o.email },
-              { key: "pets", header: "Pets", cell: (o) => o.pets_count, sortValue: (o) => o.pets_count, className: "text-right" },
+              { key: "pets", header: "Pets", cell: (o) => o.petsCount, sortValue: (o) => o.petsCount, className: "text-right" },
             ]}
           />
         </Story>
@@ -106,10 +106,10 @@ function Playground() {
             showKey
             onSubmit={(headers) =>
               apiClient.post(endpoints.appointments.create, {
-                pet_id: pet?.id ?? "pet_1",
-                doctor_id: doctorId,
+                petId: pet?.id ?? "pet_1",
+                doctorId: doctorId,
                 service: "Consultation",
-                scheduled_at: slot ?? new Date().toISOString(),
+                scheduledAt: slot ?? new Date().toISOString(),
               }, headers)
             }
           >

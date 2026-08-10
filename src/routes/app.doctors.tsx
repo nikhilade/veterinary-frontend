@@ -33,9 +33,9 @@ type Draft = {
   specialty: string;
   email: string;
   phone: string;
-  registration_no: string;
-  branch_id: string;
-  consultation_fee: string;
+  registrationNo: string;
+  branchId: string;
+  consultationFee: string;
   bio: string;
   active: boolean;
 };
@@ -45,9 +45,9 @@ const emptyDraft: Draft = {
   specialty: "General Medicine",
   email: "",
   phone: "",
-  registration_no: "",
-  branch_id: "br_1",
-  consultation_fee: "800",
+  registrationNo: "",
+  branchId: "br_1",
+  consultationFee: "800",
   bio: "",
   active: true,
 };
@@ -86,9 +86,9 @@ function DoctorsPage() {
       specialty: d.specialty,
       email: d.email ?? "",
       phone: d.phone ?? "",
-      registration_no: d.registration_no ?? "",
-      branch_id: d.branch_id ?? "br_1",
-      consultation_fee: String(d.consultation_fee ?? 800),
+      registrationNo: d.registrationNo ?? "",
+      branchId: d.branchId ?? "br_1",
+      consultationFee: String(d.consultationFee ?? 800),
       bio: d.bio ?? "",
       active: d.active ?? true,
     });
@@ -99,7 +99,7 @@ function DoctorsPage() {
   async function save() {
     setSaving(true);
     setError("");
-    const body = { ...draft, consultation_fee: Number(draft.consultation_fee) || 0 };
+    const body = { ...draft, consultationFee: Number(draft.consultationFee) || 0 };
     try {
       if (editing) await apiClient.patch<DoctorProfile>(endpoints.doctors.update(editing), body);
       else await apiClient.post<DoctorProfile>(endpoints.doctors.create, body);
@@ -148,11 +148,11 @@ function DoctorsPage() {
               </div>
               <div>
                 <label className={labelCls} htmlFor="doc-reg">Registration no.</label>
-                <input id="doc-reg" className={`${field} mt-1.5`} value={draft.registration_no} onChange={(e) => setDraft({ ...draft, registration_no: e.target.value })} />
+                <input id="doc-reg" className={`${field} mt-1.5`} value={draft.registrationNo} onChange={(e) => setDraft({ ...draft, registrationNo: e.target.value })} />
               </div>
               <div>
                 <label className={labelCls} htmlFor="doc-branch">Branch</label>
-                <select id="doc-branch" className={`${field} mt-1.5`} value={draft.branch_id} onChange={(e) => setDraft({ ...draft, branch_id: e.target.value })}>
+                <select id="doc-branch" className={`${field} mt-1.5`} value={draft.branchId} onChange={(e) => setDraft({ ...draft, branchId: e.target.value })}>
                   {branches.map((b) => (
                     <option key={b.id} value={b.id}>{b.name}</option>
                   ))}
@@ -160,7 +160,7 @@ function DoctorsPage() {
               </div>
               <div>
                 <label className={labelCls} htmlFor="doc-fee">Consultation fee (₹)</label>
-                <input id="doc-fee" inputMode="numeric" className={`${field} mt-1.5`} value={draft.consultation_fee} onChange={(e) => setDraft({ ...draft, consultation_fee: e.target.value })} />
+                <input id="doc-fee" inputMode="numeric" className={`${field} mt-1.5`} value={draft.consultationFee} onChange={(e) => setDraft({ ...draft, consultationFee: e.target.value })} />
               </div>
               <label className="flex items-end gap-2 pb-2 text-sm">
                 <input type="checkbox" checked={draft.active} onChange={(e) => setDraft({ ...draft, active: e.target.checked })} className="size-4 accent-[var(--color-forest)]" />
@@ -194,10 +194,10 @@ function DoctorsPage() {
             <Panel key={d.id} title={d.name}>
               <p className="text-sm text-foreground/70">{d.specialty}</p>
               <dl className="mt-3 space-y-1 text-sm text-foreground/70">
-                {d.registration_no ? <div>Reg. {d.registration_no}</div> : null}
+                {d.registrationNo ? <div>Reg. {d.registrationNo}</div> : null}
                 {d.email ? <div>{d.email}</div> : null}
                 {d.phone ? <div>{d.phone}</div> : null}
-                {d.consultation_fee ? <div>Consultation ₹{d.consultation_fee}</div> : null}
+                {d.consultationFee ? <div>Consultation ₹{d.consultationFee}</div> : null}
               </dl>
               <span className={`mt-3 inline-flex rounded-full px-3 py-1 text-xs font-medium ${d.active === false ? "bg-destructive/10 text-destructive" : "bg-forest/10 text-forest"}`}>
                 {d.active === false ? "inactive" : "accepting appointments"}
