@@ -85,11 +85,11 @@ function PaymentsPage() {
     };
   }, [pending, load]);
 
-  const outstanding = selected ? selected.grand_total - selected.amountPaid : 0;
+  const outstanding = selected ? selected.grandTotal - selected.amountPaid : 0;
 
   function choose(invoice: InvoiceDetail) {
     setSelected(invoice);
-    setAmount(Number((invoice.grand_total - invoice.amountPaid).toFixed(2)));
+    setAmount(Number((invoice.grandTotal - invoice.amountPaid).toFixed(2)));
     setResolved(null);
     setError("");
   }
@@ -100,7 +100,7 @@ function PaymentsPage() {
     if (!selected) throw new Error("Select an invoice first.");
     const payment = await apiClient.post<Payment>(
       endpoints.payments.create,
-      { invoice_id: selected.id, method, amount, reference },
+      { invoiceId: selected.id, method, amount, reference },
       headers,
     );
     if (payment.status === "UNKNOWN") {
@@ -134,11 +134,11 @@ function PaymentsPage() {
                       }`}
                     >
                       <span>
-                        <span className="block text-sm font-medium">{i.number}</span>
+                        <span className="block text-sm font-medium">{i.invoiceNumber}</span>
                         <span className="block text-xs text-foreground/60">{i.ownerName}</span>
                       </span>
                       <span className="shrink-0 text-right">
-                        <span className="block text-sm tabular-nums">{INR(i.grand_total - i.amountPaid)}</span>
+                        <span className="block text-sm tabular-nums">{INR(i.grandTotal - i.amountPaid)}</span>
                         <span className="block text-xs text-foreground/50">due</span>
                       </span>
                     </button>
@@ -152,7 +152,7 @@ function PaymentsPage() {
             {pending ? (
               <PendingState payment={pending} polls={polls} />
             ) : (
-              <Panel title={selected ? `Collect for ${selected.number}` : "Collect payment"}>
+              <Panel title={selected ? `Collect for ${selected.invoiceNumber}` : "Collect payment"}>
                 {!selected ? (
                   <EmptyState message="Pick an invoice on the left to collect a payment." />
                 ) : (
@@ -229,7 +229,7 @@ function PaymentsPage() {
                   {history.slice(0, 8).map((p) => (
                     <li key={p.id} className="flex items-center justify-between gap-3 py-2.5">
                       <span>
-                        <span className="block font-medium">{p.invoice_number}</span>
+                        <span className="block font-medium">{p.invoiceNumber}</span>
                         <span className="block text-xs text-foreground/55">
                           {p.method.toLowerCase()} · {new Date(p.createdAt).toLocaleString()}
                         </span>
@@ -269,7 +269,7 @@ function PendingState({ payment, polls }: { payment: Payment; polls: number }) {
         <div>
           <p className="text-lg font-medium text-forest">Confirming payment status…</p>
           <p className="mt-1 max-w-sm text-sm text-foreground/60">
-            The gateway hasn’t confirmed {INR(payment.amount)} on {payment.invoice_number} yet. This is not a failure —
+            The gateway hasn’t confirmed {INR(payment.amount)} on {payment.invoiceNumber} yet. This is not a failure —
             do not collect again or ask the client to retry.
           </p>
         </div>

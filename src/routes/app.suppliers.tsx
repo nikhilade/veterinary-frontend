@@ -27,7 +27,7 @@ export const Route = createFileRoute("/app/suppliers")({
 const field =
   "w-full rounded-2xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-forest";
 
-const blank = { name: "", contact_person: "", phone: "", email: "", gstin: "", address: "", active: true };
+const blank = { name: "", contactPerson: "", phone: "", email: "", gstin: "", address: "", active: true };
 
 function SuppliersPage() {
   const { role } = useAuth();
@@ -86,7 +86,7 @@ function SuppliersPage() {
                 {(
                   [
                     ["name", "Supplier name"],
-                    ["contact_person", "Contact person"],
+                    ["contactPerson", "Contact person"],
                     ["phone", "Phone"],
                     ["email", "Email"],
                     ["gstin", "GSTIN"],
@@ -165,7 +165,7 @@ function SuppliersPage() {
                           <span className="block text-xs text-foreground/55">{s.address}</span>
                         </td>
                         <td className="py-3 text-foreground/70">
-                          {s.contact_person}
+                          {s.contactPerson}
                           <span className="block text-xs text-foreground/50">{s.email}</span>
                         </td>
                         <td className="py-3 text-foreground/70">{s.phone}</td>
@@ -187,7 +187,7 @@ function SuppliersPage() {
                                   setEditingId(s.id);
                                   setForm({
                                     name: s.name,
-                                    contact_person: s.contact_person,
+                                    contactPerson: s.contactPerson,
                                     phone: s.phone,
                                     email: s.email,
                                     gstin: s.gstin,

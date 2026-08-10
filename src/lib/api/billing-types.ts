@@ -10,7 +10,7 @@ export interface ChargeableItem {
   type: LineItemType;
   label: string;
   unitPrice: number;
-  gst_rate: number;
+  gstRate: number;
 }
 
 export interface InvoiceLineItem {
@@ -26,23 +26,26 @@ export type InvoiceDetailStatus = "DRAFT" | "DUE" | "OVERDUE" | "PAID" | "CANCEL
 
 export interface InvoiceDetail {
   id: string;
-  number: string;
+  invoiceNumber: string;
   ownerId: string;
   ownerName: string;
   petName: string | null;
   status: InvoiceDetailStatus;
-  line_items: InvoiceLineItem[];
+  lineItems: InvoiceLineItem[];
   subtotal: number;
   discount: number;
-  gst_rate: number;
-  inter_state: boolean;
+  gstRate: number;
+  interState: boolean;
   tax: number;
-  grand_total: number;
+  cgst?: number;
+  sgst?: number;
+  igst?: number;
+  grandTotal: number;
   amountPaid: number;
   /** Once GST-finalised, corrections must go through a credit note. */
-  gst_finalised: boolean;
-  issuedAt: string;
-  dueAt: string;
+  gstFinalised: boolean;
+  invoiceDate: string;
+  dueDate: string;
 }
 
 export type PaymentMethod = "CASH" | "CARD" | "UPI" | "ONLINE";
@@ -51,8 +54,8 @@ export type PaymentStatus = "SUCCESS" | "FAILED" | "UNKNOWN";
 
 export interface Payment {
   id: string;
-  invoice_id: string;
-  invoice_number: string;
+  invoiceId: string;
+  invoiceNumber: string;
   method: PaymentMethod;
   amount: number;
   status: PaymentStatus;
@@ -69,9 +72,9 @@ export type RefundStatus =
 export interface CreditNote {
   id: string;
   number: string;
-  invoice_id: string;
-  invoice_number: string;
-  refund_id: string;
+  invoiceId: string;
+  invoiceNumber: string;
+  refundId: string;
   amount: number;
   tax: number;
   issuedAt: string;
@@ -79,20 +82,20 @@ export interface CreditNote {
 
 export interface Refund {
   id: string;
-  invoice_id: string;
-  invoice_number: string;
+  invoiceId: string;
+  invoiceNumber: string;
   ownerName: string;
   amount: number;
   reason: string;
   status: RefundStatus;
-  requested_by: string;
-  requested_at: string;
-  approved_by: string | null;
-  approved_at: string | null;
+  requestedBy: string;
+  requestedAt: string;
+  approvedBy: string | null;
+  approvedAt: string | null;
   /** Approvals above the threshold need a Super Admin. */
-  requires_super_admin: boolean;
-  credit_note: CreditNote | null;
-  rejection_reason?: string;
+  requiresSuperAdmin: boolean;
+  creditNote: CreditNote | null;
+  rejectionReason?: string;
 }
 
 /** Refunds above this value escalate to Super Admin approval. */
@@ -101,7 +104,7 @@ export const SUPER_ADMIN_REFUND_THRESHOLD = 10000;
 export interface StockBatch {
   batchNo: string;
   quantity: number;
-  expiry_date: string;
+  expiryDate: string;
 }
 
 export interface StockItem {
@@ -111,17 +114,17 @@ export interface StockItem {
   stock: number;
   reorderLevel: number;
   unitPrice: number;
-  supplier_id: string | null;
-  supplier_name: string | null;
+  supplierId: string | null;
+  supplierName: string | null;
   batches: StockBatch[];
   /** Earliest expiry across batches. */
-  nearest_expiry: string | null;
+  nearestExpiry: string | null;
 }
 
 export interface StockMovement {
   id: string;
-  item_id: string;
-  item_name: string;
+  itemId: string;
+  itemName: string;
   type: "ENTRY" | "ADJUST";
   quantity: number;
   reason: string;
@@ -132,7 +135,7 @@ export interface StockMovement {
 export interface Supplier {
   id: string;
   name: string;
-  contact_person: string;
+  contactPerson: string;
   phone: string;
   email: string;
   gstin: string;

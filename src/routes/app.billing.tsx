@@ -60,7 +60,7 @@ function BillingPage() {
 
   const outstanding = (invoices ?? [])
     .filter((i) => i.status === "DUE" || i.status === "OVERDUE")
-    .reduce((sum, i) => sum + (i.grand_total - i.amountPaid), 0);
+    .reduce((sum, i) => sum + (i.grandTotal - i.amountPaid), 0);
 
   return (
     <StaffLayout title="Billing" subtitle="Invoices, line items and GST" permission="billing:read">
@@ -112,14 +112,14 @@ function BillingPage() {
                 <tbody>
                   {invoices.map((i) => (
                     <tr key={i.id} className="border-t border-border">
-                      <td className="py-3 font-medium">{i.number}</td>
+                      <td className="py-3 font-medium">{i.invoiceNumber}</td>
                       <td className="py-3 text-foreground/70">
                         {i.ownerName}
                         {i.petName ? <span className="text-foreground/45"> · {i.petName}</span> : null}
                       </td>
-                      <td className="py-3 text-foreground/70">{new Date(i.issuedAt).toLocaleDateString()}</td>
-                      <td className="py-3 text-foreground/70">{i.line_items.length}</td>
-                      <td className="py-3 tabular-nums">{INR(i.grand_total)}</td>
+                      <td className="py-3 text-foreground/70">{new Date(i.invoiceDate || new Date()).toLocaleDateString()}</td>
+                      <td className="py-3 text-foreground/70">{i.lineItems?.length || 0}</td>
+                      <td className="py-3 tabular-nums">{INR(i.grandTotal)}</td>
                       <td className="py-3 tabular-nums text-foreground/70">{INR(i.amountPaid)}</td>
                       <td className="py-3">
                         <span className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${statusTone[i.status]}`}>
@@ -161,11 +161,12 @@ function InvoiceBuilder({
   const [owner, setOwner] = useState<PetOwner | null>(null);
   const [petName, setPetName] = useState(invoice?.petName ?? "");
   const [type, setType] = useState<LineItemType>("CONSULTATION");
-  const [items, setItems] = useState<InvoiceLineItem[]>(invoice?.line_items ?? []);
+  const [items, setItems] = useState<InvoiceLineItem[]>(invoice?.lineItems ?? []);
   const [discount, setDiscount] = useState(invoice?.discount ?? 0);
-  const [gstRate, setGstRate] = useState(invoice?.gst_rate ?? 18);
-  const [interState, setInterState] = useState(invoice?.inter_state ?? false);
+  const [gstRate, setGstRate] = useState(invoice?.gstRate ?? 18);
+  const [interState, setInterState] = useState(invoice?.interState ?? false);
   const [error, setError] = useState("");
+  const [cancelling, setCancelling] = useState(false);
 
   const subtotal = useMemo(() => items.reduce((sum, i) => sum + i.amount, 0), [items]);
   const options = catalog.filter((c) => c.type === type);
@@ -204,28 +205,56 @@ function InvoiceBuilder({
     if (locked) throw new Error("This invoice can no longer be edited.");
     if (!items.length) throw new Error("Add at least one line item.");
     const payload = {
-      ownerId: invoice?.ownerId ?? owner?.id,
-      ownerName: invoice?.ownerName ?? owner?.firstName,
-      petName: petName || null,
-      line_items: items,
+      hospitalId: "00000000-0000-0000-0000-000000000000", // Requires real hospitalId from context
+      patientId: owner?.id, // Temporary fallback since pet picker isn't fully wired for billing yet
+      visitId: null,
+      items: items.map(i => ({
+        itemType: i.type,
+        description: i.label,
+        quantity: i.quantity,
+        unitPrice: i.unitPrice,
+        taxRate: gstRate
+      })),
       discount,
-      gst_rate: gstRate,
-      inter_state: interState,
+      isInterState: interState,
     };
     if (invoice) return apiClient.patch<InvoiceDetail>(endpoints.billing.invoice(invoice.id), payload, headers);
     if (!owner) throw new Error("Select the client being billed.");
     return apiClient.post<InvoiceDetail>(endpoints.billing.invoices, payload, headers);
   }
 
+  async function cancelInvoice() {
+    if (!invoice || locked) return;
+    setCancelling(true);
+    try {
+      await apiClient.patch(endpoints.billing.invoiceStatus(invoice.id), { status: "CANCELLED" });
+      onSaved();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to cancel invoice.");
+      setCancelling(false);
+    }
+  }
+
   return (
     <div className="grid gap-5 lg:grid-cols-[1.6fr_1fr]">
       <div className="space-y-5">
         <Panel
-          title={invoice ? `Invoice ${invoice.number}` : "New invoice"}
+          title={invoice ? `Invoice ${invoice.invoiceNumber}` : "New invoice"}
           action={
-            <button onClick={onClose} className="inline-flex items-center gap-1.5 rounded-full border border-border px-4 py-2 text-sm">
-              <X className="size-4" /> Close
-            </button>
+            <div className="flex items-center gap-2">
+              {invoice && !locked ? (
+                <button
+                  onClick={cancelInvoice}
+                  disabled={cancelling}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-destructive/30 px-4 py-2 text-sm text-destructive hover:bg-destructive/10 disabled:opacity-50"
+                >
+                  <X className="size-4" /> {cancelling ? "Cancelling…" : "Cancel Invoice"}
+                </button>
+              ) : null}
+              <button onClick={onClose} className="inline-flex items-center gap-1.5 rounded-full border border-border px-4 py-2 text-sm">
+                <X className="size-4" /> Close
+              </button>
+            </div>
           }
         >
           {locked ? (
@@ -371,7 +400,15 @@ function InvoiceBuilder({
               />
               Inter-state supply (IGST)
             </label>
-            <GstBreakdown subtotal={subtotal} discount={discount} gstRate={gstRate} interState={interState} />
+            <GstBreakdown
+              subtotal={subtotal}
+              discount={discount}
+              gstRate={gstRate}
+              interState={interState}
+              cgst={invoice?.cgst}
+              sgst={invoice?.sgst}
+              igst={invoice?.igst}
+            />
             {error ? <p className="text-xs text-destructive">{error}</p> : null}
             <IdempotentSubmitButton
               disabled={locked || items.length === 0}
