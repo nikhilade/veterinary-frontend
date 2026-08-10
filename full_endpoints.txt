@@ -1,0 +1,263 @@
+﻿## AppointmentController
+### PUT /api/v1/appointments/{appointmentId}/reschedule
+### GET /api/v1/appointments/{appointmentId}
+### POST /api/v1/appointments
+### PUT /api/v1/appointments/{appointmentId}
+### PUT /api/v1/appointments/{appointmentId}/cancel
+### POST /api/v1/appointments/search
+## AuthController
+### POST /api/auth/reset-password
+### POST /api/auth/change-password
+### GET /api/auth/me
+### POST /api/auth/forgot-password
+### POST /api/auth/verify-email
+### POST /api/auth/login
+### POST /api/auth/refresh
+### POST /api/auth/logout
+### POST /api/auth/request-password-change-otp
+### POST /api/auth/resend-verification-otp
+## BillingController
+### PUT /api/v1/billing/invoices/{id}
+### POST /api/v1/billing/invoices/{id}/cancel
+### GET /api/v1/billing/gst/report
+### GET /api/v1/billing/invoices
+### GET /api/v1/billing/invoices/{id}
+### POST /api/v1/billing/invoices
+### GET /api/v1/billing/invoices/{id}/download
+## BranchController
+### GET /api/v1/branches/hospital/{hospitalId}
+### GET /api/v1/branches/{branchId}
+### PUT /api/v1/branches/{branchId}
+### GET /api/v1/branches
+### POST /api/v1/branches
+### GET /api/v1/branches/search
+### DELETE /api/v1/branches/{branchId}
+## BranchProfileController
+### PUT /api/v1/branch-profile/{branchId}
+### GET /api/v1/branch-profile/{branchId}
+## BranchSettingsController
+### GET /api/v1/branches/settings/{branchId}
+### POST /api/v1/branches/settings/{branchId}
+### PUT /api/v1/branches/settings/{branchId}
+## FileUploadController
+### POST /api/v1/files/upload
+## ConsultationController
+### GET /v1/consultations
+### GET /v1/consultations/doctor/{doctorId}
+### GET /v1/consultations/pet/{petId}
+### GET /v1/consultations/{consultationId}
+### POST /v1/consultations
+### DELETE /v1/consultations/{consultationId}
+### PUT /v1/consultations/{consultationId}
+## DiagnosisController
+### GET /v1/diagnosis/consultation/{consultationId}
+### POST /v1/diagnosis
+### GET /v1/diagnosis/{diagnosisId}
+### GET /v1/diagnosis
+### PUT /v1/diagnosis/{diagnosisId}
+### DELETE /v1/diagnosis/{diagnosisId}
+## TreatmentPlanController
+### PUT /v1/treatment-plans/{treatmentPlanId}
+### GET /v1/treatment-plans/{treatmentPlanId}
+### DELETE /v1/treatment-plans/{treatmentPlanId}
+### GET /v1/treatment-plans
+### GET /v1/treatment-plans/consultation/{consultationId}
+### POST /v1/treatment-plans
+## DashboardController
+### GET /api/v1/dashboard/appointments
+### GET /api/v1/dashboard/daily-summary
+### GET /api/v1/dashboard/monthly-summary
+### GET /api/v1/dashboard/admin
+### GET /api/v1/dashboard/staff
+## DoctorController
+### GET /v1/doctors/{doctorId}
+### PUT /v1/doctors/{doctorId}
+### GET /v1/doctors
+### DELETE /v1/doctors/{doctorId}
+### POST /v1/doctors
+## DoctorScheduleController
+### PUT /v1/doctor-schedules/{scheduleId}
+### POST /v1/doctor-schedules
+### GET /v1/doctor-schedules/doctor/{doctorId}
+### GET /v1/doctor-schedules/{scheduleId}
+### DELETE /v1/doctor-schedules/{scheduleId}
+## DoctorSpecializationController
+### POST /api/v1/doctors/{doctorId}/specializations
+### GET /api/v1/doctors/{doctorId}/specializations
+### DELETE /api/v1/doctors/{doctorId}/specializations/{specializationId}
+## SpecializationController
+### GET /api/v1/specializations/{id}
+### PUT /api/v1/specializations/{id}
+### DELETE /api/v1/specializations/{id}
+### POST /api/v1/specializations
+### GET /api/v1/specializations
+## HospitalController
+### DELETE /api/v1/hospitals/{id}
+### GET /api/v1/hospitals/{id}
+### GET /api/v1/hospitals
+### PUT /api/v1/hospitals/{id}
+### POST /api/v1/hospitals
+## HospitalDepartmentController
+### GET /api/v1/hospitals/{hospitalId}/departments
+### PUT /api/v1/hospitals/{hospitalId}/departments/{departmentId}
+### GET /api/v1/hospitals/{hospitalId}/departments/{departmentId}
+### POST /api/v1/hospitals/{hospitalId}/departments
+### DELETE /api/v1/hospitals/{hospitalId}/departments/{departmentId}
+## HospitalProfileController
+### GET /api/v1/hospitals/{hospitalId}/profile
+### PUT /api/v1/hospitals/{hospitalId}/profile
+## HospitalSettingsController
+### GET /api/v1/hospitals/settings/{hospitalId}
+### POST /api/v1/hospitals/settings/{hospitalId}
+### PUT /api/v1/hospitals/settings/{hospitalId}
+## AdmissionController
+### POST /api/v1/admissions
+### GET /api/v1/admissions/{admissionId}
+### PUT /api/v1/admissions/{admissionId}/transfer-bed
+### PUT /api/v1/admissions/{admissionId}/discharge
+### PUT /api/v1/admissions/{admissionId}
+## BedController
+### POST /api/v1/beds
+### GET /api/v1/beds/{bedId}
+### PUT /api/v1/beds/{bedId}
+### POST /api/v1/beds/search
+## WardController
+### GET /api/v1/wards/hospital/{hospitalId}
+### POST /api/v1/wards
+### GET /api/v1/wards/{wardId}
+### DELETE /api/v1/wards/{wardId}
+### PUT /api/v1/wards/{wardId}
+## InventoryController
+### POST /api/v1/inventory/stock/entry
+### GET /api/v1/inventory/low-stock
+### POST /api/v1/inventory/stock/transfer
+### GET /api/v1/inventory/expiry
+### GET /api/v1/inventory/items
+### POST /api/v1/inventory/stock/adjust
+### POST /api/v1/inventory/items
+## SupplierController
+### POST /api/v1/inventory/suppliers
+## LabOrderController
+### GET /api/v1/lab-orders/hospital/{hospitalId}
+### GET /api/v1/lab-orders/branch/{branchId}
+### GET /api/v1/lab-orders/consultation/{consultationId}
+### PATCH /api/v1/lab-orders/{labOrderId}/cancel
+### GET /api/v1/lab-orders
+### GET /api/v1/lab-orders/{labOrderId}
+### POST /api/v1/lab-orders
+### PUT /api/v1/lab-orders/{labOrderId}
+## LabResultController
+### GET /api/v1/lab-results/lab-order/{labOrderId}
+### POST /api/v1/lab-results
+### GET /api/v1/lab-results/{labResultId}
+### PUT /api/v1/lab-results/{labResultId}
+## CityController
+### GET /api/v1/cities/{cityId}
+### PUT /api/v1/cities/{cityId}
+### DELETE /api/v1/cities/{cityId}
+### POST /api/v1/cities
+### GET /api/v1/cities
+### GET /api/v1/cities/state/{stateId}
+## DesignationController
+### PATCH /api/v1/designations/{designationId}/status
+### GET /api/v1/designations/hospital/{hospitalId}
+### GET /api/v1/designations/department/{departmentId}
+### POST /api/v1/designations
+### DELETE /api/v1/designations/{designationId}
+### PUT /api/v1/designations/{designationId}
+### GET /api/v1/designations
+### GET /api/v1/designations/{designationId}
+## LabTestController
+### GET /api/v1/lab-tests/category/{category}
+### PATCH /api/v1/lab-tests/{labTestId}/deactivate
+### POST /api/v1/lab-tests
+### GET /api/v1/lab-tests/{labTestId}
+### PUT /api/v1/lab-tests/{labTestId}
+### GET /api/v1/lab-tests
+## MasterDataImportController
+### POST /api/v1/master/import
+## StateController
+### PUT /api/v1/states/{stateId}
+### DELETE /api/v1/states/{stateId}
+### POST /api/v1/states
+### GET /api/v1/states
+### GET /api/v1/states/{stateId}
+## PaymentController
+### POST /api/v1/payments
+## CommunicationHistoryController
+### POST /api/v1/pet-owners/{ownerId}/communications
+### GET /api/v1/communications/{communicationId}
+### GET /api/v1/pet-owners/{ownerId}/communications
+### DELETE /api/v1/communications/{communicationId}
+## OwnerDocumentController
+### GET /api/v1/pet-owners/{ownerId}/documents
+### DELETE /api/v1/pet-owners/documents/{documentId}
+### POST /api/v1/pet-owners/{ownerId}/documents
+## PetController
+### POST /api/v1/pets/lookup-or-create
+### GET /api/v1/pets/history/{id}
+### POST /api/v1/pets
+## PetOwnerController
+### GET /api/v1/pet-owners/search
+### GET /api/v1/pet-owners/{ownerId}
+### POST /api/v1/pet-owners
+### POST /api/v1/pet-owners/lookup-or-create
+## BreedController
+### GET /api/breeds/species/{speciesId}
+### DELETE /api/breeds/{id}
+### POST /api/breeds
+### GET /api/breeds
+## SpeciesController
+### GET /api/species/{id}
+### DELETE /api/species/{id}
+### POST /api/species
+### GET /api/species
+## PrescriptionController
+### POST /v1/prescriptions
+### DELETE /v1/prescriptions/{prescriptionId}
+### PUT /v1/prescriptions/{prescriptionId}
+### GET /v1/prescriptions/consultation/{consultationId}
+### GET /v1/prescriptions/{prescriptionId}
+### GET /v1/prescriptions
+## ProcedureController
+### POST /v1/procedures
+### GET /v1/procedures/{procedureId}
+### PUT /v1/procedures/{procedureId}
+### DELETE /v1/procedures/{procedureId}
+### GET /v1/procedures
+### GET /v1/procedures/consultation/{consultationId}
+## ReceptionQueueController
+### POST /api/v1/reception/check-in
+### PUT /api/v1/reception/{queueId}/no-show
+### PUT /api/v1/reception/call-next
+### PUT /api/v1/reception/{queueId}/skip
+### PUT /api/v1/reception/{queueId}/recall
+### GET /api/v1/reception/queue
+### PUT /api/v1/reception/{queueId}/complete
+## StaffAttendanceController
+### PUT /api/v1/staff-attendance/{attendanceId}/check-out
+### POST /api/v1/staff-attendance/check-in
+### POST /api/v1/staff-attendance/search
+### GET /api/v1/staff-attendance/{attendanceId}
+### GET /api/v1/staff-attendance/staff/{staffId}
+### GET /api/v1/staff-attendance/summary
+### GET /api/v1/staff-attendance/date
+### PUT /api/v1/staff-attendance/{attendanceId}/status
+## StaffController
+### PUT /api/v1/staff/{staffId}
+### GET /api/v1/staff/{staffId}
+### DELETE /api/v1/staff/{staffId}
+### GET /api/v1/staff
+### POST /api/v1/staff
+## StaffProfileController
+### PUT /api/v1/staff/profile/{staffId}
+### GET /api/v1/staff/profile/{staffId}
+## PasswordTestController
+## VaccinationController
+### GET /api/v1/vaccinations/{id}
+### GET /api/v1/vaccinations
+### GET /api/v1/vaccinations/due
+### POST /api/v1/vaccinations
+### PUT /api/v1/vaccinations/{id}
+### DELETE /api/v1/vaccinations/{id}
+### GET /api/v1/vaccinations/pet/{petId}

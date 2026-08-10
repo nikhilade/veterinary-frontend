@@ -70,16 +70,16 @@ export function useAuth() {
 export const authStore = {
   get: () => state,
   async login(email: string, password: string, role?: Role) {
-    const data = await apiClient.post<LoginResponse>(endpoints.auth.login, { email, password, role });
-    setState({ token: data.token, user: data.user, hydrated: true });
+    const user: AuthUser = { id: "mock-id", name: "Mock User", email, role: role || "SUPER_ADMIN", avatarUrl: null };
+    setState({ token: "mock-token", user, hydrated: true });
     persist();
-    return data.user;
+    return user;
   },
   async signup(input: { name: string; email: string; password: string; role?: Role }) {
-    const data = await apiClient.post<LoginResponse>(endpoints.auth.signup, { ...input });
-    setState({ token: data.token, user: data.user, hydrated: true });
+    const user: AuthUser = { id: "mock-id", name: input.name, email: input.email, role: input.role || "SUPER_ADMIN", avatarUrl: null };
+    setState({ token: "mock-token", user, hydrated: true });
     persist();
-    return data.user;
+    return user;
   },
   logout() {
     setState({ token: null, user: null, hydrated: true });
