@@ -46,8 +46,11 @@ function PaymentsPage() {
 
   const load = useCallback(() => {
     apiClient
-      .get<InvoiceDetail[]>(endpoints.billing.invoices)
-      .then((list) => setInvoices(list.filter((i) => i.status === "DUE" || i.status === "OVERDUE")))
+      .get<InvoiceDetail[] | { content: InvoiceDetail[] }>(endpoints.billing.invoices)
+      .then((res) => {
+        const list = Array.isArray(res) ? res : (res?.content ?? []);
+        setInvoices(list.filter((i) => i.status === "DUE" || i.status === "OVERDUE"));
+      })
       .catch(() => setInvoices([]));
     apiClient.get<Payment[]>(endpoints.payments.list).then(setHistory).catch(() => setHistory([]));
   }, []);

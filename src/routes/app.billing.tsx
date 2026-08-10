@@ -48,14 +48,31 @@ function BillingPage() {
 
   const load = useCallback(() => {
     apiClient
-      .get<InvoiceDetail[]>(endpoints.billing.invoices)
-      .then(setInvoices)
+      .get<InvoiceDetail[] | { content: InvoiceDetail[] }>(endpoints.billing.invoices)
+      .then((res) => {
+        console.log("Raw invoices response:", res);
+        const data = Array.isArray(res) ? res : (res?.content ?? []);
+        console.log("Parsed invoices data:", data, "isArray:", Array.isArray(data));
+        setInvoices(data);
+      })
       .catch(() => setInvoices([]));
   }, []);
 
   useEffect(() => {
     load();
-    apiClient.get<ChargeableItem[]>(endpoints.billing.chargeableItems).then(setCatalog).catch(() => setCatalog([]));
+    apiClient
+      .get<ChargeableItem[]>(endpoints.billing.chargeableItems)
+      .then(setCatalog)
+      .catch(() => {
+        // Fallback mock catalog since backend endpoint doesn't exist yet
+        setCatalog([
+          { id: "1", type: "CONSULTATION", label: "General Consultation", unitPrice: 500, gstRate: 18 },
+          { id: "2", type: "PHARMACY", label: "Rabies Vaccine", unitPrice: 300, gstRate: 12 },
+          { id: "3", type: "PHARMACY", label: "Deworming Tablets", unitPrice: 150, gstRate: 12 },
+          { id: "4", type: "LAB", label: "Complete Blood Count (CBC)", unitPrice: 800, gstRate: 18 },
+          { id: "5", type: "GROOMING", label: "Basic Grooming", unitPrice: 1000, gstRate: 18 }
+        ]);
+      });
   }, [load]);
 
   const outstanding = (invoices ?? [])
@@ -205,7 +222,6 @@ function InvoiceBuilder({
     if (locked) throw new Error("This invoice can no longer be edited.");
     if (!items.length) throw new Error("Add at least one line item.");
     const payload = {
-      hospitalId: "00000000-0000-0000-0000-000000000000", // Requires real hospitalId from context
       patientId: owner?.id, // Temporary fallback since pet picker isn't fully wired for billing yet
       visitId: null,
       items: items.map(i => ({

@@ -45,8 +45,11 @@ function RefundsPage() {
 
   const load = useCallback(() => {
     apiClient
-      .get<InvoiceDetail[]>(endpoints.billing.invoices)
-      .then((list) => setInvoices(list.filter((i) => i.amountPaid > 0)))
+      .get<InvoiceDetail[] | { content: InvoiceDetail[] }>(endpoints.billing.invoices)
+      .then((res) => {
+        const list = Array.isArray(res) ? res : (res?.content ?? []);
+        setInvoices(list.filter((i) => i.amountPaid > 0));
+      })
       .catch(() => setInvoices([]));
     apiClient.get<Refund[]>(endpoints.refunds.list).then(setRefunds).catch(() => setRefunds([]));
     apiClient.get<CreditNote[]>(endpoints.creditNotes.list).then(setNotes).catch(() => setNotes([]));
