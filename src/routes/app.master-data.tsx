@@ -39,7 +39,7 @@ const collections: { key: string; label: string; description: string; fields: Cr
     description: "Breeds mapped to a species, used by the pet registration form.",
     fields: [
       { key: "name", label: "Breed", required: true },
-      { key: "species", label: "Species", type: "select", options: ["Dog", "Cat", "Rabbit", "Bird"] },
+      { key: "speciesId", label: "Species", type: "select", lookup: "species" },
       { key: "size", label: "Size", type: "select", options: ["Small", "Medium", "Large"] },
       { key: "active", label: "Status", type: "boolean" },
     ],
@@ -50,7 +50,7 @@ const collections: { key: string; label: string; description: string; fields: Cr
     description: "Vaccine catalogue with default booster intervals for due-date calculation.",
     fields: [
       { key: "name", label: "Vaccine", required: true },
-      { key: "species", label: "Species", type: "select", options: ["Dog", "Cat", "Rabbit", "Bird"] },
+      { key: "speciesId", label: "Species", type: "select", lookup: "species" },
       { key: "interval_months", label: "Booster interval (months)", type: "number" },
       { key: "active", label: "Status", type: "boolean" },
     ],

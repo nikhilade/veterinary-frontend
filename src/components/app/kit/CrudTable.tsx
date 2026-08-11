@@ -10,6 +10,8 @@ export interface CrudField {
   label: string;
   type?: CrudFieldType;
   options?: string[];
+  /** Master data resource key to lookup for options (e.g., "species") */
+  lookup?: string;
   required?: boolean;
   /** Hidden from the table, still editable in the form. */
   hideInTable?: boolean;
@@ -127,17 +129,22 @@ export function CrudTable<T extends { id: string }>({
             <label key={f.key} className="space-y-1.5 text-sm">
               <span className="text-foreground/70">{f.label}</span>
               {f.type === "select" ? (
-                <select
-                  className={field}
-                  value={String(form[f.key] ?? "")}
-                  onChange={(e) => setForm((s) => ({ ...s, [f.key]: e.target.value }))}
-                >
-                  {(f.options ?? []).map((o) => (
-                    <option key={o} value={o}>
-                      {o}
-                    </option>
-                  ))}
-                </select>
+                f.lookup ? (
+                  <LookupSelect field={f} form={form} setForm={setForm} />
+                ) : (
+                  <select
+                    className={field}
+                    value={String(form[f.key] ?? "")}
+                    onChange={(e) => setForm((s) => ({ ...s, [f.key]: e.target.value }))}
+                  >
+                    <option value="">Select...</option>
+                    {(f.options ?? []).map((o) => (
+                      <option key={o} value={o}>
+                        {o}
+                      </option>
+                    ))}
+                  </select>
+                )
               ) : f.type === "boolean" ? (
                 <select
                   className={field}
@@ -242,5 +249,33 @@ export function CrudTable<T extends { id: string }>({
         </div>
       )}
     </Panel>
+  );
+}
+
+import { useMasterData } from "@/hooks/use-master-data";
+
+function LookupSelect({
+  field: f,
+  form,
+  setForm,
+}: {
+  field: CrudField;
+  form: Record<string, unknown>;
+  setForm: React.Dispatch<React.SetStateAction<Record<string, unknown>>>;
+}) {
+  const { data = [] } = useMasterData(f.lookup!);
+  return (
+    <select
+      className={field}
+      value={String(form[f.key] ?? "")}
+      onChange={(e) => setForm((s) => ({ ...s, [f.key]: e.target.value }))}
+    >
+      <option value="">Select {f.label.toLowerCase()}...</option>
+      {data.map((o) => (
+        <option key={o.id} value={o.id}>
+          {o.name}
+        </option>
+      ))}
+    </select>
   );
 }

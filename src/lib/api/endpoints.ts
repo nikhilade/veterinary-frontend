@@ -164,8 +164,41 @@ export const endpoints = {
     attendance: (id: string) => `${V1}/staff-attendance/staff/${id}`,
   },
   masterData: {
-    list: (resource: string) => `${V1}/master-data/${resource}`,
-    create: (resource: string) => `${V1}/master-data/${resource}`,
-    detail: (resource: string, id: string) => `${V1}/master-data/${resource}/${id}`,
+    list: (resource: string) => {
+      const paths: Record<string, string> = {
+        cities: `${V1}/cities`,
+        states: `${V1}/states`,
+        designations: `${V1}/designations`,
+        breeds: `/api/breeds`,
+        species: `/api/species`,
+        specializations: `${V1}/specializations`,
+        "lab-tests": `${V1}/lab-tests`,
+      };
+      return paths[resource] || `${V1}/master-data/${resource}`;
+    },
+    create: (resource: string) => {
+      const paths: Record<string, string> = {
+        cities: `${V1}/cities`,
+        states: `${V1}/states`,
+        designations: `${V1}/designations`,
+        breeds: `/api/breeds`,
+        species: `/api/species`,
+        specializations: `${V1}/specializations`,
+        "lab-tests": `${V1}/lab-tests`,
+      };
+      return paths[resource] || `${V1}/master-data/${resource}`;
+    },
+    detail: (resource: string, id: string) => {
+      const paths: Record<string, string> = {
+        cities: `${V1}/cities/${id}`,
+        states: `${V1}/states/${id}`,
+        designations: `${V1}/designations/${id}`,
+        breeds: `/api/breeds/${id}`,
+        species: `/api/species/${id}`,
+        specializations: `${V1}/specializations/${id}`,
+        "lab-tests": `${V1}/lab-tests/${id}`,
+      };
+      return paths[resource] || `${V1}/master-data/${resource}/${id}`;
+    },
   },
 } as const;

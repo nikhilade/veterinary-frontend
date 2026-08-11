@@ -77,9 +77,15 @@ export interface Pet {
 
 export interface Doctor {
   id: string;
-  name: string;
-  specialty: string;
-  availableSlots: string[];
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  gender: string;
+  status: string;
+  consultationFee: number;
+  consultationDurationMin: number;
+  employeeCode?: string;
 }
 
 export interface AppointmentSlot {
@@ -98,9 +104,25 @@ export interface BranchWorkingHours {
 
 export interface Branch {
   id: string;
-  name: string;
-  address: string;
-  workingHours: BranchWorkingHours;
+  hospitalId: string;
+  hospitalName: string;
+  branchName: string;
+  branchCode: string;
+  email: string;
+  phone: string;
+  addressLine1: string;
+  stateId: string;
+  stateName: string;
+  cityId: string;
+  cityName: string;
+  pincode: string;
+  country: string;
+  latitude: number;
+  longitude: number;
+  isHeadBranch: boolean;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export type AppointmentStatus =
@@ -225,13 +247,8 @@ export interface Vaccine {
 /* ---------- Clinical: doctors, consultations, prescriptions ---------- */
 
 export interface DoctorProfile extends Doctor {
-  email: string;
-  phone: string;
-  registrationNo: string;
-  branchId: string;
-  consultationFee: number;
-  bio?: string;
-  active: boolean;
+  dob?: string;
+  joiningDate?: string;
 }
 
 /** Weekly recurring availability. dayOfWeek: 0 = Sunday … 6 = Saturday */

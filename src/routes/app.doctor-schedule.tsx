@@ -56,7 +56,7 @@ function SchedulePage() {
         setDoctors(list);
         // A doctor only ever sees their own schedule.
         const own = isDoctor
-          ? list.find((d) => d.name.toLowerCase().replace(/^dr\.?\s*/, "") === (user?.name ?? "").toLowerCase().replace(/^dr\.?\s*/, "")) ?? list[0]
+          ? list.find((d) => (d.firstName + " " + d.lastName).toLowerCase().replace(/^dr\.?\s*/, "") === (user?.name ?? "").toLowerCase().replace(/^dr\.?\s*/, "")) ?? list[0]
           : list.find((d) => d.id === doctorParam) ?? list[0];
         setDoctorId(own?.id ?? null);
       })
@@ -136,10 +136,10 @@ function SchedulePage() {
         <Loading />
       ) : (
         <div className="space-y-6">
-          <Panel title={selected ? selected.name : "Select a doctor"}>
+          <Panel title={selected ? `${selected.firstName} ${selected.lastName}` : "Select a doctor"}>
             {isDoctor ? (
               <p className="text-sm text-foreground/60">
-                You are viewing your own schedule. {selected?.specialty}
+                You are viewing your own schedule.
               </p>
             ) : (
               <div className="max-w-sm">
@@ -154,7 +154,7 @@ function SchedulePage() {
                 >
                   {doctors.map((d) => (
                     <option key={d.id} value={d.id}>
-                      {d.name} — {d.specialty}
+                      {d.firstName} {d.lastName}
                     </option>
                   ))}
                 </select>

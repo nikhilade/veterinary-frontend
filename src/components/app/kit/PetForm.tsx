@@ -7,14 +7,7 @@ import type { Pet } from "@/lib/api/types";
 const field =
   "w-full rounded-2xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-forest";
 
-export const SPECIES = ["Dog", "Cat", "Bird", "Rabbit"] as const;
-
-export const BREEDS: Record<string, string[]> = {
-  Dog: ["Golden Retriever", "Labrador", "German Shepherd", "French Bulldog", "Border Collie", "Indie / Mixed"],
-  Cat: ["Persian", "British Shorthair", "Siamese", "Maine Coon", "Indie / Mixed"],
-  Bird: ["Budgerigar", "Cockatiel", "Lovebird", "African Grey"],
-  Rabbit: ["Holland Lop", "Netherland Dwarf", "Rex", "Mixed"],
-};
+import { useMasterData } from "@/hooks/use-master-data";
 
 export interface PetFormProps {
   ownerId: string;
@@ -40,6 +33,13 @@ export function PetForm({ ownerId, pet = null, onSaved, submitLabel = "Save pet"
   const [photo, setPhoto] = useState<string | null>(pet?.photoUrl ?? null);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+
+  const { data: speciesList = [] } = useMasterData("species");
+  const { data: breedsList = [] } = useMasterData("breeds");
+
+  // Optional: if breeds should be filtered by species, you could do it here
+  // assuming breed objects have a speciesId field. For now, filter if applicable.
+  const breeds = breedsList.filter((b) => !b.speciesId || b.speciesId === form.speciesId);
 
   function onPhoto(file: File | undefined) {
     if (!file) return;
@@ -74,7 +74,7 @@ export function PetForm({ ownerId, pet = null, onSaved, submitLabel = "Save pet"
     }
   }
 
-  const breeds = BREEDS[form.species] ?? [];
+  // breeds defined above
 
   return (
     <div className="space-y-3">
@@ -93,17 +93,18 @@ export function PetForm({ ownerId, pet = null, onSaved, submitLabel = "Save pet"
       <div className="grid grid-cols-2 gap-2">
         <select
           className={field}
-          value={form.species}
-          onChange={(e) => setForm({ ...form, speciesId: e.target.value as Pet["species"], breedId: "" })}
+          value={form.speciesId}
+          onChange={(e) => setForm({ ...form, speciesId: e.target.value as Pet["speciesId"], breedId: "" })}
         >
-          {SPECIES.map((s) => (
-            <option key={s}>{s}</option>
+          <option value="">Select species</option>
+          {speciesList.map((s) => (
+            <option key={s.id} value={s.id}>{s.name}</option>
           ))}
         </select>
-        <select className={field} value={form.breed} onChange={(e) => setForm({ ...form, breedId: e.target.value })}>
+        <select className={field} value={form.breedId} onChange={(e) => setForm({ ...form, breedId: e.target.value })}>
           <option value="">Select breed</option>
           {breeds.map((b) => (
-            <option key={b}>{b}</option>
+            <option key={b.id} value={b.id}>{b.name}</option>
           ))}
         </select>
         <select className={field} value={form.sex} onChange={(e) => setForm({ ...form, gender: e.target.value as Pet["sex"] })}>
