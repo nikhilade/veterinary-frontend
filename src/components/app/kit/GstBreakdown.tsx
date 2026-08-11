@@ -6,6 +6,9 @@ export interface GstBreakdownInput {
   gstRate?: number; // percent, e.g. 18
   /** Interstate supplies use IGST; intrastate splits into CGST + SGST. */
   interState?: boolean;
+  cgst?: number;
+  sgst?: number;
+  igst?: number;
 }
 
 export function computeGst({ subtotal, discount = 0, gstRate = 18, interState = false }: GstBreakdownInput) {
@@ -28,7 +31,15 @@ function Row({ label, value, strong }: { label: string; value: string; strong?: 
 
 /** Invoice / credit-note tax summary. */
 export function GstBreakdown(props: GstBreakdownInput) {
-  const { taxable, discount, cgst, sgst, igst, grandTotal } = computeGst(props);
+  const computed = computeGst(props);
+  const taxable = computed.taxable;
+  const discount = computed.discount;
+  const cgst = props.cgst ?? computed.cgst;
+  const sgst = props.sgst ?? computed.sgst;
+  const igst = props.igst ?? computed.igst;
+  const grandTotal = props.cgst !== undefined || props.sgst !== undefined || props.igst !== undefined
+    ? taxable + cgst + sgst + igst
+    : computed.grandTotal;
   const rate = props.gstRate ?? 18;
 
   return (

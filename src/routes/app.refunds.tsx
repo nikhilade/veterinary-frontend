@@ -45,8 +45,11 @@ function RefundsPage() {
 
   const load = useCallback(() => {
     apiClient
-      .get<InvoiceDetail[]>(endpoints.billing.invoices)
-      .then((list) => setInvoices(list.filter((i) => i.amountPaid > 0)))
+      .get<InvoiceDetail[] | { content: InvoiceDetail[] }>(endpoints.billing.invoices)
+      .then((res) => {
+        const list = Array.isArray(res) ? res : (res?.content ?? []);
+        setInvoices(list.filter((i) => i.amountPaid > 0));
+      })
       .catch(() => setInvoices([]));
     apiClient.get<Refund[]>(endpoints.refunds.list).then(setRefunds).catch(() => setRefunds([]));
     apiClient.get<CreditNote[]>(endpoints.creditNotes.list).then(setNotes).catch(() => setNotes([]));
@@ -62,7 +65,7 @@ function RefundsPage() {
     if (!invoice) throw new Error("Select the invoice being refunded.");
     return apiClient.post<Refund>(
       endpoints.refunds.create,
-      { invoice_id: invoice.id, amount, reason, requested_by: user?.name ?? "Billing Staff" },
+      { invoiceId, amount, reason, requestedBy: user?.name ?? "Billing Staff" },
       headers,
     );
   }
@@ -135,7 +138,7 @@ function RefundsPage() {
                       <option value="">Select an invoice…</option>
                       {invoices.map((i) => (
                         <option key={i.id} value={i.id}>
-                          {i.number} · {i.ownerName} · paid {INR(i.amountPaid)}
+                          {i.invoiceNumber} · {i.ownerName} · paid {INR(i.amountPaid)}
                         </option>
                       ))}
                     </select>
@@ -143,9 +146,9 @@ function RefundsPage() {
 
                   <MoneyInput label="Refund amount" value={amount} onChange={setAmount} />
 
-                  {invoice?.gst_finalised ? (
+                  {invoice?.gstFinalised ? (
                     <p className="rounded-2xl bg-muted px-4 py-3 text-xs text-foreground/65">
-                      {invoice.number} is GST-finalised — a sequential credit note is generated automatically on
+                      {invoice.invoiceNumber} is GST-finalised — a sequential credit note is generated automatically on
                       approval, before the money moves.
                     </p>
                   ) : null}
@@ -172,19 +175,21 @@ function RefundsPage() {
                     />
                   </div>
 
-                  <IdempotentSubmitButton
-                    key={invoiceId}
-                    disabled={!invoiceId || amount <= 0 || reason.trim().length < 5}
-                    onSubmit={submitRequest}
-                    onSuccess={() => {
-                      setReason("");
-                      setAmount(0);
-                      setInvoiceId("");
-                      load();
-                    }}
-                  >
-                    Submit for approval
-                  </IdempotentSubmitButton>
+                  <div title="Refunds coming soon">
+                    <IdempotentSubmitButton
+                      key={invoiceId}
+                      disabled={true}
+                      onSubmit={submitRequest}
+                      onSuccess={() => {
+                        setReason("");
+                        setAmount(0);
+                        setInvoiceId("");
+                        load();
+                      }}
+                    >
+                      Submit for approval
+                    </IdempotentSubmitButton>
+                  </div>
                 </div>
               )}
             </Panel>
@@ -199,13 +204,13 @@ function RefundsPage() {
                       <div className="flex flex-wrap items-start justify-between gap-3">
                         <div>
                           <p className="text-sm font-medium">
-                            {r.invoice_number} · {INR(r.amount)}
+                            <span className="block font-medium">{r.invoiceNumber}</span>
+                            <span className="block text-xs text-foreground/55">
+                               requested by {r.requestedBy} · {new Date(r.requestedAt).toLocaleDateString()}
+                            </span>
                           </p>
                           <p className="mt-0.5 text-xs text-foreground/60">
                             {r.ownerName} — {r.reason}
-                          </p>
-                          <p className="mt-1 text-xs text-foreground/45">
-                            Requested by {r.requested_by} on {new Date(r.requested_at).toLocaleDateString()}
                           </p>
                         </div>
                         <span
@@ -221,16 +226,16 @@ function RefundsPage() {
                         </span>
                       </div>
 
-                      {r.requires_super_admin && r.status === "PENDING_APPROVAL" ? (
+                      {r.requiresSuperAdmin && r.status === "PENDING_APPROVAL" ? (
                         <p className="mt-2 inline-flex items-center gap-1.5 text-xs text-clay">
                           <ShieldCheck className="size-3.5" /> Super Admin authorisation required
                         </p>
                       ) : null}
 
-                      {r.credit_note ? (
+                      {r.creditNote ? (
                         <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1 text-xs">
-                          <FileText className="size-3.5" /> Credit note {r.credit_note.number} ·{" "}
-                          {INR(r.credit_note.amount)}
+                          <FileText className="size-3.5" /> Credit note {r.creditNote.number} ·{" "}
+                          {INR(r.creditNote.amount)}
                         </p>
                       ) : null}
 
@@ -280,7 +285,7 @@ function RefundsPage() {
                     {notes.map((n) => (
                       <tr key={n.id} className="border-t border-border">
                         <td className="py-3 font-medium">{n.number}</td>
-                        <td className="py-3 text-foreground/70">{n.invoice_number}</td>
+                        <td className="py-3 text-foreground/70">Against {n.invoiceNumber}</td>
                         <td className="py-3 text-foreground/70">{new Date(n.issuedAt).toLocaleDateString()}</td>
                         <td className="py-3 tabular-nums text-foreground/70">{INR(n.tax)}</td>
                         <td className="py-3 tabular-nums">{INR(n.amount)}</td>

@@ -97,6 +97,7 @@ export const endpoints = {
     chargeableItems: `${V1}/billing/chargeable-items`,
     invoices: `${V1}/billing/invoices`,
     invoice: (id: string) => `${V1}/billing/invoices/${id}`,
+    invoiceStatus: (id: string) => `${V1}/billing/invoices/${id}/status`,
   },
   payments: {
     list: `${V1}/payments`,
