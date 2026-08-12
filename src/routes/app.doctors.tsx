@@ -102,9 +102,11 @@ function DoctorsPage() {
   async function save() {
     setSaving(true);
     setError("");
-    const body = { ...draft, consultationFee: Number(draft.consultationFee) || 0, consultationDurationMin: Number(draft.consultationDurationMin) || 15 };
+    const body: any = { ...draft, consultationFee: Number(draft.consultationFee) || 0, consultationDurationMin: Number(draft.consultationDurationMin) || 15 };
+    if (!body.dob) delete body.dob;
+    if (!body.joiningDate) delete body.joiningDate;
     try {
-      if (editing) await apiClient.patch<DoctorProfile>(endpoints.doctors.update(editing), body);
+      if (editing) await apiClient.put<DoctorProfile>(endpoints.doctors.update(editing), body);
       else await apiClient.post<DoctorProfile>(endpoints.doctors.create, body);
       setOpen(false);
       load();

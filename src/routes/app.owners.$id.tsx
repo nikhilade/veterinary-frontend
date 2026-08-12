@@ -41,14 +41,13 @@ function OwnerDetailPage() {
 
   const load = useCallback(async () => {
     setLoading(true);
-    const [o, p, d, c] = await Promise.all([
+    const [o, d, c] = await Promise.all([
       apiClient.get<PetOwner>(endpoints.petOwners.detail(id)),
-      apiClient.get<Pet[]>(endpoints.pets.byOwner(id)),
       apiClient.get<OwnerDocument[]>(endpoints.petOwners.documents(id)),
       apiClient.get<CommunicationLog[]>(endpoints.petOwners.communications(id)),
     ]);
     setOwner(o);
-    setPets(p);
+    setPets(o.pets || []);
     setDocs(d);
     setLogs(c);
     setDraft({ firstName: o.firstName, email: o.email, phoneNumber: o.phoneNumber, address: o.address });

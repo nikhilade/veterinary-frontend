@@ -174,7 +174,11 @@ export const endpoints = {
         species: `/api/species`,
         specializations: `${V1}/specializations`,
         "lab-tests": `${V1}/lab-tests`,
+        hospitals: `${V1}/hospitals`,
       };
+      if (resource.startsWith("cities-by-state/")) {
+        return `${V1}/cities/state/${resource.split("/")[1]}`;
+      }
       return paths[resource] || `${V1}/master-data/${resource}`;
     },
     create: (resource: string) => {

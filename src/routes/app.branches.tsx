@@ -33,13 +33,16 @@ function BranchesPage() {
         detailPath={endpoints.branchAdmin.detail}
         emptyMessage="No branches yet — add your first location."
         fields={[
+          { key: "hospitalId", label: "Hospital", required: true, type: "select", lookup: "hospitals", hideInTable: true },
           { key: "branchName", label: "Branch name", required: true },
           { key: "branchCode", label: "Branch code", required: true },
-          { key: "cityId", label: "City", type: "select", lookup: "cities" },
-          { key: "stateId", label: "State", type: "select", lookup: "states" },
-          { key: "addressLine1", label: "Address" },
-          { key: "phone", label: "Phone" },
-          { key: "email", label: "Email" },
+          { key: "stateId", label: "State", type: "select", lookup: "states", required: true },
+          { key: "cityId", label: "City", type: "select", lookup: (form) => form.stateId ? `cities-by-state/${form.stateId}` : null, required: true },
+          { key: "country", label: "Country" },
+          { key: "pincode", label: "Pincode", required: true },
+          { key: "addressLine1", label: "Address", required: true },
+          { key: "phone", label: "Phone", required: true },
+          { key: "email", label: "Email", required: true },
           { key: "latitude", label: "Latitude", type: "number" },
           { key: "longitude", label: "Longitude", type: "number" },
           { key: "isHeadBranch", label: "Head Branch", type: "boolean" },

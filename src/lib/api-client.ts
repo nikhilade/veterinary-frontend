@@ -78,11 +78,14 @@ export const apiClient = {
   async get<T>(path: string, query?: RequestOptions["query"]) {
     return (await request<T>(path, { method: "GET", query })).data;
   },
-  async post<T>(path: string, body?: Record<string, unknown>, headers?: Record<string, string>) {
-    return (await request<T>(path, { method: "POST", body, headers })).data;
+  async post<T>(path: string, body?: Record<string, unknown>, headers?: Record<string, string>, query?: RequestOptions["query"]) {
+    return (await request<T>(path, { method: "POST", body, headers, query })).data;
   },
   async patch<T>(path: string, body?: Record<string, unknown>, headers?: Record<string, string>) {
     return (await request<T>(path, { method: "PATCH", body, headers })).data;
+  },
+  async put<T>(path: string, body?: Record<string, unknown>, headers?: Record<string, string>) {
+    return (await request<T>(path, { method: "PUT", body, headers })).data;
   },
   async delete<T>(path: string) {
     return (await request<T>(path, { method: "DELETE" })).data;
