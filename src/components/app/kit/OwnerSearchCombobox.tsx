@@ -30,7 +30,7 @@ export function OwnerSearchCombobox({
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [creating, setCreating] = useState(false);
-  const [draft, setDraft] = useState({ name: "", phone: "", email: "", address: "" });
+  const [draft, setDraft] = useState({ firstName: "", lastName: "", phoneNumber: "", email: "", address: "" });
   const [error, setError] = useState("");
   const box = useRef<HTMLDivElement>(null);
 
@@ -61,16 +61,16 @@ export function OwnerSearchCombobox({
 
   async function createOwner() {
     setError("");
-    if (!draft.name.trim() || draft.phone.replace(/\D/g, "").length < 6) {
-      setError("Name and a valid phone number are required.");
+    if (!draft.firstName.trim() || draft.phoneNumber.replace(/\D/g, "").length < 6) {
+      setError("First name and a valid phone number are required.");
       return;
     }
     try {
-      const owner = await apiClient.post<PetOwner>(endpoints.petOwners.create, draft);
+      const owner = await apiClient.post<PetOwner>(endpoints.petOwners.lookupOrCreate, draft);
       onChange?.(owner);
       setCreating(false);
       setOpen(false);
-      setDraft({ name: "", phone: "", email: "", address: "" });
+      setDraft({ firstName: "", lastName: "", phoneNumber: "", email: "", address: "" });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not create the owner.");
     }
@@ -84,7 +84,7 @@ export function OwnerSearchCombobox({
         <input
           className={cn(field, "pl-10")}
           placeholder={placeholder}
-          value={open ? query : (value?.name ?? "")}
+          value={open ? query : (value ? `${value.firstName || ""} ${value.lastName || ""}`.trim() : "")}
           onFocus={() => setOpen(true)}
           onChange={(e) => {
             setQuery(e.target.value);
@@ -94,7 +94,7 @@ export function OwnerSearchCombobox({
       </div>
       {value && !open ? (
         <p className="mt-1.5 text-xs text-foreground/60">
-          {value.phone} · {value.pets?.length || value.petsCount || 0} pet{(value.pets?.length || value.petsCount || 0) === 1 ? "" : "s"}
+          {value.phoneNumber} · {value.pets?.length || value.petsCount || 0} pet{(value.pets?.length || value.petsCount || 0) === 1 ? "" : "s"}
         </p>
       ) : null}
 
@@ -103,15 +103,13 @@ export function OwnerSearchCombobox({
           {creating ? (
             <div className="space-y-2 p-4">
               <p className="text-sm font-medium">New owner</p>
-              {(["name", "phone", "email", "address"] as const).map((k) => (
-                <input
-                  key={k}
-                  className={field}
-                  placeholder={k[0].toUpperCase() + k.slice(1)}
-                  value={draft[k]}
-                  onChange={(e) => setDraft({ ...draft, [k]: e.target.value })}
-                />
-              ))}
+              <div className="grid grid-cols-2 gap-2">
+                <input className={field} placeholder="First name" value={draft.firstName} onChange={(e) => setDraft({ ...draft, firstName: e.target.value })} />
+                <input className={field} placeholder="Last name" value={draft.lastName} onChange={(e) => setDraft({ ...draft, lastName: e.target.value })} />
+              </div>
+              <input className={field} placeholder="Phone number" value={draft.phoneNumber} onChange={(e) => setDraft({ ...draft, phoneNumber: e.target.value })} />
+              <input className={field} placeholder="Email" value={draft.email} onChange={(e) => setDraft({ ...draft, email: e.target.value })} />
+              <input className={field} placeholder="Address" value={draft.address} onChange={(e) => setDraft({ ...draft, address: e.target.value })} />
               {error ? <p className="text-xs text-destructive">{error}</p> : null}
               <div className="flex gap-2 pt-1">
                 <button
@@ -152,7 +150,7 @@ export function OwnerSearchCombobox({
                         className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left hover:bg-muted"
                       >
                         <span>
-                          <span className="block text-sm font-medium">{o.firstName}</span>
+                          <span className="block text-sm font-medium">{o.firstName} {o.lastName}</span>
                           <span className="block text-xs text-foreground/60">
                             {o.phoneNumber} · {o.email}
                           </span>
@@ -167,7 +165,7 @@ export function OwnerSearchCombobox({
                 type="button"
                 onClick={() => {
                   setCreating(true);
-                  setDraft((d) => ({ ...d, name: /\d/.test(query) ? d.name : query, phone: /\d/.test(query) ? query : d.phone }));
+                  setDraft((d) => ({ ...d, firstName: /\d/.test(query) ? d.firstName : query, phoneNumber: /\d/.test(query) ? query : d.phoneNumber }));
                 }}
                 className="flex w-full items-center gap-2 border-t border-border px-4 py-3 text-sm text-forest hover:bg-muted"
               >
