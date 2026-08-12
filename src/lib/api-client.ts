@@ -35,7 +35,7 @@ export class ApiError extends Error {
 
 type RequestOptions = {
   method?: "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
-  body?: Record<string, unknown>;
+  body?: Record<string, unknown> | FormData;
   query?: Record<string, string | number | boolean | undefined>;
   headers?: Record<string, string>;
 };
@@ -51,14 +51,15 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<A
 
   const token = readToken();
   const url = `${BASE_URL}${path}${search.toString() ? `?${search}` : ""}`;
+  const isFormData = body instanceof FormData;
   const res = await fetch(url, {
     method,
     headers: {
-      "Content-Type": "application/json",
+      ...(isFormData ? {} : { "Content-Type": "application/json" }),
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(headers ?? {}),
     },
-    body: body ? JSON.stringify(body) : undefined,
+    body: body ? (isFormData ? body : JSON.stringify(body)) : undefined,
   });
   const raw = (await res.json()) as ApiResponse<unknown>;
   payload = { ...raw, data: raw.data } as ApiResponse<T>;
@@ -78,13 +79,13 @@ export const apiClient = {
   async get<T>(path: string, query?: RequestOptions["query"]) {
     return (await request<T>(path, { method: "GET", query })).data;
   },
-  async post<T>(path: string, body?: Record<string, unknown>, headers?: Record<string, string>, query?: RequestOptions["query"]) {
+  async post<T>(path: string, body?: Record<string, unknown> | FormData, headers?: Record<string, string>, query?: RequestOptions["query"]) {
     return (await request<T>(path, { method: "POST", body, headers, query })).data;
   },
-  async patch<T>(path: string, body?: Record<string, unknown>, headers?: Record<string, string>) {
+  async patch<T>(path: string, body?: Record<string, unknown> | FormData, headers?: Record<string, string>) {
     return (await request<T>(path, { method: "PATCH", body, headers })).data;
   },
-  async put<T>(path: string, body?: Record<string, unknown>, headers?: Record<string, string>) {
+  async put<T>(path: string, body?: Record<string, unknown> | FormData, headers?: Record<string, string>) {
     return (await request<T>(path, { method: "PUT", body, headers })).data;
   },
   async delete<T>(path: string) {

@@ -40,7 +40,7 @@ export function OwnerSearchCombobox({
     setLoading(true);
     const t = setTimeout(() => {
       apiClient
-        .get<PetOwner[]>(endpoints.petOwners.search, { q: query })
+        .get<PetOwner[]>(endpoints.petOwners.search, { query: query })
         .then((r) => active && setResults(r))
         .catch(() => active && setResults([]))
         .finally(() => active && setLoading(false));
@@ -66,7 +66,12 @@ export function OwnerSearchCombobox({
       return;
     }
     try {
-      const owner = await apiClient.post<PetOwner>(endpoints.petOwners.lookupOrCreate, draft);
+      const owner = await apiClient.post<PetOwner>(
+        endpoints.petOwners.lookupOrCreate,
+        undefined,
+        undefined,
+        { phoneNumber: draft.phoneNumber, firstName: draft.firstName }
+      );
       onChange?.(owner);
       setCreating(false);
       setOpen(false);
