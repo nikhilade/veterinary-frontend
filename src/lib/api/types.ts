@@ -214,11 +214,10 @@ export interface OwnerDocument {
 export interface CommunicationLog {
   id: string;
   ownerId: string;
-  channel: "SMS" | "Email" | "Call" | "WhatsApp";
-  subject: string;
-  body: string;
-  direction: "OUTBOUND" | "INBOUND";
+  communicationType: string;
+  messageContent: string;
   sentAt: string;
+  status: string;
 }
 
 export interface MedicalEvent {

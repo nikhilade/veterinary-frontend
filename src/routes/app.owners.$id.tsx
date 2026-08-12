@@ -1,12 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
-import { ArrowLeft, FileText, MessageSquare, PawPrint, Pencil, Plus, Upload } from "lucide-react";
+import { ArrowLeft, FileText, MessageSquare, PawPrint, Pencil, Plus, Upload, Mail, Smartphone } from "lucide-react";
 import { StaffLayout } from "@/components/app/StaffLayout";
 import { EmptyState, Loading, Panel, formatDate } from "@/components/app/ui";
 import { PetForm } from "@/components/app/kit/PetForm";
 import { apiClient } from "@/lib/api-client";
 import { endpoints } from "@/lib/api/endpoints";
 import type { CommunicationLog, OwnerDocument, Pet, PetOwner } from "@/lib/api/types";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/app/owners/$id")({
   head: () => ({
@@ -36,6 +37,7 @@ function OwnerDetailPage() {
   const [editing, setEditing] = useState(false);
   const [addingPet, setAddingPet] = useState(false);
   const [draft, setDraft] = useState({ firstName: "", email: "", phoneNumber: "", address: "" });
+  const [activeTab, setActiveTab] = useState<"overview" | "communications">("overview");
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -82,8 +84,25 @@ function OwnerDetailPage() {
       {loading || !owner ? (
         <Loading />
       ) : (
-        <div className="grid gap-5 lg:grid-cols-2">
-          <Panel
+        <>
+          <div className="mb-6 flex gap-6 border-b border-border px-1">
+            <button
+              onClick={() => setActiveTab("overview")}
+              className={cn("pb-3 text-sm font-medium border-b-2 transition-colors", activeTab === "overview" ? "border-forest text-forest" : "border-transparent text-foreground/60 hover:text-foreground")}
+            >
+              Overview
+            </button>
+            <button
+              onClick={() => setActiveTab("communications")}
+              className={cn("pb-3 text-sm font-medium border-b-2 transition-colors", activeTab === "communications" ? "border-forest text-forest" : "border-transparent text-foreground/60 hover:text-foreground")}
+            >
+              Communication History
+            </button>
+          </div>
+
+          {activeTab === "overview" ? (
+            <div className="grid gap-5 lg:grid-cols-2">
+              <Panel
             title="Profile"
             action={
               <button onClick={() => setEditing((v) => !v)} className="inline-flex items-center gap-1.5 text-sm text-forest">
@@ -208,33 +227,46 @@ function OwnerDetailPage() {
                 ))}
               </ul>
             )}
-          </Panel>
-
-          <Panel title="Communication history">
-            {logs.length === 0 ? (
-              <EmptyState
-                icon={<MessageSquare className="size-7" />}
-                title="Nothing sent yet"
-                message="Reminders, invoices and call notes for this owner will appear here."
-              />
-            ) : (
-              <ol className="space-y-3">
-                {logs.map((l) => (
-                  <li key={l.id} className="rounded-2xl border border-border px-4 py-3 text-sm">
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="font-medium">{l.subject}</span>
-                      <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs">{l.channel}</span>
-                    </div>
-                    <p className="mt-1 text-foreground/70">{l.body}</p>
-                    <p className="mt-1 text-xs text-foreground/50">
-                      {l.direction === "INBOUND" ? "Received" : "Sent"} · {formatDate(l.sentAt)}
-                    </p>
-                  </li>
-                ))}
-              </ol>
-            )}
-          </Panel>
-        </div>
+            </Panel>
+            </div>
+          ) : (
+            <div className="max-w-3xl">
+              <Panel title="Communication history">
+                {logs.length === 0 ? (
+                  <EmptyState
+                    icon={<MessageSquare className="size-7" />}
+                    title="Nothing sent yet"
+                    message="Reminders, invoices and call notes for this owner will appear here."
+                  />
+                ) : (
+                  <ol className="space-y-3">
+                    {logs.map((l) => (
+                      <li key={l.id} className="rounded-2xl border border-border px-4 py-3 text-sm">
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="font-medium flex items-center gap-2">
+                            {l.communicationType === "SMS" ? (
+                              <MessageSquare className="size-4 text-forest" />
+                            ) : l.communicationType === "Email" ? (
+                              <Mail className="size-4 text-forest" />
+                            ) : (
+                              <Smartphone className="size-4 text-forest" />
+                            )}
+                            {l.communicationType}
+                          </span>
+                          <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs">{l.status}</span>
+                        </div>
+                        <p className="mt-1 text-foreground/70">{l.messageContent}</p>
+                        <p className="mt-1 text-xs text-foreground/50">
+                          {formatDate(l.sentAt)}
+                        </p>
+                      </li>
+                    ))}
+                  </ol>
+                )}
+              </Panel>
+            </div>
+          )}
+        </>
       )}
     </StaffLayout>
   );
