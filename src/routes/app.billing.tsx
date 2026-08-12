@@ -66,11 +66,11 @@ function BillingPage() {
       .catch(() => {
         // Fallback mock catalog since backend endpoint doesn't exist yet
         setCatalog([
-          { id: "1", type: "CONSULTATION", label: "General Consultation", unitPrice: 500, gstRate: 18 },
-          { id: "2", type: "PHARMACY", label: "Rabies Vaccine", unitPrice: 300, gstRate: 12 },
-          { id: "3", type: "PHARMACY", label: "Deworming Tablets", unitPrice: 150, gstRate: 12 },
-          { id: "4", type: "LAB", label: "Complete Blood Count (CBC)", unitPrice: 800, gstRate: 18 },
-          { id: "5", type: "GROOMING", label: "Basic Grooming", unitPrice: 1000, gstRate: 18 }
+          { id: "1", code: "C001", name: "General Consultation", description: "", itemType: "CONSULTATION", price: 500, taxRate: 18, active: true },
+          { id: "2", code: "P001", name: "Rabies Vaccine", description: "", itemType: "PHARMACY", price: 300, taxRate: 12, active: true },
+          { id: "3", code: "P002", name: "Deworming Tablets", description: "", itemType: "PHARMACY", price: 150, taxRate: 12, active: true },
+          { id: "4", code: "L001", name: "Complete Blood Count (CBC)", description: "", itemType: "LAB", price: 800, taxRate: 18, active: true },
+          { id: "5", code: "G001", name: "Basic Grooming", description: "", itemType: "GROOMING", price: 1000, taxRate: 18, active: true }
         ]);
       });
   }, [load]);
@@ -186,12 +186,12 @@ function InvoiceBuilder({
   const [cancelling, setCancelling] = useState(false);
 
   const subtotal = useMemo(() => items.reduce((sum, i) => sum + i.amount, 0), [items]);
-  const options = catalog.filter((c) => c.type === type);
+  const options = catalog.filter((c) => c.itemType === type && c.active);
 
   function addItem(entry: ChargeableItem) {
     if (locked) return;
     setItems((current) => {
-      const existing = current.find((i) => i.label === entry.label && i.type === entry.type);
+      const existing = current.find((i) => i.label === entry.name && i.type === entry.itemType);
       if (existing) {
         return current.map((i) =>
           i === existing ? { ...i, quantity: i.quantity + 1, amount: (i.quantity + 1) * i.unitPrice } : i,
@@ -201,11 +201,11 @@ function InvoiceBuilder({
         ...current,
         {
           id: `li_${entry.id}_${current.length}`,
-          type: entry.type,
-          label: entry.label,
+          type: entry.itemType,
+          label: entry.name,
           quantity: 1,
-          unitPrice: entry.unitPrice,
-          amount: entry.unitPrice,
+          unitPrice: entry.price,
+          amount: entry.price,
         },
       ];
     });
@@ -223,6 +223,7 @@ function InvoiceBuilder({
     if (!items.length) throw new Error("Add at least one line item.");
     const payload = {
       patientId: owner?.id, // Temporary fallback since pet picker isn't fully wired for billing yet
+      hospitalId: "00000000-0000-0000-0000-000000000000", // Fallback hospital ID, will need to be fetched from context later
       visitId: null,
       items: items.map(i => ({
         itemType: i.type,
@@ -328,8 +329,8 @@ function InvoiceBuilder({
                 disabled={locked}
                 className="flex items-center justify-between gap-3 rounded-2xl border border-border px-4 py-3 text-left text-sm transition-colors hover:border-forest disabled:opacity-50"
               >
-                <span>{c.label}</span>
-                <span className="shrink-0 tabular-nums text-foreground/60">{INR(c.unitPrice)}</span>
+                <span>{c.name}</span>
+                <span className="shrink-0 tabular-nums text-foreground/60">{INR(c.price)}</span>
               </button>
             ))}
           </div>

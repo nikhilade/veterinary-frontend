@@ -1,16 +1,19 @@
 /** Billing, payments, refunds, inventory and supplier domain types. */
 
-export type LineItemType = "CONSULTATION" | "LAB" | "PHARMACY" | "GROOMING" | "MISC";
+export type LineItemType = "CONSULTATION" | "LAB" | "PHARMACY" | "GROOMING" | "SURGERY" | "MISC";
 
-export const LINE_ITEM_TYPES: LineItemType[] = ["CONSULTATION", "LAB", "PHARMACY", "GROOMING", "MISC"];
+export const LINE_ITEM_TYPES: LineItemType[] = ["CONSULTATION", "LAB", "PHARMACY", "GROOMING", "SURGERY", "MISC"];
 
 /** Master catalogue of chargeable services, grouped by line-item type. */
 export interface ChargeableItem {
   id: string;
-  type: LineItemType;
-  label: string;
-  unitPrice: number;
-  gstRate: number;
+  code: string;
+  name: string;
+  description: string;
+  itemType: LineItemType;
+  price: number;
+  taxRate: number;
+  active: boolean;
 }
 
 export interface InvoiceLineItem {
