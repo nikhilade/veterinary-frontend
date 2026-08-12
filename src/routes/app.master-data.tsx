@@ -24,6 +24,26 @@ export const Route = createFileRoute("/app/master-data")({
 /** Five screens, one component — each entry is just configuration. */
 const collections: { key: string; label: string; description: string; fields: CrudField[] }[] = [
   {
+    key: "states",
+    label: "States",
+    description: "States and provinces used for branch and client addresses.",
+    fields: [
+      { key: "name", label: "State", required: true },
+      { key: "code", label: "Code", required: true },
+      { key: "isActive", label: "Status", type: "boolean" },
+    ],
+  },
+  {
+    key: "cities",
+    label: "Cities",
+    description: "Cities mapped to states.",
+    fields: [
+      { key: "name", label: "City", required: true },
+      { key: "stateId", label: "State", type: "select", lookup: "states", required: true },
+      { key: "isActive", label: "Status", type: "boolean" },
+    ],
+  },
+  {
     key: "species",
     label: "Species",
     description: "Top-level animal types offered by the hospital.",

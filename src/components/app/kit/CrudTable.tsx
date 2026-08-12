@@ -10,8 +10,8 @@ export interface CrudField {
   label: string;
   type?: CrudFieldType;
   options?: string[];
-  /** Master data resource key to lookup for options (e.g., "species") */
-  lookup?: string;
+  /** Master data resource key to lookup for options, or a function returning the key based on form state. */
+  lookup?: string | ((form: Record<string, unknown>) => string | null);
   required?: boolean;
   /** Hidden from the table, still editable in the form. */
   hideInTable?: boolean;
@@ -78,7 +78,7 @@ export function CrudTable<T extends { id: string }>({
       return;
     }
     try {
-      if (editingId) await apiClient.patch(detailPath(editingId), form);
+      if (editingId) await apiClient.put(detailPath(editingId), form);
       else await apiClient.post(createPath, form);
       setOpen(false);
       setEditingId(null);
@@ -263,7 +263,8 @@ function LookupSelect({
   form: Record<string, unknown>;
   setForm: React.Dispatch<React.SetStateAction<Record<string, unknown>>>;
 }) {
-  const { data = [] } = useMasterData(f.lookup!);
+  const lookupKey = typeof f.lookup === "function" ? f.lookup(form) : f.lookup!;
+  const { data = [] } = useMasterData(lookupKey);
   return (
     <select
       className={field}
@@ -271,9 +272,9 @@ function LookupSelect({
       onChange={(e) => setForm((s) => ({ ...s, [f.key]: e.target.value }))}
     >
       <option value="">Select {f.label.toLowerCase()}...</option>
-      {data.map((o) => (
+      {data.map((o: any) => (
         <option key={o.id} value={o.id}>
-          {o.name}
+          {o.name || o.tenantName || o.hospitalName || o.branchName || o.firstName || o.id}
         </option>
       ))}
     </select>

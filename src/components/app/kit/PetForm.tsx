@@ -3,6 +3,7 @@ import { ImagePlus } from "lucide-react";
 import { apiClient, ApiError } from "@/lib/api-client";
 import { endpoints } from "@/lib/api/endpoints";
 import type { Pet } from "@/lib/api/types";
+import { toast } from "sonner";
 
 const field =
   "w-full rounded-2xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-forest";
@@ -50,7 +51,7 @@ export function PetForm({ ownerId, pet = null, onSaved, submitLabel = "Save pet"
 
   async function submit() {
     setError(null);
-    if (!form.name.trim()) {
+    if (!form.petName.trim()) {
       setError("Pet name is required.");
       return;
     }
@@ -65,7 +66,9 @@ export function PetForm({ ownerId, pet = null, onSaved, submitLabel = "Save pet"
       };
       const saved = pet
         ? await apiClient.patch<Pet>(endpoints.pets.update(pet.id), payload)
-        : (await apiClient.post<{ pet: Pet; created: boolean }>(endpoints.pets.lookupOrCreate, payload)).pet;
+        : await apiClient.post<Pet>(endpoints.pets.lookupOrCreate, payload);
+      
+      toast.success(`Pet ${pet ? "updated" : "saved"} successfully!`);
       onSaved(saved);
     } catch (e) {
       setError(e instanceof ApiError ? e.message : "Could not save the pet.");
@@ -81,13 +84,13 @@ export function PetForm({ ownerId, pet = null, onSaved, submitLabel = "Save pet"
       <div className="flex items-center gap-4">
         <label className="flex size-20 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-2xl border border-dashed border-border bg-muted">
           {photo ? (
-            <img src={photo} alt={`${form.name || "Pet"} photo`} className="size-full object-cover" />
+            <img src={photo} alt={`${form.petName || "Pet"} photo`} className="size-full object-cover" />
           ) : (
             <ImagePlus className="size-6 text-foreground/40" />
           )}
           <input type="file" accept="image/*" className="hidden" onChange={(e) => onPhoto(e.target.files?.[0])} />
         </label>
-        <input className={field} placeholder="Pet name" value={form.name} onChange={(e) => setForm({ ...form, petName: e.target.value })} />
+        <input className={field} placeholder="Pet name" value={form.petName} onChange={(e) => setForm({ ...form, petName: e.target.value })} />
       </div>
 
       <div className="grid grid-cols-2 gap-2">

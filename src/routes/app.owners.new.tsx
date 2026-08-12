@@ -7,6 +7,7 @@ import { PetForm } from "@/components/app/kit/PetForm";
 import { apiClient, ApiError } from "@/lib/api-client";
 import { endpoints } from "@/lib/api/endpoints";
 import type { PetOwner } from "@/lib/api/types";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/app/owners/new")({
   head: () => ({
@@ -26,15 +27,13 @@ export const Route = createFileRoute("/app/owners/new")({
 const field =
   "w-full rounded-2xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-forest";
 
-type LookupResult = { owner: PetOwner | null; created: boolean };
-
 function NewOwnerPage() {
   const navigate = useNavigate();
   const [phone, setPhone] = useState("");
   const [checking, setChecking] = useState(false);
   const [match, setMatch] = useState<PetOwner | null>(null);
   const [checked, setChecked] = useState(false);
-  const [form, setForm] = useState({ name: "", email: "", address: "" });
+  const [form, setForm] = useState({ firstName: "", lastName: "", email: "", address: "" });
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -48,12 +47,15 @@ function NewOwnerPage() {
     setChecking(true);
     const t = setTimeout(async () => {
       try {
-        const res = await apiClient.post<LookupResult>(endpoints.petOwners.lookupOrCreate, {
-          phone,
-          lookup_only: true,
-        });
+        // Use the search endpoint to check for duplicates by phone number
+        const res = await apiClient.get<PetOwner[]>(
+          endpoints.petOwners.search,
+          { q: phone }
+        );
         if (!active) return;
-        setMatch(res.owner);
+        // Strictly find exact match to avoid fuzzy search false-positives
+        const exactMatch = (res || []).find(o => o.phoneNumber === phone);
+        setMatch(exactMatch || null);
         setChecked(true);
       } catch {
         if (active) setChecked(false);
@@ -71,8 +73,17 @@ function NewOwnerPage() {
     setError(null);
     setSaving(true);
     try {
-      const res = await apiClient.post<LookupResult>(endpoints.petOwners.lookupOrCreate, { phone, ...form });
-      if (res.owner) navigate({ to: "/app/owners/$id", params: { id: res.owner.id } });
+        // Use the standard POST /pet-owners to create the new owner with a JSON body
+      const res = await apiClient.post<PetOwner>(
+        endpoints.petOwners.create,
+        { phoneNumber: phone, ...form }
+      );
+      if (res && res.id) {
+        toast.success("Owner created successfully!");
+        navigate({ to: "/app/owners/$id", params: { id: res.id } });
+      } else {
+        throw new Error("Invalid response from server.");
+      }
     } catch (e) {
       setError(e instanceof ApiError ? e.message : "Could not save the owner.");
     } finally {
@@ -143,12 +154,20 @@ function NewOwnerPage() {
         ) : (
           <Panel title="Step 2 — Owner details">
             <div className="space-y-3">
-              <input
-                className={field}
-                placeholder="Full name"
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-              />
+              <div className="grid gap-3 sm:grid-cols-2">
+                <input
+                  className={field}
+                  placeholder="First name"
+                  value={form.firstName}
+                  onChange={(e) => setForm({ ...form, firstName: e.target.value })}
+                />
+                <input
+                  className={field}
+                  placeholder="Last name"
+                  value={form.lastName}
+                  onChange={(e) => setForm({ ...form, lastName: e.target.value })}
+                />
+              </div>
               <input
                 className={field}
                 placeholder="Email"
@@ -165,7 +184,7 @@ function NewOwnerPage() {
               {error ? <p className="text-sm text-destructive">{error}</p> : null}
               <button
                 type="button"
-                disabled={saving || !checked || !form.name.trim()}
+                disabled={saving || !checked || !form.firstName.trim()}
                 onClick={createOwner}
                 className="rounded-full bg-forest px-5 py-2.5 text-sm text-primary-foreground disabled:opacity-50"
               >
