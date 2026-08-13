@@ -108,7 +108,7 @@ function CalendarPage() {
     }
     setBanner("");
     try {
-      await apiClient.post(endpoints.appointments.reschedule(id), { scheduledAt: target.toISOString() });
+      await apiClient.put(endpoints.appointments.reschedule(id), { scheduledAt: target.toISOString() });
       load();
     } catch (err) {
       setBanner(

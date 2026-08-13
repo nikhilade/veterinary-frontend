@@ -25,7 +25,12 @@ function StaffDashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
 
   useEffect(() => {
-    apiClient.get<DashboardStats>(endpoints.dashboard.staff).then(setStats).catch(() => setStats(null));
+    function load() {
+      apiClient.get<DashboardStats>(endpoints.dashboard.staff).then(setStats).catch(() => setStats(null));
+    }
+    load();
+    const t = setInterval(load, 15000);
+    return () => clearInterval(t);
   }, []);
 
   return (

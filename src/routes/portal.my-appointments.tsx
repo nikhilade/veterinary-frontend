@@ -41,7 +41,7 @@ function MyAppointments() {
     setBusy(a.id);
     setMessage(null);
     try {
-      replace(await apiClient.post<Appointment>(endpoints.appointments.cancel(a.id)));
+      replace(await apiClient.put<Appointment>(endpoints.appointments.cancel(a.id)));
       setMessage("Appointment cancelled.");
     } catch (e) {
       setMessage(e instanceof ApiError ? e.message : "Could not cancel — please call the clinic.");
@@ -56,7 +56,7 @@ function MyAppointments() {
     setMessage(null);
     try {
       replace(
-        await apiClient.post<Appointment>(endpoints.appointments.reschedule(a.id), {
+        await apiClient.put<Appointment>(endpoints.appointments.reschedule(a.id), {
           scheduledAt: new Date(newDate).toISOString(),
         }),
       );

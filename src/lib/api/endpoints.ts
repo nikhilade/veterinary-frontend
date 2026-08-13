@@ -141,6 +141,7 @@ export const endpoints = {
   },
 
   dashboard: {
+    admin: `${V1}/dashboard/admin`,
     staff: `${V1}/dashboard/staff`,
     portal: `${V1}/dashboard/daily-summary`,
   },

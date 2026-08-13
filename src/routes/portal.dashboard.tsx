@@ -32,7 +32,12 @@ function PortalDashboard() {
   const [stats, setStats] = useState<PortalStats | null>(null);
 
   useEffect(() => {
-    apiClient.get<PortalStats>(endpoints.dashboard.portal).then(setStats).catch(() => setStats(null));
+    function load() {
+      apiClient.get<PortalStats>(endpoints.dashboard.portal).then(setStats).catch(() => setStats(null));
+    }
+    load();
+    const t = setInterval(load, 15000);
+    return () => clearInterval(t);
   }, []);
 
   return (

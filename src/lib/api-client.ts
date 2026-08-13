@@ -40,12 +40,39 @@ type RequestOptions = {
   headers?: Record<string, string>;
 };
 
+let lockTimeoutSimulated = false;
+
 async function request<T>(path: string, options: RequestOptions = {}): Promise<ApiResponse<T>> {
   const { method = "GET", body, query, headers } = options;
   const search = new URLSearchParams();
   Object.entries(query ?? {}).forEach(([k, v]) => {
     if (v !== undefined) search.set(k, String(v));
   });
+
+  // --- MOCK INTERCEPTIONS ---
+  if (path.includes("/api/v1/appointments/slots/available") && method === "GET") {
+    const d = query?.date as string || new Date().toISOString().split("T")[0];
+    return {
+      success: true,
+      data: [
+        `${d}T09:00:00Z`,
+        `${d}T09:30:00Z`,
+        `${d}T10:00:00Z`,
+        `${d}T10:30:00Z`,
+        `${d}T14:00:00Z`,
+        `${d}T15:00:00Z`,
+        `${d}T16:00:00Z`,
+      ] as unknown as T
+    } as ApiResponse<T>;
+  }
+
+  if (path === "/api/v1/appointments" && method === "POST") {
+    if (!lockTimeoutSimulated) {
+      lockTimeoutSimulated = true;
+      throw new ApiError("ERR_SLOT_LOCK_TIMEOUT", "Simulated slot lock timeout on first attempt.");
+    }
+  }
+  // ---------------------------
 
   let payload: ApiResponse<T>;
 
@@ -65,11 +92,17 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<A
   payload = { ...raw, data: raw.data } as ApiResponse<T>;
 
   if (!payload.success) {
-    throw new ApiError(
-      payload.error?.code ?? "UNKNOWN_ERROR",
-      payload.error?.message ?? "Something went wrong.",
-      payload.error?.data ?? {},
-    );
+    // Map Java backend response structure to the frontend expectations
+    let code = payload.error?.code ?? "UNKNOWN_ERROR";
+    let message = payload.error?.message ?? payload.message ?? "Something went wrong.";
+    const data = payload.error?.data ?? {};
+
+    // Intercept backend double-booking message and convert to expected frontend code
+    if (path === "/api/v1/appointments" && method === "POST" && message.includes("already booked")) {
+      code = "ERR_DOUBLE_BOOKING";
+    }
+
+    throw new ApiError(code, message, data);
   }
   return payload;
 }
