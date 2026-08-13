@@ -21,6 +21,9 @@ export const endpoints = {
   files: {
     upload: `${V1}/files/upload`,
   },
+  hospitals: {
+    list: `${V1}/hospitals`,
+  },
   petOwners: {
     list: `${V1}/pet-owners`,
     search: `${V1}/pet-owners/search`,

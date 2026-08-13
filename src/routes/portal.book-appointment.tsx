@@ -36,8 +36,8 @@ function PortalBooking() {
   const [pets, setPets] = useState<Pet[]>([]);
 
   const [petId, setPetId] = useState("");
-  const [branchId, setBranchId] = useState("br_1");
-  const [doctorId, setDoctorId] = useState("doc_1");
+  const [branchId, setBranchId] = useState("");
+  const [doctorId, setDoctorId] = useState("");
   const [service, setService] = useState(SERVICES[0]);
   const [date, setDate] = useState(todayISODate());
   const [slot, setSlot] = useState<string | null>(null);
@@ -60,6 +60,8 @@ function PortalBooking() {
         setDoctors(d);
         setPets(p);
         if (p[0]) setPetId(p[0].id);
+        if (b.length > 0) setBranchId(b[0].id);
+        if (d.length > 0) setDoctorId(d[0].id);
       })
       .catch(() => undefined);
   }, []);
@@ -75,13 +77,17 @@ function PortalBooking() {
     try {
       const created = await createAppointment(
         {
-          petId: petId,
-          doctorId: doctorId,
+          hospitalId: branches.find((b) => b.id === branchId)?.hospitalId ?? "",
           branchId: branchId,
-          service,
-          scheduledAt: slot,
-          notes,
+          doctorId: doctorId,
+          ownerId: pets.find((p) => p.id === petId)?.ownerId ?? "",
+          petId: petId,
+          appointmentDate: slot.split("T")[0],
+          startTime: slot.split("T")[1].substring(0, 8),
+          endTime: new Date(new Date(slot).getTime() + 30 * 60000).toISOString().split("T")[1].substring(0, 8),
           sourceChannel: "ONLINE",
+          reason: service,
+          notes,
         },
         headers,
         {
@@ -146,7 +152,7 @@ function PortalBooking() {
             <select value={branchId} onChange={(e) => setBranchId(e.target.value)} className={field}>
               {branches.map((b) => (
                 <option key={b.id} value={b.id}>
-                  {b.name} — {b.address}
+                  {b.branchName} — {b.addressLine1}
                 </option>
               ))}
             </select>
@@ -157,7 +163,7 @@ function PortalBooking() {
             <select value={doctorId} onChange={(e) => setDoctorId(e.target.value)} className={field}>
               {doctors.map((d) => (
                 <option key={d.id} value={d.id}>
-                  {d.name} · {d.specialty}
+                  Dr. {d.firstName} {d.lastName}
                 </option>
               ))}
             </select>

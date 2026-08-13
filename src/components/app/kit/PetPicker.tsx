@@ -50,7 +50,7 @@ export function PetPicker({ owner: ownerProp, onOwnerChange, value = null, onCha
   }, [owner]);
 
   async function addPet() {
-    if (!owner || !draft.name.trim()) return;
+    if (!owner || !draft.name.trim() || !draft.speciesId || !draft.breedId) return;
     const created = await apiClient.post<Pet>(
       endpoints.pets.lookupOrCreate,
       undefined,
@@ -59,6 +59,7 @@ export function PetPicker({ owner: ownerProp, onOwnerChange, value = null, onCha
         ownerId: owner.id,
         petName: draft.name,
         speciesId: draft.speciesId,
+        breedId: draft.breedId,
       }
     );
     setPets((p) => [...p, created]);

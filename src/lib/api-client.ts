@@ -40,6 +40,24 @@ type RequestOptions = {
   headers?: Record<string, string>;
 };
 
+function mapBackendResponse(data: any): any {
+  if (Array.isArray(data)) return data.map(mapBackendResponse);
+  if (data && typeof data === "object") {
+    for (const key of Object.keys(data)) {
+      if (data[key] && typeof data[key] === "object") {
+        data[key] = mapBackendResponse(data[key]);
+      }
+    }
+    if (data.appointmentDate && data.startTime && !data.scheduledAt) {
+      data.scheduledAt = `${data.appointmentDate}T${data.startTime}`;
+      if (data.reason && !data.service) {
+        data.service = data.reason;
+      }
+    }
+  }
+  return data;
+}
+
 let lockTimeoutSimulated = false;
 
 async function request<T>(path: string, options: RequestOptions = {}): Promise<ApiResponse<T>> {
@@ -55,13 +73,13 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<A
     return {
       success: true,
       data: [
-        `${d}T09:00:00Z`,
-        `${d}T09:30:00Z`,
-        `${d}T10:00:00Z`,
-        `${d}T10:30:00Z`,
-        `${d}T14:00:00Z`,
-        `${d}T15:00:00Z`,
-        `${d}T16:00:00Z`,
+        { startAt: `${d}T09:00:00Z`, available: true },
+        { startAt: `${d}T09:30:00Z`, available: true },
+        { startAt: `${d}T10:00:00Z`, available: true },
+        { startAt: `${d}T10:30:00Z`, available: true },
+        { startAt: `${d}T14:00:00Z`, available: true },
+        { startAt: `${d}T15:00:00Z`, available: true },
+        { startAt: `${d}T16:00:00Z`, available: true },
       ] as unknown as T
     } as ApiResponse<T>;
   }
@@ -71,6 +89,14 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<A
       lockTimeoutSimulated = true;
       throw new ApiError("ERR_SLOT_LOCK_TIMEOUT", "Simulated slot lock timeout on first attempt.");
     }
+  }
+
+  if (path.match(/\/api\/v1\/pet-owners\/.*\/pets/) && method === "GET") {
+    // Mock the pets list for a given owner until Dev B implements the endpoint
+    return {
+      success: true,
+      data: [] as unknown as T
+    } as ApiResponse<T>;
   }
   // ---------------------------
 
@@ -89,7 +115,7 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<A
     body: body ? (isFormData ? body : JSON.stringify(body)) : undefined,
   });
   const raw = (await res.json()) as ApiResponse<unknown>;
-  payload = { ...raw, data: raw.data } as ApiResponse<T>;
+  payload = { ...raw, data: mapBackendResponse(raw.data) } as ApiResponse<T>;
 
   if (!payload.success) {
     // Map Java backend response structure to the frontend expectations

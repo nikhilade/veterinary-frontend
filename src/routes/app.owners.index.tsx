@@ -47,7 +47,7 @@ function OwnersPage() {
   const fetchPage = useCallback(
     async (cursor: string | null) => {
       const res = await apiClient.list<PetOwner>(endpoints.petOwners.search, {
-        q: applied,
+        query: applied,
         limit: 10,
         cursor: cursor ?? undefined,
       });

@@ -29,6 +29,7 @@ const field = "w-full rounded-2xl border border-border bg-background px-4 py-2.5
 const labelCls = "block text-xs font-medium uppercase tracking-wide text-foreground/50";
 
 type Draft = {
+  hospitalId: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -42,6 +43,7 @@ type Draft = {
 };
 
 const emptyDraft: Draft = {
+  hospitalId: "",
   firstName: "",
   lastName: "",
   email: "",
@@ -59,6 +61,7 @@ function DoctorsPage() {
   const canWrite = can(role, "doctors:write");
   const [doctors, setDoctors] = useState<DoctorProfile[] | null>(null);
   const [branches, setBranches] = useState<Branch[]>([]);
+  const [hospitals, setHospitals] = useState<any[]>([]);
   const [editing, setEditing] = useState<string | null>(null);
   const [draft, setDraft] = useState<Draft>(emptyDraft);
   const [open, setOpen] = useState(false);
@@ -72,6 +75,7 @@ function DoctorsPage() {
   useEffect(() => {
     load();
     apiClient.get<Branch[]>(endpoints.branches.list).then(setBranches).catch(() => setBranches([]));
+    apiClient.get<any[]>(endpoints.hospitals.list).then(setHospitals).catch(() => setHospitals([]));
   }, []);
 
   function startCreate() {
@@ -84,6 +88,7 @@ function DoctorsPage() {
   function startEdit(d: DoctorProfile) {
     setEditing(d.id);
     setDraft({
+      hospitalId: (d as any).hospitalId ?? "",
       firstName: d.firstName ?? "",
       lastName: d.lastName ?? "",
       email: d.email ?? "",
@@ -135,6 +140,15 @@ function DoctorsPage() {
         <div className="mb-6">
           <Panel title={editing ? "Edit doctor" : "Add doctor"}>
             <div className="grid gap-4 md:grid-cols-2">
+              <div>
+                <label className={labelCls} htmlFor="doc-hospital">Hospital</label>
+                <select id="doc-hospital" className={`${field} mt-1.5`} value={draft.hospitalId} onChange={(e) => setDraft({ ...draft, hospitalId: e.target.value })}>
+                  <option value="">Select a hospital</option>
+                  {hospitals.map((h) => (
+                    <option key={h.id} value={h.id}>{h.hospitalName ?? h.name ?? h.id}</option>
+                  ))}
+                </select>
+              </div>
               <div>
                 <label className={labelCls} htmlFor="doc-fn">First name</label>
                 <input id="doc-fn" className={`${field} mt-1.5`} value={draft.firstName} onChange={(e) => setDraft({ ...draft, firstName: e.target.value })} placeholder="Amelia" />

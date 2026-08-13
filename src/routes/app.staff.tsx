@@ -166,7 +166,7 @@ function StaffPage() {
                   <option value="">Select a branch</option>
                   {branches.map((b) => (
                     <option key={b.id} value={b.id}>
-                      {b.name}
+                      {b.branchName}
                     </option>
                   ))}
                 </select>

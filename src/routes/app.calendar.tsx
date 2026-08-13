@@ -51,7 +51,7 @@ function CalendarPage() {
   const [anchor, setAnchor] = useState(() => new Date());
   const [items, setItems] = useState<Appointment[] | null>(null);
   const [branches, setBranches] = useState<Branch[]>([]);
-  const [branchId, setBranchId] = useState("br_1");
+  const [branchId, setBranchId] = useState("");
   const [creating, setCreating] = useState(false);
   const [dragId, setDragId] = useState<string | null>(null);
   const [banner, setBanner] = useState("");
@@ -67,7 +67,10 @@ function CalendarPage() {
     load();
     apiClient
       .get<Branch[]>(endpoints.branches.list)
-      .then(setBranches)
+      .then((b) => {
+        setBranches(b);
+        if (b.length > 0) setBranchId(b[0].id);
+      })
       .catch(() => undefined);
   }, [load]);
 
@@ -78,7 +81,11 @@ function CalendarPage() {
     return Array.from({ length: 7 }, (_, i) => addDays(s, i));
   }, [view, anchor]);
 
-  const visible = (items ?? []).filter((a) => (a.branchId ?? "br_1") === branchId);
+  const visible = (items ?? []).filter((a) => {
+    if (a.branchId && a.branchId !== "br_1") return a.branchId === branchId;
+    const currentBranch = branches.find((b) => b.id === branchId);
+    return a.branchName === currentBranch?.branchName;
+  });
   const hours = Array.from({ length: HOUR_END - HOUR_START }, (_, i) => HOUR_START + i);
 
   function forCell(day: Date, hour: number) {
@@ -88,9 +95,9 @@ function CalendarPage() {
     });
   }
 
-  const closedOn = (day: Date) => !!branch && branch.workingHours.closedDays.includes(day.getDay());
+  const closedOn = (day: Date) => !!branch && !!branch.workingHours && !!branch.workingHours.closedDays && branch.workingHours.closedDays.includes(day.getDay());
   const outsideHours = (day: Date, hour: number) =>
-    !!branch && (hour < branch.workingHours.openHour || hour >= branch.workingHours.closeHour || closedOn(day));
+    !!branch && !!branch.workingHours && (hour < branch.workingHours.openHour || hour >= branch.workingHours.closeHour || closedOn(day));
 
   async function drop(day: Date, hour: number) {
     const id = dragId;
@@ -161,7 +168,7 @@ function CalendarPage() {
               >
                 {branches.map((b) => (
                   <option key={b.id} value={b.id}>
-                    {b.name}
+                    {b.branchName}
                   </option>
                 ))}
               </select>

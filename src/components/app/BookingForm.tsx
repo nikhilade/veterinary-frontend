@@ -74,7 +74,7 @@ export function BookingForm({ ownerId = "own_1" }: { ownerId?: string }) {
       <select value={form.doctorId} onChange={(e) => setForm({ ...form, doctorId: e.target.value })} className={field}>
         {doctors.map((d) => (
           <option key={d.id} value={d.id}>
-            {d.name} — {d.specialty}
+            Dr. {d.firstName} {d.lastName}
           </option>
         ))}
       </select>

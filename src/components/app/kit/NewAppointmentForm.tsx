@@ -25,8 +25,8 @@ export function NewAppointmentForm({
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [owner, setOwner] = useState<PetOwner | null>(null);
   const [pet, setPet] = useState<Pet | null>(null);
-  const [branchId, setBranchId] = useState("br_1");
-  const [doctorId, setDoctorId] = useState("doc_1");
+  const [branchId, setBranchId] = useState("");
+  const [doctorId, setDoctorId] = useState("");
   const [service, setService] = useState(SERVICES[0]);
   const [date, setDate] = useState(defaultDate ?? todayISODate());
   const [slot, setSlot] = useState<string | null>(null);
@@ -45,6 +45,8 @@ export function NewAppointmentForm({
       .then(([b, d]) => {
         setBranches(b);
         setDoctors(d);
+        if (b.length > 0) setBranchId(b[0].id);
+        if (d.length > 0) setDoctorId(d[0].id);
       })
       .catch(() => undefined);
   }, []);
@@ -60,13 +62,17 @@ export function NewAppointmentForm({
     try {
       const created = await createAppointment(
         {
-          petId: pet.id,
-          doctorId: doctorId,
+          hospitalId: branch?.hospitalId ?? "",
           branchId: branchId,
-          service,
-          scheduledAt: slot,
-          notes,
+          doctorId: doctorId,
+          ownerId: owner.id,
+          petId: pet.id,
+          appointmentDate: slot.split("T")[0],
+          startTime: slot.split("T")[1].substring(0, 8),
+          endTime: new Date(new Date(slot).getTime() + 30 * 60000).toISOString().split("T")[1].substring(0, 8),
           sourceChannel: "WALK_IN",
+          reason: service,
+          notes,
         },
         headers,
         {
@@ -101,7 +107,7 @@ export function NewAppointmentForm({
           <select value={branchId} onChange={(e) => setBranchId(e.target.value)} className={field}>
             {branches.map((b) => (
               <option key={b.id} value={b.id}>
-                {b.name}
+                {b.branchName}
               </option>
             ))}
           </select>
@@ -111,7 +117,7 @@ export function NewAppointmentForm({
           <select value={doctorId} onChange={(e) => setDoctorId(e.target.value)} className={field}>
             {doctors.map((d) => (
               <option key={d.id} value={d.id}>
-                {d.name}
+                {d.firstName} {d.lastName}
               </option>
             ))}
           </select>
