@@ -47,7 +47,7 @@ function QueuePage() {
   async function checkIn(id: string) {
     setBusy(id);
     try {
-      await apiClient.post(endpoints.appointments.checkIn(id));
+      await apiClient.post(endpoints.appointments.checkIn, { appointmentId: id });
       load();
     } finally {
       setBusy(null);
@@ -57,7 +57,15 @@ function QueuePage() {
   async function setStatus(id: string, status: AppointmentStatus) {
     setBusy(id);
     try {
-      await apiClient.post(endpoints.appointments.status(id), { status });
+      if (status === "IN_PROGRESS") {
+        await apiClient.put(endpoints.appointments.callNext);
+      } else if (status === "COMPLETED") {
+        await apiClient.put(endpoints.appointments.complete(id));
+      } else if (status === "NO_SHOW") {
+        await apiClient.put(endpoints.appointments.noShow(id));
+      } else {
+        await apiClient.post(endpoints.appointments.status(id), { status });
+      }
       load();
     } finally {
       setBusy(null);
@@ -137,21 +145,39 @@ function QueuePage() {
                             Check in
                           </button>
                         ) : a.status === "CHECKED_IN" ? (
-                          <button
-                            disabled={busy === a.id}
-                            onClick={() => setStatus(a.id, "IN_PROGRESS")}
-                            className="rounded-full border border-forest px-4 py-2 text-xs font-medium text-forest disabled:opacity-60"
-                          >
-                            Call in
-                          </button>
+                          <div className="flex justify-end gap-2">
+                            <button
+                              disabled={busy === a.id}
+                              onClick={() => setStatus(a.id, "IN_PROGRESS")}
+                              className="rounded-full border border-forest px-4 py-2 text-xs font-medium text-forest disabled:opacity-60"
+                            >
+                              Call in
+                            </button>
+                            <button
+                              disabled={busy === a.id}
+                              onClick={() => setStatus(a.id, "NO_SHOW")}
+                              className="rounded-full border border-destructive px-4 py-2 text-xs font-medium text-destructive disabled:opacity-60"
+                            >
+                              No-show
+                            </button>
+                          </div>
                         ) : a.status === "IN_PROGRESS" ? (
-                          <button
-                            disabled={busy === a.id}
-                            onClick={() => setStatus(a.id, "COMPLETED")}
-                            className="inline-flex items-center gap-1.5 rounded-full border border-border px-4 py-2 text-xs font-medium disabled:opacity-60"
-                          >
-                            <CheckCircle2 className="size-3.5" /> Complete
-                          </button>
+                          <div className="flex justify-end gap-2">
+                            <button
+                              disabled={busy === a.id}
+                              onClick={() => setStatus(a.id, "COMPLETED")}
+                              className="inline-flex items-center gap-1.5 rounded-full border border-border px-4 py-2 text-xs font-medium disabled:opacity-60"
+                            >
+                              <CheckCircle2 className="size-3.5" /> Complete
+                            </button>
+                            <button
+                              disabled={busy === a.id}
+                              onClick={() => setStatus(a.id, "NO_SHOW")}
+                              className="rounded-full border border-destructive px-4 py-2 text-xs font-medium text-destructive disabled:opacity-60"
+                            >
+                              No-show
+                            </button>
+                          </div>
                         ) : (
                           <span className="text-xs text-foreground/40">—</span>
                         )}

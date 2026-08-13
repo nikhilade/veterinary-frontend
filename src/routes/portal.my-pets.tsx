@@ -87,7 +87,7 @@ function MyPets() {
                   </div>
                   <div>
                     <dt className="text-foreground/60">Weight</dt>
-                    <dd>{p.weight} kg</dd>
+                    <dd>{p.weightKg} kg</dd>
                   </div>
                   <div>
                     <dt className="text-foreground/60">Sex</dt>

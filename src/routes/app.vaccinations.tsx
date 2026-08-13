@@ -48,7 +48,7 @@ function VaccinationsPage() {
   useEffect(() => setOk(null), [pet]);
 
   const fetchPage = useCallback(async (cursor: string | null) => {
-    const res = await apiClient.list<Vaccine>(endpoints.vaccines.due, { within_days: 30, limit: 10, cursor: cursor ?? undefined });
+    const res = await apiClient.list<Vaccine>(endpoints.vaccines.due, { days: 30, limit: 10, cursor: cursor ?? undefined });
     if (!cursor) setEmpty(res.items.length === 0);
     return res;
   }, []);

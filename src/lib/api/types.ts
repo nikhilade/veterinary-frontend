@@ -62,17 +62,20 @@ export interface PetOwner {
 export interface Pet {
   id: string;
   ownerId: string;
+  ownerName?: string;
   petName: string;
   speciesId: string;
   breedId: string;
   gender: "Male" | "Female";
   age: number;
-  weight: number;
+  weightKg: number;
   photoUrl: string | null;
   microchipNumber: string | null;
   allergies?: string;
   color?: string;
   notes?: string;
+  dateOfBirth?: string;
+  status?: string;
 }
 
 export interface Doctor {

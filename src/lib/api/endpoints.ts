@@ -18,6 +18,9 @@ export const endpoints = {
     me: "/api/auth/me",
     logout: "/api/auth/logout",
   },
+  files: {
+    upload: `${V1}/files/upload`,
+  },
   petOwners: {
     list: `${V1}/pet-owners`,
     search: `${V1}/pet-owners/search`,
@@ -38,10 +41,10 @@ export const endpoints = {
     history: (id: string) => `${V1}/pets/history/${id}`,
   },
   vaccines: {
-    list: `${V1}/vaccines`,
-    due: `${V1}/vaccines/due`,
-    create: `${V1}/vaccines`,
-    byPet: (petId: string) => `${V1}/pets/${petId}/vaccines`,
+    list: `${V1}/vaccinations`,
+    due: `${V1}/vaccinations/due`,
+    create: `${V1}/vaccinations`,
+    byPet: (petId: string) => `${V1}/vaccinations/pet/${petId}`,
   },
   doctors: {
     list: `${V1}/doctors`,
@@ -74,7 +77,12 @@ export const endpoints = {
     availableSlots: `${V1}/appointments/slots/available`,
     /** ReceptionQueueController */
     queue: `${V1}/reception/queue`,
-    checkIn: (id: string) => `${V1}/reception/check-in/${id}`,
+    checkIn: `${V1}/reception/check-in`,
+    callNext: `${V1}/reception/call-next`,
+    skip: (id: string) => `${V1}/reception/${id}/skip`,
+    recall: (id: string) => `${V1}/reception/${id}/recall`,
+    complete: (id: string) => `${V1}/reception/${id}/complete`,
+    noShow: (id: string) => `${V1}/reception/${id}/no-show`,
     status: (id: string) => `${V1}/appointments/${id}/status`,
     reschedule: (id: string) => `${V1}/appointments/${id}/reschedule`,
     cancel: (id: string) => `${V1}/appointments/${id}/cancel`,
