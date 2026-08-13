@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { ArrowLeft, FileText, MessageSquare, PawPrint, Pencil, Plus, Upload, Mail, Smartphone } from "lucide-react";
 import { StaffLayout } from "@/components/app/StaffLayout";
+import { SpeciesName, BreedName } from "@/components/app/MasterData";
 import { EmptyState, Loading, Panel, formatDate } from "@/components/app/ui";
 import { PetForm } from "@/components/app/kit/PetForm";
 import { apiClient } from "@/lib/api-client";
@@ -79,7 +80,7 @@ function OwnerDetailPage() {
   }
 
   return (
-    <StaffLayout title={owner ? `${owner.firstName} ${owner.lastName}` : "Owner" ?? "Owner"} subtitle="Client profile" permission="owners:read">
+    <StaffLayout title={owner ? `${owner.firstName} ${owner.lastName}` : "Owner"} subtitle="Client profile" permission="owners:read">
       <Link to="/app/owners" className="mb-4 inline-flex items-center gap-1.5 text-sm text-forest">
         <ArrowLeft className="size-4" /> Back to owners
       </Link>
@@ -187,7 +188,7 @@ function OwnerDetailPage() {
                       <span>
                         <span className="block font-medium">{p.petName}</span>
                         <span className="block text-xs text-foreground/60">
-                          {p.speciesId} · {p.breedId} · {p.age}y
+                          <SpeciesName id={p.speciesId} /> &middot; <BreedName id={p.breedId} /> &middot; {p.age != null ? p.age + "y" : "—"}
                         </span>
                       </span>
                     </Link>

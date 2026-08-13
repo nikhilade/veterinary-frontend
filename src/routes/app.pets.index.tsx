@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback } from "react";
 import { Dog, Plus } from "lucide-react";
+import { SpeciesName, BreedName } from "@/components/app/MasterData";
 import { StaffLayout } from "@/components/app/StaffLayout";
 import { Panel } from "@/components/app/ui";
 import { DataTable, type DataTableColumn } from "@/components/app/kit/DataTable";
@@ -34,11 +35,20 @@ const columns: DataTableColumn<Pet>[] = [
       </Link>
     ),
   },
-  { key: "owner", header: "Owner", sortValue: (p) => p.ownerId, cell: (p) => p.ownerId },
-  { key: "species", header: "Species", sortValue: (p) => p.speciesId, cell: (p) => p.speciesId },
-  { key: "breed", header: "Breed", cell: (p) => p.breedId },
-  { key: "age", header: "Age", sortValue: (p) => p.age, cell: (p) => `${p.age} yrs` },
-  { key: "weight", header: "Weight", sortValue: (p) => p.weight, cell: (p) => `${p.weight} kg` },
+  {
+    key: "owner",
+    header: "Owner",
+    sortValue: (p) => p.ownerName || p.ownerId,
+    cell: (p) => (
+      <Link to="/app/owners/$id" params={{ id: p.ownerId }} className="text-forest hover:underline underline-offset-4">
+        {p.ownerName || p.ownerId}
+      </Link>
+    ),
+  },
+  { key: "species", header: "Species", sortValue: (p) => p.speciesId, cell: (p) => <SpeciesName id={p.speciesId} /> },
+  { key: "breed", header: "Breed", cell: (p) => <BreedName id={p.breedId} /> },
+  { key: "age", header: "Age", sortValue: (p) => p.age, cell: (p) => p.age != null ? `${p.age} yrs` : "—" },
+  { key: "weight", header: "Weight", sortValue: (p) => p.weightKg, cell: (p) => p.weightKg != null ? `${p.weightKg} kg` : "—" },
 ];
 
 function PetsPage() {

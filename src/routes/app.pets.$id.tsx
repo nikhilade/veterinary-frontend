@@ -52,8 +52,8 @@ function PetDetailPage() {
       .then(([p, h, v]) => {
         if (!active) return;
         setPet(p);
-        setEvents(h);
-        setVaccines(v);
+        setEvents(Array.isArray(h) ? h : []);
+        setVaccines(v || []);
       })
       .finally(() => active && setLoading(false));
     return () => {
@@ -62,7 +62,7 @@ function PetDetailPage() {
   }, [id]);
 
   return (
-    <StaffLayout title={pet?.name ?? "Patient"} subtitle="Patient record" permission="pets:read">
+    <StaffLayout title={pet?.petName ?? "Patient"} subtitle="Patient record" permission="pets:read">
       <Link to="/app/pets" className="mb-4 inline-flex items-center gap-1.5 text-sm text-forest">
         <ArrowLeft className="size-4" /> Back to patients
       </Link>
@@ -99,7 +99,7 @@ function PetDetailPage() {
                     <div>
                       <p className="text-lg font-medium">{pet.petName}</p>
                       <Link to="/app/owners/$id" params={{ id: pet.ownerId }} className="text-sm text-forest underline underline-offset-4">
-                        {pet.ownerId}
+                        {pet.ownerName || "View Owner"}
                       </Link>
                     </div>
                   </div>
@@ -118,7 +118,7 @@ function PetDetailPage() {
                     </div>
                     <div>
                       <dt className="text-foreground/60">Weight</dt>
-                      <dd>{pet.weight} kg</dd>
+                      <dd>{pet.weightKg} kg</dd>
                     </div>
                     <div>
                       <dt className="text-foreground/60">Sex</dt>
@@ -128,9 +128,21 @@ function PetDetailPage() {
                       <dt className="text-foreground/60">Microchip</dt>
                       <dd>{pet.microchipNumber ?? "—"}</dd>
                     </div>
+                    <div>
+                      <dt className="text-foreground/60">Color</dt>
+                      <dd>{pet.color || "—"}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-foreground/60">Status</dt>
+                      <dd className={pet.status === "Deceased" ? "text-destructive font-medium" : ""}>{pet.status || "—"}</dd>
+                    </div>
                     <div className="col-span-2">
                       <dt className="text-foreground/60">Allergies</dt>
                       <dd className={pet.allergies ? "text-destructive" : ""}>{pet.allergies || "None recorded"}</dd>
+                    </div>
+                    <div className="col-span-2">
+                      <dt className="text-foreground/60">Notes</dt>
+                      <dd className="whitespace-pre-wrap">{pet.notes || "No notes recorded"}</dd>
                     </div>
                   </dl>
                 </div>

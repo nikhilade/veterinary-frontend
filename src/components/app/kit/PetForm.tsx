@@ -20,18 +20,21 @@ export interface PetFormProps {
 /** Create / edit a pet. Uses POST /pets/lookup-or-create so duplicates are merged. */
 export function PetForm({ ownerId, pet = null, onSaved, submitLabel = "Save pet" }: PetFormProps) {
   const [form, setForm] = useState({
-    petName: pet?.name ?? "",
-    speciesId: (pet?.species ?? "Dog") as Pet["species"],
-    breedId: pet?.breed ?? "",
-    gender: (pet?.sex ?? "Male") as Pet["sex"],
+    petName: pet?.petName ?? "",
+    speciesId: pet?.speciesId ?? "",
+    breedId: pet?.breedId ?? "",
+    gender: pet?.gender ?? "Male",
     age: String(pet?.age ?? "1"),
-    weight: String(pet?.weight ?? ""),
+    weightKg: String(pet?.weightKg ?? ""),
     microchipNumber: pet?.microchipNumber ?? "",
     color: pet?.color ?? "",
     allergies: pet?.allergies ?? "",
     notes: pet?.notes ?? "",
+    dateOfBirth: pet?.dateOfBirth ?? "",
+    status: pet?.status ?? "Active",
   });
   const [photo, setPhoto] = useState<string | null>(pet?.photoUrl ?? null);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -44,6 +47,7 @@ export function PetForm({ ownerId, pet = null, onSaved, submitLabel = "Save pet"
 
   function onPhoto(file: File | undefined) {
     if (!file) return;
+    setPhotoFile(file);
     const reader = new FileReader();
     reader.onload = () => setPhoto(String(reader.result));
     reader.readAsDataURL(file);
@@ -57,16 +61,42 @@ export function PetForm({ ownerId, pet = null, onSaved, submitLabel = "Save pet"
     }
     setSaving(true);
     try {
+      let finalPhotoUrl = photo;
+      
+      if (photoFile) {
+        const formData = new FormData();
+        formData.append("file", photoFile);
+        formData.append("folder", "pets");
+        
+        const rawToken = window.localStorage.getItem("petgood.auth");
+        const token = rawToken ? JSON.parse(rawToken).token : "";
+        
+        const res = await fetch(endpoints.files.upload, {
+          method: "POST",
+          body: formData,
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        });
+        
+        if (!res.ok) {
+           throw new Error("Failed to upload photo to server");
+        }
+        
+        const json = await res.json();
+        finalPhotoUrl = json.data.fileUrl;
+      }
+
       const payload = {
         ...form,
         ownerId: ownerId,
         age: Number(form.age) || 0,
-        weight: Number(form.weight) || 0,
-        photoUrl: photo,
+        weightKg: Number(form.weightKg) || 0,
+        photoUrl: finalPhotoUrl,
       };
       const saved = pet
-        ? await apiClient.patch<Pet>(endpoints.pets.update(pet.id), payload)
-        : await apiClient.post<Pet>(endpoints.pets.lookupOrCreate, payload);
+        ? await apiClient.put<Pet>(endpoints.pets.update(pet.id), payload)
+        : await apiClient.post<Pet>(endpoints.pets.create, payload);
       
       toast.success(`Pet ${pet ? "updated" : "saved"} successfully!`);
       onSaved(saved);
@@ -110,13 +140,18 @@ export function PetForm({ ownerId, pet = null, onSaved, submitLabel = "Save pet"
             <option key={b.id} value={b.id}>{b.name}</option>
           ))}
         </select>
-        <select className={field} value={form.sex} onChange={(e) => setForm({ ...form, gender: e.target.value as Pet["sex"] })}>
+        <select className={field} value={form.gender} onChange={(e) => setForm({ ...form, gender: e.target.value as "Male" | "Female" })}>
           <option>Male</option>
           <option>Female</option>
         </select>
         <input className={field} placeholder="Colour / markings" value={form.color} onChange={(e) => setForm({ ...form, color: e.target.value })} />
         <input className={field} placeholder="Age (years)" value={form.age} onChange={(e) => setForm({ ...form, age: e.target.value })} />
-        <input className={field} placeholder="Weight (kg)" value={form.weight} onChange={(e) => setForm({ ...form, weight: e.target.value })} />
+        <input className={field} type="date" title="Date of Birth" placeholder="Date of Birth" value={form.dateOfBirth} onChange={(e) => setForm({ ...form, dateOfBirth: e.target.value })} />
+        <input className={field} placeholder="Weight (kg)" value={form.weightKg} onChange={(e) => setForm({ ...form, weightKg: e.target.value })} />
+        <select className={field} value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}>
+          <option>Active</option>
+          <option>Deceased</option>
+        </select>
       </div>
 
       <input

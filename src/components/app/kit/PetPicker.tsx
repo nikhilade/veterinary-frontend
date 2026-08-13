@@ -51,11 +51,16 @@ export function PetPicker({ owner: ownerProp, onOwnerChange, value = null, onCha
 
   async function addPet() {
     if (!owner || !draft.name.trim()) return;
-    const created = await apiClient.post<Pet>(endpoints.pets.create, {
-      ...draft,
-      ownerId: owner.id,
-      age: Number(draft.age) || 1,
-    });
+    const created = await apiClient.post<Pet>(
+      endpoints.pets.lookupOrCreate,
+      undefined,
+      undefined,
+      {
+        ownerId: owner.id,
+        petName: draft.name,
+        speciesId: draft.speciesId,
+      }
+    );
     setPets((p) => [...p, created]);
     onChange?.(created);
     setAdding(false);
