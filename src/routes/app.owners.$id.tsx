@@ -67,11 +67,15 @@ function OwnerDetailPage() {
 
   async function uploadDoc(file: File | undefined) {
     if (!file) return;
-    const created = await apiClient.post<OwnerDocument>(endpoints.petOwners.documents(id), {
-      name: file.name,
-      type: "Other",
-      sizeKb: Math.round(file.size / 1024),
-    });
+    const formData = new FormData();
+    formData.append("documentName", file.name);
+    formData.append("documentType", "Other");
+    formData.append("file", file);
+
+    const created = await apiClient.post<OwnerDocument>(
+      endpoints.petOwners.documents(id),
+      formData
+    );
     setDocs((d) => [...d, created]);
   }
 

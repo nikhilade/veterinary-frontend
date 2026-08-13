@@ -59,7 +59,6 @@ const FIELD_TO_FRONTEND: Record<string, string> = {
   age: "age",
   weight: "weightKg",
   microchipNumber: "microchipNumber",
-  phoneNumber: "phone",
   speciesId: "species",
   breedId: "breed",
   photoUrl: "photoUrl",
