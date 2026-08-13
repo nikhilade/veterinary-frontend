@@ -55,7 +55,7 @@ export function NewAppointmentForm({
 
   async function submit(headers: { "Idempotency-Key": string }) {
     setError("");
-    if (!pet || !slot) {
+    if (!pet || !owner || !slot) {
       setError("Pick a pet and a time slot first.");
       throw new Error("incomplete");
     }

@@ -37,6 +37,10 @@ export function PetPicker({ owner: ownerProp, onOwnerChange, value = null, onCha
       setPets([]);
       return;
     }
+    if (owner.pets && owner.pets.length > 0) {
+      setPets(owner.pets);
+      return;
+    }
     let active = true;
     setLoading(true);
     apiClient
@@ -100,9 +104,9 @@ export function PetPicker({ owner: ownerProp, onOwnerChange, value = null, onCha
               >
                 <PawPrint className="size-4 text-clay" />
                 <span>
-                  <span className="block font-medium">{p.name}</span>
+                  <span className="block font-medium">{p.name || (p as any).petName || "Unnamed Pet"}</span>
                   <span className="block text-xs text-foreground/60">
-                    {p.species} · {p.breed} · {p.age}y
+                    {p.species || speciesList.find(s => s.id === (p as any).speciesId)?.name || "Unknown Species"} · {p.breed || breedsList.find(b => b.id === (p as any).breedId)?.name || "Unknown Breed"} · {p.age}y
                   </span>
                 </span>
               </button>

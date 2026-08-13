@@ -32,9 +32,31 @@ function QueuePage() {
   const [busy, setBusy] = useState<string | null>(null);
 
   const load = useCallback(() => {
-    apiClient
-      .get<Appointment[]>(endpoints.appointments.queue, { branchId: "br_1" })
-      .then(setItems)
+    Promise.all([
+      apiClient.get<Appointment[]>(endpoints.appointments.queue, { branchId: "br_1" }).catch(() => []),
+      apiClient.get<Appointment[]>(endpoints.appointments.list).catch(() => []),
+    ])
+      .then(([queueItems, allAppointments]) => {
+        const queueList = queueItems ?? [];
+        const apptList = allAppointments ?? [];
+        const todayISO = new Date().toISOString().split("T")[0];
+
+        const todayAppointments = apptList.filter((a) => {
+          const d = a.scheduledAt ? a.scheduledAt.split("T")[0] : a.appointmentDate;
+          return !d || d === todayISO;
+        });
+
+        const checkedInIds = new Set(queueList.map((q) => (q as { appointmentId?: string; id: string }).appointmentId || q.id));
+        const combined = [...queueList];
+
+        for (const appt of todayAppointments) {
+          if (!checkedInIds.has(appt.id)) {
+            combined.push(appt);
+          }
+        }
+
+        setItems(combined);
+      })
       .catch(() => setItems([]));
   }, []);
 
@@ -48,6 +70,26 @@ function QueuePage() {
     setBusy(id);
     try {
       await apiClient.post(endpoints.appointments.checkIn, { appointmentId: id });
+      load();
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function skipPatient(id: string) {
+    setBusy(id);
+    try {
+      await apiClient.put(endpoints.appointments.skip(id));
+      load();
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function recallPatient(id: string) {
+    setBusy(id);
+    try {
+      await apiClient.put(endpoints.appointments.recall(id));
       load();
     } finally {
       setBusy(null);
@@ -73,8 +115,8 @@ function QueuePage() {
   }
 
   const list = items ?? [];
-  const waiting = list.filter((a) => a.status === "CHECKED_IN");
-  const serving = list.find((a) => a.status === "IN_PROGRESS") ?? null;
+  const waiting = list.filter((a) => a.status === "CHECKED_IN" || (a.status as string) === "WAITING");
+  const serving = list.find((a) => a.status === "IN_PROGRESS" || (a.status as string) === "CALLED") ?? null;
   const done = list.filter((a) => a.status === "COMPLETED").length;
 
   return (
@@ -144,7 +186,7 @@ function QueuePage() {
                           >
                             Check in
                           </button>
-                        ) : a.status === "CHECKED_IN" ? (
+                        ) : a.status === "CHECKED_IN" || (a.status as string) === "WAITING" ? (
                           <div className="flex justify-end gap-2">
                             <button
                               disabled={busy === a.id}
@@ -155,13 +197,37 @@ function QueuePage() {
                             </button>
                             <button
                               disabled={busy === a.id}
+                              onClick={() => skipPatient(a.id)}
+                              className="rounded-full border border-border px-4 py-2 text-xs font-medium text-foreground/70 disabled:opacity-60"
+                            >
+                              Skip
+                            </button>
+                            <button
+                              disabled={busy === a.id}
                               onClick={() => setStatus(a.id, "NO_SHOW")}
                               className="rounded-full border border-destructive px-4 py-2 text-xs font-medium text-destructive disabled:opacity-60"
                             >
                               No-show
                             </button>
                           </div>
-                        ) : a.status === "IN_PROGRESS" ? (
+                        ) : (a.status as string) === "SKIPPED" ? (
+                          <div className="flex justify-end gap-2">
+                            <button
+                              disabled={busy === a.id}
+                              onClick={() => recallPatient(a.id)}
+                              className="rounded-full border border-forest px-4 py-2 text-xs font-medium text-forest disabled:opacity-60"
+                            >
+                              Recall
+                            </button>
+                            <button
+                              disabled={busy === a.id}
+                              onClick={() => setStatus(a.id, "NO_SHOW")}
+                              className="rounded-full border border-destructive px-4 py-2 text-xs font-medium text-destructive disabled:opacity-60"
+                            >
+                              No-show
+                            </button>
+                          </div>
+                        ) : a.status === "IN_PROGRESS" || (a.status as string) === "CALLED" ? (
                           <div className="flex justify-end gap-2">
                             <button
                               disabled={busy === a.id}

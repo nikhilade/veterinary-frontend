@@ -47,6 +47,8 @@ export const endpoints = {
     list: `${V1}/vaccinations`,
     due: `${V1}/vaccinations/due`,
     create: `${V1}/vaccinations`,
+    update: (id: string) => `${V1}/vaccinations/${id}`,
+    delete: (id: string) => `${V1}/vaccinations/${id}`,
     byPet: (petId: string) => `${V1}/vaccinations/pet/${petId}`,
   },
   doctors: {

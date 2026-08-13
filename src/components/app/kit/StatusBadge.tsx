@@ -1,6 +1,6 @@
 import type { AppointmentStatus } from "@/lib/api/types";
 
-const TONES: Record<AppointmentStatus, { label: string; className: string; dot: string }> = {
+const TONES: Record<AppointmentStatus | "WAITING" | "SKIPPED" | "CALLED", { label: string; className: string; dot: string }> = {
   SCHEDULED: { label: "Scheduled", className: "bg-clay/15 text-clay border-clay/30", dot: "bg-clay" },
   CONFIRMED: { label: "Confirmed", className: "bg-forest/10 text-forest border-forest/25", dot: "bg-forest" },
   CHECKED_IN: {
@@ -8,9 +8,24 @@ const TONES: Record<AppointmentStatus, { label: string; className: string; dot: 
     className: "bg-forest/20 text-forest border-forest/40",
     dot: "bg-forest",
   },
+  WAITING: {
+    label: "Checked in",
+    className: "bg-forest/20 text-forest border-forest/40",
+    dot: "bg-forest",
+  },
   IN_PROGRESS: {
     label: "In progress",
     className: "bg-amber-500/15 text-amber-700 border-amber-500/30",
+    dot: "bg-amber-500",
+  },
+  CALLED: {
+    label: "Now serving",
+    className: "bg-amber-500/15 text-amber-700 border-amber-500/30",
+    dot: "bg-amber-500",
+  },
+  SKIPPED: {
+    label: "Skipped",
+    className: "bg-amber-500/10 text-amber-600 border-amber-500/25",
     dot: "bg-amber-500",
   },
   COMPLETED: {
