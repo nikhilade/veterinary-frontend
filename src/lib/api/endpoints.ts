@@ -60,6 +60,21 @@ export const endpoints = {
     /** StaffLeaveController — queried by staff id. */
     leave: (id: string) => `${V1}/staff-leaves/search/${id}`,
   },
+  doctorSchedules: {
+    byDoctor: (doctorId: string) => `${V1}/doctor-schedules/doctor/${doctorId}`,
+    create: `${V1}/doctor-schedules`,
+    update: (scheduleId: string) => `${V1}/doctor-schedules/${scheduleId}`,
+    delete: (scheduleId: string) => `${V1}/doctor-schedules/${scheduleId}`,
+    getById: (scheduleId: string) => `${V1}/doctor-schedules/${scheduleId}`,
+  },
+  leaves: {
+    search: `${V1}/staff-leaves/search`,
+    apply: `${V1}/staff-leaves`,
+    cancel: (leaveId: string) => `${V1}/staff-leaves/${leaveId}/cancel`,
+    approve: (leaveId: string) => `${V1}/staff-leaves/${leaveId}/approve`,
+    reject: (leaveId: string) => `${V1}/staff-leaves/${leaveId}/reject`,
+    getById: (leaveId: string) => `${V1}/staff-leaves/${leaveId}`,
+  },
   medicines: {
     /** Inventory items filtered to the medicine category on the frontend. */
     list: `${V1}/inventory/items`,

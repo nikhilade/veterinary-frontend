@@ -35,7 +35,7 @@ export class ApiError extends Error {
 
 type RequestOptions = {
   method?: "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
-  body?: Record<string, unknown> | FormData;
+  body?: unknown;
   query?: Record<string, string | number | boolean | undefined>;
   headers?: Record<string, string>;
 };
@@ -138,13 +138,13 @@ export const apiClient = {
   async get<T>(path: string, query?: RequestOptions["query"]) {
     return (await request<T>(path, { method: "GET", query })).data;
   },
-  async post<T>(path: string, body?: Record<string, unknown> | FormData, headers?: Record<string, string>, query?: RequestOptions["query"]) {
+  async post<T>(path: string, body?: unknown, headers?: Record<string, string>, query?: RequestOptions["query"]) {
     return (await request<T>(path, { method: "POST", body, headers, query })).data;
   },
-  async patch<T>(path: string, body?: Record<string, unknown> | FormData, headers?: Record<string, string>) {
+  async patch<T>(path: string, body?: unknown, headers?: Record<string, string>) {
     return (await request<T>(path, { method: "PATCH", body, headers })).data;
   },
-  async put<T>(path: string, body?: Record<string, unknown> | FormData, headers?: Record<string, string>) {
+  async put<T>(path: string, body?: unknown, headers?: Record<string, string>) {
     return (await request<T>(path, { method: "PUT", body, headers })).data;
   },
   async delete<T>(path: string) {

@@ -253,6 +253,91 @@ export interface DoctorProfile extends Doctor {
   joiningDate?: string;
 }
 
+/** Backend DayOfWeek enum */
+export type BackendDayOfWeek =
+  | "MONDAY"
+  | "TUESDAY"
+  | "WEDNESDAY"
+  | "THURSDAY"
+  | "FRIDAY"
+  | "SATURDAY"
+  | "SUNDAY";
+
+export interface DoctorScheduleResponse {
+  id: string;
+  doctorId: string;
+  doctorName?: string;
+  dayOfWeek: BackendDayOfWeek;
+  startTime: string; // "09:00:00"
+  endTime: string;   // "17:00:00"
+}
+
+export interface AddDoctorScheduleRequest {
+  doctorId: string;
+  dayOfWeek: BackendDayOfWeek;
+  startTime: string;
+  endTime: string;
+}
+
+export interface UpdateDoctorScheduleRequest {
+  dayOfWeek: BackendDayOfWeek;
+  startTime: string;
+  endTime: string;
+}
+
+export type LeaveType =
+  | "CASUAL"
+  | "SICK"
+  | "EARNED"
+  | "MATERNITY"
+  | "PATERNITY"
+  | "UNPAID"
+  | "EMERGENCY"
+  | "OTHER";
+
+export type LeaveStatus = "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED";
+
+export interface StaffLeaveRequestDto {
+  staffId: string;
+  leaveType: LeaveType;
+  startDate: string;
+  endDate: string;
+  reason: string;
+  attachmentUrl?: string;
+}
+
+export interface StaffLeaveSearchRequestDto {
+  hospitalId?: string;
+  branchId?: string;
+  staffId?: string;
+  leaveType?: LeaveType;
+  status?: LeaveStatus;
+  startDate?: string;
+  endDate?: string;
+  employeeCode?: string;
+  search?: string;
+}
+
+export interface StaffLeaveResponseDto {
+  id: string;
+  staffId: string;
+  employeeCode?: string;
+  staffName?: string;
+  department?: string;
+  designation?: string;
+  leaveType: LeaveType;
+  startDate: string;
+  endDate: string;
+  totalDays?: number;
+  reason: string;
+  status: LeaveStatus;
+  approvedBy?: string;
+  approvedByName?: string;
+  approvedAt?: string;
+  rejectionReason?: string;
+  attachmentUrl?: string;
+}
+
 /** Weekly recurring availability. dayOfWeek: 0 = Sunday … 6 = Saturday */
 export interface AvailabilityRule {
   dayOfWeek: number;
