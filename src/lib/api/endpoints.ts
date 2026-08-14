@@ -30,6 +30,7 @@ export const endpoints = {
     detail: (id: string) => `${V1}/pet-owners/${id}`,
     create: `${V1}/pet-owners`,
     update: (id: string) => `${V1}/pet-owners/${id}`,
+    delete: (id: string) => `${V1}/pet-owners/${id}`,
     lookupOrCreate: `${V1}/pet-owners/lookup-or-create`,
     documents: (id: string) => `${V1}/pet-owners/${id}/documents`,
     communications: (id: string) => `${V1}/pet-owners/${id}/communications`,
@@ -41,6 +42,7 @@ export const endpoints = {
     byOwner: (ownerId: string) => `${V1}/pet-owners/${ownerId}/pets`,
     lookupOrCreate: `${V1}/pets/lookup-or-create`,
     update: (id: string) => `${V1}/pets/${id}`,
+    delete: (id: string) => `${V1}/pets/${id}`,
     history: (id: string) => `${V1}/pets/history/${id}`,
   },
   vaccines: {

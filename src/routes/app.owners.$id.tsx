@@ -1,14 +1,25 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
-import { ArrowLeft, FileText, MessageSquare, PawPrint, Pencil, Plus, Upload, Mail, Smartphone } from "lucide-react";
+import { ArrowLeft, FileText, MessageSquare, PawPrint, Pencil, Plus, Upload, Mail, Smartphone, Trash2, Loader2 } from "lucide-react";
 import { StaffLayout } from "@/components/app/StaffLayout";
 import { SpeciesName, BreedName } from "@/components/app/MasterData";
 import { EmptyState, Loading, Panel, formatDate } from "@/components/app/ui";
 import { PetForm } from "@/components/app/kit/PetForm";
-import { apiClient } from "@/lib/api-client";
+import { apiClient, ApiError } from "@/lib/api-client";
 import { endpoints } from "@/lib/api/endpoints";
 import type { CommunicationLog, OwnerDocument, Pet, PetOwner } from "@/lib/api/types";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export const Route = createFileRoute("/app/owners/$id")({
   head: () => ({
@@ -30,6 +41,7 @@ const field =
 
 function OwnerDetailPage() {
   const { id } = Route.useParams();
+  const navigate = useNavigate();
   const [owner, setOwner] = useState<PetOwner | null>(null);
   const [pets, setPets] = useState<Pet[]>([]);
   const [docs, setDocs] = useState<OwnerDocument[]>([]);
@@ -39,6 +51,8 @@ function OwnerDetailPage() {
   const [addingPet, setAddingPet] = useState(false);
   const [draft, setDraft] = useState({ firstName: "", email: "", phoneNumber: "", address: "" });
   const [activeTab, setActiveTab] = useState<"overview" | "communications">("overview");
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -63,6 +77,21 @@ function OwnerDetailPage() {
     const updated = await apiClient.patch<PetOwner>(endpoints.petOwners.update(id), draft);
     setOwner(updated);
     setEditing(false);
+  }
+
+  async function handleDelete() {
+    if (!owner) return;
+    setDeleting(true);
+    try {
+      await apiClient.delete(endpoints.petOwners.delete(id));
+      toast.success(`Owner ${owner.firstName} ${owner.lastName || ""} deleted successfully`);
+      navigate({ to: "/app/owners" });
+    } catch (e) {
+      toast.error(e instanceof ApiError ? e.message : "Could not delete this owner");
+    } finally {
+      setDeleting(false);
+      setShowDeleteDialog(false);
+    }
   }
 
   async function uploadDoc(file: File | undefined) {
@@ -92,13 +121,13 @@ function OwnerDetailPage() {
           <div className="mb-6 flex gap-6 border-b border-border px-1">
             <button
               onClick={() => setActiveTab("overview")}
-              className={cn("pb-3 text-sm font-medium border-b-2 transition-colors", activeTab === "overview" ? "border-forest text-forest" : "border-transparent text-foreground/60 hover:text-foreground")}
+              className={cn("pb-3 text-sm font-medium border-b-2 transition-colors cursor-pointer", activeTab === "overview" ? "border-forest text-forest" : "border-transparent text-foreground/60 hover:text-foreground")}
             >
               Overview
             </button>
             <button
               onClick={() => setActiveTab("communications")}
-              className={cn("pb-3 text-sm font-medium border-b-2 transition-colors", activeTab === "communications" ? "border-forest text-forest" : "border-transparent text-foreground/60 hover:text-foreground")}
+              className={cn("pb-3 text-sm font-medium border-b-2 transition-colors cursor-pointer", activeTab === "communications" ? "border-forest text-forest" : "border-transparent text-foreground/60 hover:text-foreground")}
             >
               Communication History
             </button>
@@ -107,13 +136,21 @@ function OwnerDetailPage() {
           {activeTab === "overview" ? (
             <div className="grid gap-5 lg:grid-cols-2">
               <Panel
-            title="Profile"
-            action={
-              <button onClick={() => setEditing((v) => !v)} className="inline-flex items-center gap-1.5 text-sm text-forest">
-                <Pencil className="size-4" /> {editing ? "Cancel" : "Edit"}
-              </button>
-            }
-          >
+                title="Profile"
+                action={
+                  <div className="flex items-center gap-3">
+                    <button onClick={() => setEditing((v) => !v)} className="inline-flex items-center gap-1.5 text-sm text-forest cursor-pointer">
+                      <Pencil className="size-4" /> {editing ? "Cancel" : "Edit"}
+                    </button>
+                    <button
+                      onClick={() => setShowDeleteDialog(true)}
+                      className="inline-flex items-center gap-1.5 text-sm text-destructive hover:text-destructive/80 transition-colors cursor-pointer"
+                    >
+                      <Trash2 className="size-4" /> Delete
+                    </button>
+                  </div>
+                }
+              >
             {editing ? (
               <div className="space-y-3">
                 <input className={field} value={draft.firstName} onChange={(e) => setDraft({ ...draft, firstName: e.target.value })} placeholder="Name" />
@@ -272,6 +309,33 @@ function OwnerDetailPage() {
           )}
         </>
       )}
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Pet Owner</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete <span className="font-semibold text-foreground">{owner?.firstName} {owner?.lastName || ""}</span>? This action cannot be undone and will permanently delete this owner record.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              disabled={deleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleting ? (
+                <>
+                  <Loader2 className="mr-2 size-4 animate-spin" /> Deleting…
+                </>
+              ) : (
+                "Delete owner"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </StaffLayout>
   );
 }

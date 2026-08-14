@@ -1,13 +1,24 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowLeft, Activity, Pencil, Syringe } from "lucide-react";
+import { ArrowLeft, Activity, Pencil, Syringe, Trash2, Loader2 } from "lucide-react";
 import { SpeciesName, BreedName } from "@/components/app/MasterData";
 import { StaffLayout } from "@/components/app/StaffLayout";
 import { EmptyState, Loading, Panel, formatDate } from "@/components/app/ui";
 import { PetForm } from "@/components/app/kit/PetForm";
-import { apiClient } from "@/lib/api-client";
+import { apiClient, ApiError } from "@/lib/api-client";
 import { endpoints } from "@/lib/api/endpoints";
 import type { MedicalEvent, Pet, Vaccine } from "@/lib/api/types";
+import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export const Route = createFileRoute("/app/pets/$id")({
   head: () => ({
@@ -35,11 +46,14 @@ const typeTone: Record<MedicalEvent["type"], string> = {
 
 function PetDetailPage() {
   const { id } = Route.useParams();
+  const navigate = useNavigate();
   const [pet, setPet] = useState<Pet | null>(null);
   const [events, setEvents] = useState<MedicalEvent[]>([]);
   const [vaccines, setVaccines] = useState<Vaccine[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -61,6 +75,21 @@ function PetDetailPage() {
     };
   }, [id]);
 
+  async function handleDeletePet() {
+    if (!pet) return;
+    setDeleting(true);
+    try {
+      await apiClient.delete(endpoints.pets.delete(id));
+      toast.success(`Pet ${pet.petName} deleted successfully`);
+      navigate({ to: "/app/pets" });
+    } catch (e) {
+      toast.error(e instanceof ApiError ? e.message : "Could not delete this pet");
+    } finally {
+      setDeleting(false);
+      setShowDeleteDialog(false);
+    }
+  }
+
   return (
     <StaffLayout title={pet?.petName ?? "Patient"} subtitle="Patient record" permission="pets:read">
       <Link to="/app/pets" className="mb-4 inline-flex items-center gap-1.5 text-sm text-forest">
@@ -75,9 +104,17 @@ function PetDetailPage() {
             <Panel
               title="Profile"
               action={
-                <button onClick={() => setEditing((v) => !v)} className="inline-flex items-center gap-1.5 text-sm text-forest">
-                  <Pencil className="size-4" /> {editing ? "Cancel" : "Edit"}
-                </button>
+                <div className="flex items-center gap-3">
+                  <button onClick={() => setEditing((v) => !v)} className="inline-flex items-center gap-1.5 text-sm text-forest cursor-pointer">
+                    <Pencil className="size-4" /> {editing ? "Cancel" : "Edit"}
+                  </button>
+                  <button
+                    onClick={() => setShowDeleteDialog(true)}
+                    className="inline-flex items-center gap-1.5 text-sm text-destructive hover:text-destructive/80 transition-colors cursor-pointer"
+                  >
+                    <Trash2 className="size-4" /> Delete
+                  </button>
+                </div>
               }
             >
               {editing ? (
@@ -195,6 +232,33 @@ function PetDetailPage() {
           </Panel>
         </div>
       )}
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Patient Record</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete <span className="font-semibold text-foreground">{pet?.petName}</span>? This action cannot be undone and will permanently remove this patient record and medical history.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeletePet}
+              disabled={deleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleting ? (
+                <>
+                  <Loader2 className="mr-2 size-4 animate-spin" /> Deleting…
+                </>
+              ) : (
+                "Delete pet"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </StaffLayout>
   );
 }
