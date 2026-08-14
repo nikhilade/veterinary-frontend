@@ -114,13 +114,24 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<A
     },
     body: body ? (isFormData ? body : JSON.stringify(body)) : undefined,
   });
-  const raw = (await res.json()) as ApiResponse<unknown>;
-  payload = { ...raw, data: mapBackendResponse(raw.data) } as ApiResponse<T>;
 
-  if (!payload.success) {
+  const text = await res.text();
+  let raw: ApiResponse<unknown>;
+  try {
+    raw = text ? (JSON.parse(text) as ApiResponse<unknown>) : { success: res.ok, data: null, error: null, meta: {} as any };
+  } catch {
+    if (!res.ok) {
+      throw new ApiError(`HTTP_${res.status}`, `Server returned error (${res.status}): ${text || res.statusText}`);
+    }
+    raw = { success: true, data: text as any, error: null, meta: {} as any };
+  }
+
+  payload = { ...raw, data: mapBackendResponse(raw?.data) } as ApiResponse<T>;
+
+  if (!payload.success && !res.ok) {
     // Map Java backend response structure to the frontend expectations
-    let code = payload.error?.code ?? "UNKNOWN_ERROR";
-    let message = payload.error?.message ?? payload.message ?? "Something went wrong.";
+    let code = payload.error?.code ?? `HTTP_${res.status}`;
+    let message = payload.error?.message ?? payload.message ?? res.statusText ?? "Something went wrong.";
     const data = payload.error?.data ?? {};
 
     // Intercept backend double-booking message and convert to expected frontend code

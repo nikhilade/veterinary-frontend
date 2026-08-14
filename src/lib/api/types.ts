@@ -15,6 +15,7 @@ export interface ApiMeta {
 
 export interface ApiResponse<T> {
   success: boolean;
+  message?: string;
   data: T;
   error: ApiErrorPayload;
   meta: ApiMeta;
