@@ -13,8 +13,14 @@ export function useMasterData(resource: string | null) {
     queryKey: ["master-data", resource],
     queryFn: async () => {
       if (!resource) return [];
-      const data = await apiClient.get<MasterDataItem[]>(endpoints.masterData.list(resource));
-      return data || [];
+      const res = await apiClient.get<MasterDataItem[] | { content: MasterDataItem[] }>(
+        endpoints.masterData.list(resource),
+        { size: 1000 },
+      );
+      if (res && typeof res === "object" && "content" in res && Array.isArray((res as any).content)) {
+        return (res as any).content;
+      }
+      return Array.isArray(res) ? res : [];
     },
     enabled: !!resource,
     staleTime: 1000 * 60 * 60 * 24, // 24 hours

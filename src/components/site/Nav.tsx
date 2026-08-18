@@ -1,10 +1,11 @@
 import { useState } from "react";
+import { Link } from "@tanstack/react-router";
 import { Menu, X, PawPrint } from "lucide-react";
 
 const links = [
   { label: "Home", href: "#home" },
   { label: "About Us", href: "#about" },
-  { label: "Services", href: "#services" },
+  { label: "Modules", href: "#services" },
   { label: "Blog", href: "#blog" },
 ];
 
@@ -30,12 +31,26 @@ export function Nav() {
           ))}
         </nav>
 
-        <a
-          href="#contact"
-          className="hidden rounded-full border border-forest px-7 py-3 text-[15px] font-medium text-forest transition-colors hover:bg-forest hover:text-primary-foreground md:inline-block"
-        >
-          Contact US
-        </a>
+        <div className="hidden items-center gap-3 md:flex">
+          <Link
+            to="/pricing"
+            className="text-[15px] font-medium text-forest/85 transition-colors hover:text-clay"
+          >
+            Pricing
+          </Link>
+          <Link
+            to="/login"
+            className="rounded-full border border-forest px-6 py-3 text-[15px] font-medium text-forest transition-colors hover:bg-forest hover:text-primary-foreground"
+          >
+            Log in
+          </Link>
+          <Link
+            to="/signup"
+            className="rounded-full bg-forest px-6 py-3 text-[15px] font-medium text-primary-foreground transition-opacity hover:opacity-90"
+          >
+            Start free trial
+          </Link>
+        </div>
 
         <button
           aria-label="Toggle menu"
@@ -59,13 +74,23 @@ export function Nav() {
                 {l.label}
               </a>
             ))}
-            <a
-              href="#contact"
+            <Link to="/pricing" onClick={() => setOpen(false)} className="font-medium text-forest">
+              Pricing
+            </Link>
+            <Link
+              to="/login"
               onClick={() => setOpen(false)}
               className="mt-2 rounded-full border border-forest px-6 py-3 text-center font-medium text-forest"
             >
-              Contact US
-            </a>
+              Log in
+            </Link>
+            <Link
+              to="/signup"
+              onClick={() => setOpen(false)}
+              className="rounded-full bg-forest px-6 py-3 text-center font-medium text-primary-foreground"
+            >
+              Start free trial
+            </Link>
           </nav>
         </div>
       )}

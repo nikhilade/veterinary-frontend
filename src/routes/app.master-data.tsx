@@ -39,7 +39,7 @@ const collections: { key: string; label: string; description: string; fields: Cr
     description: "Cities mapped to states.",
     fields: [
       { key: "name", label: "City", required: true },
-      { key: "stateId", label: "State", type: "select", lookup: "states", required: true },
+      { key: "stateId", label: "State", type: "select", lookup: "states", displayKey: "stateName", required: true },
       { key: "isActive", label: "Status", type: "boolean" },
     ],
   },
@@ -50,6 +50,7 @@ const collections: { key: string; label: string; description: string; fields: Cr
     fields: [
       { key: "name", label: "Species", required: true },
       { key: "code", label: "Code" },
+      { key: "description", label: "Description" },
       { key: "active", label: "Status", type: "boolean" },
     ],
   },
@@ -59,8 +60,8 @@ const collections: { key: string; label: string; description: string; fields: Cr
     description: "Breeds mapped to a species, used by the pet registration form.",
     fields: [
       { key: "name", label: "Breed", required: true },
-      { key: "speciesId", label: "Species", type: "select", lookup: "species" },
-      { key: "size", label: "Size", type: "select", options: ["Small", "Medium", "Large"] },
+      { key: "speciesId", label: "Species", type: "select", lookup: "species", displayKey: "speciesName", required: true },
+      { key: "description", label: "Description" },
       { key: "active", label: "Status", type: "boolean" },
     ],
   },
@@ -70,7 +71,7 @@ const collections: { key: string; label: string; description: string; fields: Cr
     description: "Vaccine catalogue with default booster intervals for due-date calculation.",
     fields: [
       { key: "name", label: "Vaccine", required: true },
-      { key: "speciesId", label: "Species", type: "select", lookup: "species" },
+      { key: "speciesId", label: "Species", type: "select", lookup: "species", displayKey: "speciesName" },
       { key: "interval_months", label: "Booster interval (months)", type: "number" },
       { key: "active", label: "Status", type: "boolean" },
     ],
@@ -93,10 +94,26 @@ const collections: { key: string; label: string; description: string; fields: Cr
     description: "Diagnostics catalogue with pricing and turnaround time.",
     fields: [
       { key: "name", label: "Test", required: true },
-      { key: "category", label: "Category", type: "select", options: ["Haematology", "Biochemistry", "Pathology", "Imaging"] },
-      { key: "price", label: "Price (₹)", type: "number" },
-      { key: "tat_hours", label: "Turnaround (hours)", type: "number" },
-      { key: "active", label: "Status", type: "boolean" },
+      { key: "code", label: "Code" },
+      {
+        key: "category",
+        label: "Category",
+        type: "select",
+        options: [
+          "HEMATOLOGY",
+          "BIOCHEMISTRY",
+          "MICROBIOLOGY",
+          "SEROLOGY",
+          "URINALYSIS",
+          "RADIOLOGY",
+          "PARASITOLOGY",
+          "PATHOLOGY",
+          "OTHER",
+        ],
+      },
+      { key: "description", label: "Description" },
+      { key: "normalTurnaroundHours", label: "Turnaround (hours)", type: "number" },
+      { key: "isActive", label: "Status", type: "boolean" },
     ],
   },
 ];

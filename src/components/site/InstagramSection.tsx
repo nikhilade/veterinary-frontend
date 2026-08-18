@@ -79,9 +79,9 @@ export function InstagramSection() {
 
         <div className="relative z-10 mx-auto max-w-3xl px-6 text-center">
           <h2 className="text-4xl leading-tight sm:text-5xl lg:text-6xl">
-            Stay Pawsome With Us
+            Follow the Hospitals
             <br />
-            On Instagram
+            Growing With Us
           </h2>
           <a
             href="https://instagram.com"
@@ -90,7 +90,7 @@ export function InstagramSection() {
             className="mt-6 inline-flex items-center gap-3 text-[17px] text-foreground/85 hover:text-forest"
           >
             <Instagram className="size-6 text-clay" />
-            Pet Care_Insta
+            @pawcareos
           </a>
         </div>
       </div>

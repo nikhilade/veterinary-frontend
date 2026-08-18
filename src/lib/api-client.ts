@@ -118,7 +118,15 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<A
   const text = await res.text();
   let raw: ApiResponse<unknown>;
   try {
-    raw = text ? (JSON.parse(text) as ApiResponse<unknown>) : { success: res.ok, data: null, error: null, meta: {} as any };
+    const parsed = text ? JSON.parse(text) : null;
+    if (parsed && typeof parsed === "object" && !Array.isArray(parsed) && ("data" in parsed || "success" in parsed)) {
+      raw = parsed as ApiResponse<unknown>;
+      if (raw.success === undefined) {
+        raw.success = res.ok;
+      }
+    } else {
+      raw = { success: res.ok, data: parsed, error: null, meta: {} as any };
+    }
   } catch {
     if (!res.ok) {
       throw new ApiError(`HTTP_${res.status}`, `Server returned error (${res.status}): ${text || res.statusText}`);
@@ -127,6 +135,7 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<A
   }
 
   payload = { ...raw, data: mapBackendResponse(raw?.data) } as ApiResponse<T>;
+
 
   if (!payload.success && !res.ok) {
     // Map Java backend response structure to the frontend expectations

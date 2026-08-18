@@ -101,14 +101,14 @@ export function ScrollGallery() {
             Every Visit Is a Happy Tail Story
           </h2>
           <p className="mt-6 max-w-md text-[17px] leading-relaxed text-foreground/80">
-            Real families, real companions. From first puppy check-ups to gentle senior care, these
-            are the moments our team gets to be part of every single day.
+            Hospitals using PawCareOS see shorter queues, cleaner records and faster collections —
+            while their pet owners book, pay and download prescriptions from their phone.
           </p>
           <a
             href="#contact"
             className="mt-9 inline-flex items-center gap-2 rounded-full border border-forest px-9 py-4 text-[16px] font-medium text-forest transition-colors hover:bg-forest hover:text-primary-foreground"
           >
-            Book a visit
+            Request a demo
           </a>
         </div>
 

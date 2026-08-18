@@ -30,9 +30,11 @@ const statusTone: Record<SubscriptionStatus, string> = {
   CANCELLED: "bg-muted text-foreground/60",
 };
 
-export function SubscriptionBadge({ status }: { status: SubscriptionStatus }) {
+export function SubscriptionBadge({ status }: { status?: SubscriptionStatus | string }) {
+  const normalizedStatus = (status?.toUpperCase() ?? "TRIAL") as SubscriptionStatus;
+  const tone = statusTone[normalizedStatus] || "bg-muted text-foreground/60";
   return (
-    <span className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${statusTone[status]}`}>{status}</span>
+    <span className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${tone}`}>{normalizedStatus}</span>
   );
 }
 
@@ -44,8 +46,32 @@ function TenantsPage() {
   useEffect(() => {
     setTenants(null);
     apiClient
-      .get<Tenant[]>(endpoints.tenants.list, { status, search })
-      .then(setTenants)
+      .get<any[]>(endpoints.tenants.list, { status, search })
+      .then((data) => {
+        if (Array.isArray(data)) {
+          const mapped: Tenant[] = data.map((t: any) => ({
+            id: t.id,
+            name: t.name || t.hospitalName || "Hospital",
+            slug: t.slug || "",
+            city: t.city || "—",
+            ownerName: t.ownerName || "—",
+            owner_email: t.owner_email || t.ownerEmail || "—",
+            phone: t.phone || "—",
+            plan_id: t.plan_id || t.planId || "",
+            plan_name: t.plan_name || t.planName || "Starter",
+            subscription_status: (t.subscription_status || t.status || "TRIAL") as SubscriptionStatus,
+            branches_count: t.branches_count ?? t.branchesCount ?? 1,
+            staff_count: t.staff_count ?? t.staffCount ?? 1,
+            trial_ends_at: t.trial_ends_at || t.trialEndsAt || null,
+            renews_at: t.renews_at || t.renewsAt || null,
+            mrr: Number(t.mrr ?? 0),
+            createdAt: t.createdAt || t.created_at || "",
+          }));
+          setTenants(mapped);
+        } else {
+          setTenants([]);
+        }
+      })
       .catch(() => setTenants([]));
   }, [status, search]);
 
@@ -53,9 +79,9 @@ function TenantsPage() {
     const list = tenants ?? [];
     return {
       count: list.length,
-      active: list.filter((t) => t.subscription_status === "ACTIVE").length,
-      trial: list.filter((t) => t.subscription_status === "TRIAL").length,
-      mrr: list.reduce((s, t) => s + t.mrr, 0),
+      active: list.filter((t) => (t.subscription_status || (t as any).status) === "ACTIVE").length,
+      trial: list.filter((t) => (t.subscription_status || (t as any).status) === "TRIAL").length,
+      mrr: list.reduce((s, t) => s + (t.mrr || 0), 0),
     };
   }, [tenants]);
 
@@ -137,7 +163,7 @@ function TenantsPage() {
                             ? formatDate(t.renews_at)
                             : "—"}
                       </td>
-                      <td className="py-3 text-right">₹{t.mrr.toLocaleString("en-IN")}</td>
+                      <td className="py-3 text-right">₹{(t.mrr || 0).toLocaleString("en-IN")}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -149,3 +175,4 @@ function TenantsPage() {
     </StaffLayout>
   );
 }
+

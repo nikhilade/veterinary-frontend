@@ -4,17 +4,17 @@ import { Home } from "@/components/site/Home";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "PawCareOS | Veterinary Care, Grooming & Daycare in Los Angeles" },
+      { title: "PawCareOS | Veterinary Hospital Management Software" },
       {
         name: "description",
         content:
-          "PawCareOS is a full-service veterinary clinic in Los Angeles offering expert vet care, grooming, boarding, daycare and training for happy, healthy pets.",
+          "PawCareOS runs your veterinary hospital end to end: appointments, SOAP consultations, prescriptions, pharmacy stock, GST billing, analytics and a pet owner portal.",
       },
-      { property: "og:title", content: "PawCareOS | Where Happy Pets Meet Expert Care" },
+      { property: "og:title", content: "PawCareOS | Run Your Whole Hospital From One Console" },
       {
         property: "og:description",
         content:
-          "Veterinary care, grooming, boarding and training under one roof. Book an appointment with the PawCareOS team today.",
+          "One platform for appointments, clinical records, pharmacy, GST invoicing and analytics — with a branded portal for your pet owners. Start a 14-day free trial.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

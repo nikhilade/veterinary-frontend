@@ -34,41 +34,41 @@ import { BlogCards } from "@/components/site/BlogCards";
 
 const services = [
   {
-    title: "Veterinary Care",
-    copy: "Routine check-ups, vaccinations, diagnostics and emergency treatment from licensed veterinarians who know your pet by name.",
+    title: "Appointments & Queue",
+    copy: "Online booking, day and week calendars, drag-to-reschedule, reception check-in and a live token queue for the waiting room screen.",
     img: serviceVet,
   },
   {
-    title: "Grooming Services",
-    copy: "Baths, trims, nail care and de-shedding treatments that keep coats healthy and tails wagging all year round.",
+    title: "Clinical Records",
+    copy: "Structured SOAP consultations, pet medical history timelines, vaccination due lists and prescriptions with instant PDF generation.",
+    img: serviceSpecial,
+  },
+  {
+    title: "Billing & GST Invoicing",
+    copy: "Invoice builder with automatic GST breakdown, Cash/Card/UPI/Online collection, credit notes and dual-approval refunds.",
     img: serviceGrooming,
   },
   {
-    title: "Boarding & Daycare",
-    copy: "Cosy overnight suites and supervised play days so your companion feels at home even when you are away.",
+    title: "Pharmacy & Inventory",
+    copy: "Batch-wise stock, low-stock and expiry alerts, supplier management and dispensing linked straight to the prescription.",
     img: serviceBoarding,
   },
   {
-    title: "Training Services",
-    copy: "Positive-reinforcement obedience and behaviour programmes built around your pet's pace and personality.",
+    title: "Analytics & Reports",
+    copy: "Daily revenue, doctor performance, payment-mode split, appointment heatmaps and outstanding invoices — refreshed automatically.",
     img: serviceTraining,
-  },
-  {
-    title: "Special Care Services",
-    copy: "Post-surgery recovery, senior support and chronic condition management with attentive daily monitoring.",
-    img: serviceSpecial,
   },
 ];
 
 const posts = [
-  { title: "Top Foods for a Healthy Pet Diet", author: "Brooklyn Simmons", date: "November 28, 2024", img: blog1 },
-  { title: "Holiday Safety Tips for Your Pets", author: "Isabella Parker", date: "November 28, 2024", img: blog2 },
-  { title: "How to Stop Unwanted Chewing", author: "Sophia Bennett", date: "November 28, 2024", img: blog3 },
-  { title: "Grooming Routines That Keep Coats Shiny", author: "Ethan Brooks", date: "December 4, 2024", img: blog4 },
-  { title: "Keeping Your Cat Hydrated All Year", author: "Maya Torres", date: "December 11, 2024", img: blog5 },
-  { title: "Daily Exercise Ideas for Active Dogs", author: "Liam Carter", date: "December 18, 2024", img: blog6 },
-  { title: "Dental Care Basics Every Owner Needs", author: "Dr. Amelia Reed", date: "January 6, 2025", img: blog7 },
-  { title: "Creating a Calm Sleep Space for Kittens", author: "Noah Fletcher", date: "January 15, 2025", img: blog8 },
+  { title: "Cutting Patient Wait Times With a Token Queue", author: "Product Team", date: "November 28, 2024", img: blog1 },
+  { title: "GST Invoicing for Veterinary Hospitals, Simplified", author: "Finance Desk", date: "November 28, 2024", img: blog2 },
+  { title: "Why Structured SOAP Notes Beat Free-Text", author: "Dr. Amelia Reed", date: "November 28, 2024", img: blog3 },
+  { title: "Stop Stock-Outs: Expiry Alerts That Actually Work", author: "Ops Team", date: "December 4, 2024", img: blog4 },
+  { title: "Rolling Out a Second Branch Without the Chaos", author: "Customer Success", date: "December 11, 2024", img: blog5 },
+  { title: "Five Metrics Every Hospital Admin Should Track", author: "Analytics Team", date: "December 18, 2024", img: blog6 },
+  { title: "Handling Refunds and Credit Notes Safely", author: "Finance Desk", date: "January 6, 2025", img: blog7 },
+  { title: "Getting Pet Owners to Use the Owner Portal", author: "Customer Success", date: "January 15, 2025", img: blog8 },
 ];
 
 const sponsors = [logo4, logo1, logo3, logo2];
@@ -83,22 +83,30 @@ export function Home() {
           <Nav />
           <div className="mx-auto grid max-w-7xl items-center gap-10 px-6 pb-0 pt-8 lg:grid-cols-2 lg:pt-16">
             <div className="pb-12 lg:pb-28">
-              <p className="text-lg font-medium text-clay">The Best Pet Care Service</p>
+              <p className="text-lg font-medium text-clay">Veterinary Hospital Management Software</p>
               <h1 className="mt-4 text-5xl leading-[1.1] sm:text-6xl lg:text-[64px]">
-                Where Happy Pets
+                Run Your Whole
                 <br />
-                Meet Expert Care
+                Hospital From One Console
               </h1>
               <p className="mt-6 max-w-lg text-[17px] leading-relaxed text-foreground/80">
-                Compassionate veterinary medicine, grooming and daycare under one roof — because
-                your companion deserves a team that treats them like family.
+                PawCareOS gives veterinary hospitals appointments, consultations, pharmacy,
+                GST billing and analytics in one place — plus a branded portal for their pet owners.
               </p>
-              <a
-                href="#contact"
-                className="mt-9 inline-flex items-center gap-2 rounded-full border border-forest px-9 py-4 text-[16px] font-medium text-forest transition-colors hover:bg-forest hover:text-primary-foreground"
-              >
-                Get Started
-              </a>
+              <div className="mt-9 flex flex-wrap items-center gap-4">
+                <Link
+                  to="/signup"
+                  className="inline-flex items-center gap-2 rounded-full bg-forest px-9 py-4 text-[16px] font-medium text-primary-foreground transition-opacity hover:opacity-90"
+                >
+                  Start 14-day free trial
+                </Link>
+                <Link
+                  to="/pricing"
+                  className="inline-flex items-center gap-2 rounded-full border border-forest px-9 py-4 text-[16px] font-medium text-forest transition-colors hover:bg-forest hover:text-primary-foreground"
+                >
+                  See pricing
+                </Link>
+              </div>
             </div>
 
             <div className="relative flex items-end justify-center">
@@ -122,9 +130,9 @@ export function Home() {
         <div className="mx-auto max-w-7xl px-6">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:gap-6">
             <h2 className="max-w-xl text-4xl leading-tight sm:text-5xl">
-              Loving Pets Is What We
+              Built With Vets, For
               <br className="hidden lg:inline" />
-              Do Best
+              Busy Hospitals
             </h2>
             <img
               src={frameArrow}
@@ -146,20 +154,20 @@ export function Home() {
 
             <div>
               <p className="text-[17px] leading-relaxed text-foreground/80">
-                From the first wagging-tail welcome to the follow-up call after treatment, every
-                part of our clinic is designed around comfort. Our veterinarians, groomers and
-                daycare team work together so your pet gets consistent, gentle care at every visit.
+                Every screen in PawCareOS was designed alongside practising veterinarians, receptionists
+                and billing staff. Reception, consulting rooms, pharmacy and accounts all work off the same
+                record, so nothing is re-typed and nothing slips between departments.
               </p>
 
               <div className="mt-10 grid gap-8 sm:grid-cols-2">
                 {[
                   {
-                    title: "Passion for pets",
-                    copy: "We are pet owners first — every animal in our care is treated like our own.",
+                    title: "Live in a day",
+                    copy: "Guided onboarding imports your doctors, services and price list so you can go live the same week.",
                   },
                   {
-                    title: "Expertise & experience",
-                    copy: "Over fifteen years of clinical practice across preventive and emergency care.",
+                    title: "Role-based access",
+                    copy: "Admins, doctors, receptionists, lab, pharmacy and billing each see only what they need.",
                   },
                 ].map((f) => (
                   <div key={f.title}>
@@ -180,9 +188,9 @@ export function Home() {
       <section className="bg-cream py-14">
         <div className="mx-auto flex max-w-7xl flex-col items-center gap-8 px-6 lg:flex-row lg:justify-between">
           <h3 className="shrink-0 text-center text-2xl font-bold lg:text-3xl lg:text-left">
-            Our Generous Sponsors
+            Trusted by Hospitals
             <br />
-            and Donors
+            and Clinic Chains
           </h3>
           <div className="relative w-full overflow-hidden lg:w-auto">
             <div className="marquee-track flex w-max items-center gap-12 pr-12 lg:gap-16 lg:pr-16">
@@ -206,7 +214,7 @@ export function Home() {
       <section id="services" className="bg-background py-20 lg:py-28">
         <div className="mx-auto max-w-7xl px-6">
           <h2 className="mx-auto max-w-3xl text-center text-4xl leading-tight sm:text-5xl">
-            Expert Care for Every Stage of Your Pet's Life
+            Everything Your Hospital Runs On, In One Platform
           </h2>
 
           <div className="mt-14 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
@@ -230,10 +238,10 @@ export function Home() {
                   {s.copy}
                 </p>
                 <Link
-                  to="/book-appointment"
+                  to="/pricing"
                   className="relative z-20 mt-6 inline-flex items-center gap-2 text-[15px] font-medium text-clay"
                 >
-                  Book now <ArrowUpRight className="size-4" />
+                  Explore module <ArrowUpRight className="size-4" />
                 </Link>
               </article>
             ))}
@@ -250,13 +258,13 @@ export function Home() {
         <div className="paw-field absolute inset-0 opacity-100 invert" aria-hidden />
         <div className="relative mx-auto max-w-5xl px-6">
           <h2 className="max-w-2xl text-4xl leading-tight text-primary-foreground sm:text-5xl">
-            Every Visit Is a Happy Tail Story
+            Hospitals Run Calmer on PawCareOS
           </h2>
         </div>
         <div className="relative mx-auto mt-12 grid max-w-5xl items-center gap-10 px-6 md:grid-cols-[220px_1fr]">
           <img
             src={testimonial1}
-            alt="Sarah Johnson holding her dog Max"
+            alt="Dr. Sarah Johnson, Managing Director at Happy Tails Pet Hospital"
             loading="lazy"
             width={700}
             height={700}
@@ -264,11 +272,11 @@ export function Home() {
           />
           <div>
             <blockquote className="text-3xl leading-snug text-primary-foreground sm:text-4xl">
-              &ldquo;She&apos;s not just a pet, she&apos;s our cuddle buddy — and this team treats
-              her exactly that way.&rdquo;
+              &ldquo;Reception, pharmacy and billing finally speak the same language. Day-end
+              closing went from two hours to ten minutes.&rdquo;
             </blockquote>
-            <p className="mt-6 text-lg font-semibold text-primary-foreground">Sarah Johnson</p>
-            <p className="text-sm text-primary-foreground/70">Dog — Max</p>
+            <p className="mt-6 text-lg font-semibold text-primary-foreground">Dr. Sarah Johnson</p>
+            <p className="text-sm text-primary-foreground/70">Managing Director — Happy Tails Pet Hospital</p>
           </div>
         </div>
       </section>
@@ -277,7 +285,7 @@ export function Home() {
       {/* BLOG */}
       <section id="blog" className="bg-sand py-20 lg:py-28">
         <div className="mx-auto max-w-7xl px-6">
-          <h2 className="text-4xl leading-tight sm:text-5xl">Unleashing Expert Tips for Pet Owners</h2>
+          <h2 className="text-4xl leading-tight sm:text-5xl">Practice Management Insights for Hospital Teams</h2>
 
           <BlogCards posts={posts} />
         </div>
@@ -295,12 +303,12 @@ export function Home() {
         />
         <div className="relative z-10 mx-auto grid max-w-7xl gap-14 px-6 lg:grid-cols-2">
           <div>
-            <h2 className="text-4xl leading-tight sm:text-5xl">Have Questions? We&apos;re Here to Help</h2>
+            <h2 className="text-4xl leading-tight sm:text-5xl">Talk to Our Team About Your Hospital</h2>
             <ul className="mt-10 space-y-6">
               {[
-                { icon: Phone, text: "(00) 123 654 987" },
-                { icon: Mail, text: "info@pawcareos.com" },
-                { icon: MapPin, text: "9400 S Normandie Ave #14, Los Angeles, CA" },
+                { icon: Phone, text: "+91 90000 12345" },
+                { icon: Mail, text: "sales@pawcareos.com" },
+                { icon: MapPin, text: "Baner Road, Pune, Maharashtra 411045" },
               ].map(({ icon: Icon, text }) => (
                 <li key={text} className="flex items-center gap-4">
                   <span className="inline-flex size-12 items-center justify-center rounded-full bg-cream text-forest">
@@ -328,7 +336,7 @@ export function Home() {
               <input
                 required
                 type="email"
-                placeholder="Email address"
+                placeholder="Work email"
                 className="rounded-full border border-border bg-card px-5 py-3 text-[15px] outline-none focus:border-forest"
               />
             </div>
@@ -337,7 +345,7 @@ export function Home() {
               defaultValue=""
             >
               <option value="" disabled>
-                Choose Service...
+                What are you interested in?
               </option>
               {services.map((s) => (
                 <option key={s.title}>{s.title}</option>
@@ -345,14 +353,14 @@ export function Home() {
             </select>
             <textarea
               rows={4}
-              placeholder="Tell us about your pet"
+              placeholder="Tell us about your hospital — branches, doctors, daily footfall"
               className="mt-5 w-full rounded-[1.5rem] border border-border bg-card px-5 py-4 text-[15px] outline-none focus:border-forest"
             />
             <button
               type="submit"
               className="mt-6 rounded-full bg-forest px-9 py-4 font-medium text-primary-foreground transition-opacity hover:opacity-90"
             >
-              Send Message
+              Request a demo
             </button>
           </form>
         </div>
@@ -389,7 +397,8 @@ export function Home() {
               PawCareOS<PawPrint className="inline size-5 -rotate-12 text-clay ml-1" />
             </span>
             <p className="mt-4 max-w-xs text-sm text-primary-foreground/75">
-              Full-service veterinary care, grooming and daycare for the pets of Los Angeles.
+              Hospital management software for veterinary practices — appointments, clinical
+              records, pharmacy, billing and analytics, plus a portal for pet owners.
             </p>
             <div className="mt-6 flex gap-3">
               {[Facebook, Instagram, Twitter, Linkedin].map((Icon, i) => (
@@ -408,7 +417,7 @@ export function Home() {
           <Reveal delay={120}>
             <h3 className="text-lg text-primary-foreground">Quick Link</h3>
             <ul className="mt-4 space-y-3 text-sm text-primary-foreground/75">
-              {["Home", "About us", "Services", "Blog", "Contact us"].map((l) => (
+              {["Home", "About us", "Modules", "Blog", "Contact us"].map((l) => (
                 <li key={l}>
                   <a href="#home" className="hover:text-clay">
                     {l}
@@ -421,7 +430,7 @@ export function Home() {
           <Reveal delay={240}>
             <h3 className="text-lg text-primary-foreground">Support</h3>
             <ul className="mt-4 space-y-3 text-sm text-primary-foreground/75">
-              {["Appointments", "Emergency care", "Pricing"].map((l) => (
+              {["Pricing", "Staff login", "Pet owner portal", "Help centre"].map((l) => (
                 <li key={l}>
                   <a href="#contact" className="hover:text-clay">
                     {l}
@@ -433,7 +442,7 @@ export function Home() {
         </div>
         <Reveal delay={360} className="mx-auto mt-12 max-w-7xl px-6">
           <p className="text-xs text-primary-foreground/60">
-            © {new Date().getFullYear()} PawCareOS Veterinary Clinic. All rights reserved.
+            © {new Date().getFullYear()} PawCareOS. Veterinary hospital management software. All rights reserved.
           </p>
         </Reveal>
 
