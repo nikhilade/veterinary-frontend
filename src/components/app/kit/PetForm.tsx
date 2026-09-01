@@ -43,7 +43,7 @@ export function PetForm({ ownerId, pet = null, onSaved, submitLabel = "Save pet"
 
   // Optional: if breeds should be filtered by species, you could do it here
   // assuming breed objects have a speciesId field. For now, filter if applicable.
-  const breeds = breedsList.filter((b) => !b.speciesId || b.speciesId === form.speciesId);
+  const breeds = breedsList.filter((b: any) => !b.speciesId || b.speciesId === form.speciesId);
 
   function onPhoto(file: File | undefined) {
     if (!file) return;
@@ -130,13 +130,13 @@ export function PetForm({ ownerId, pet = null, onSaved, submitLabel = "Save pet"
           onChange={(e) => setForm({ ...form, speciesId: e.target.value as Pet["speciesId"], breedId: "" })}
         >
           <option value="">Select species</option>
-          {speciesList.map((s) => (
+          {speciesList.map((s: any) => (
             <option key={s.id} value={s.id}>{s.name}</option>
           ))}
         </select>
         <select className={field} value={form.breedId} onChange={(e) => setForm({ ...form, breedId: e.target.value })}>
           <option value="">Select breed</option>
-          {breeds.map((b) => (
+          {breeds.map((b: any) => (
             <option key={b.id} value={b.id}>{b.name}</option>
           ))}
         </select>

@@ -41,6 +41,7 @@ export interface AuthUser {
   email: string;
   role: Role;
   avatarUrl: string | null;
+  hospitalId?: string;
 }
 
 export interface LoginResponse {
@@ -52,8 +53,10 @@ export interface PetOwner {
   id: string;
   firstName: string;
   lastName: string;
+  name?: string;
   email: string;
   phoneNumber: string;
+  phone?: string;
   address: string;
   pets?: Pet[];
   petsCount?: number;
@@ -65,8 +68,11 @@ export interface Pet {
   ownerId: string;
   ownerName?: string;
   petName: string;
+  name?: string;
   speciesId: string;
+  species?: string;
   breedId: string;
+  breed?: string;
   gender: "Male" | "Female";
   age: number;
   weightKg: number;
@@ -127,6 +133,7 @@ export interface Branch {
   status: string;
   createdAt: string;
   updatedAt: string;
+  workingHours?: BranchWorkingHours;
 }
 
 export type AppointmentStatus =
@@ -142,6 +149,7 @@ export type SourceChannel = "WALK_IN" | "PHONE" | "ONLINE";
 
 export interface Appointment {
   id: string;
+  appointmentNumber?: string;
   petId: string;
   petName: string;
   ownerId: string;
@@ -150,13 +158,14 @@ export interface Appointment {
   doctorName: string;
   service: string;
   scheduledAt: string;
-  appointmentDate: string;
-  startTime: string;
-  endTime: string;
+  appointmentDate?: string;
+  startTime?: string;
+  endTime?: string;
   status: AppointmentStatus;
-  notes: string;
+  notes?: string;
   branchId?: string;
-  tokenNumber?: number | null;
+  branchName?: string;
+  tokenNumber?: string | number | null;
   checkedInAt?: string | null;
   sourceChannel?: SourceChannel;
 }
@@ -362,20 +371,76 @@ export interface DoctorAvailability {
   leaves: DoctorLeave[];
 }
 
+export interface ConsultationVitals {
+  temperatureC?: string;
+  weightKg?: string;
+  heartRate?: string;
+  respRate?: string;
+}
+
+export type DiagnosisSeverity = "Mild" | "Moderate" | "Severe" | "Critical";
+
+export interface DiagnosisItem {
+  id?: string;
+  consultationId?: string;
+  diagnosisName: string;
+  description?: string;
+  severity?: DiagnosisSeverity | string;
+}
+
+export interface TreatmentPlanItem {
+  id?: string;
+  consultationId?: string;
+  treatment: string;
+  medication?: string;
+  dosage?: string;
+  instructions?: string;
+}
+
+export type LabPriority = "NORMAL" | "URGENT" | "STAT";
+export type LabOrderStatus = "ORDERED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
+
+export interface LabOrderDto {
+  id?: string;
+  hospitalId?: string;
+  branchId?: string;
+  consultationId: string;
+  labTestId: string;
+  labTestName?: string;
+  priority: LabPriority;
+  status?: LabOrderStatus;
+  clinicalNotes?: string;
+  orderedAt?: string;
+}
+
 export interface Consultation {
   id: string;
   appointmentId: string;
   petId: string;
-  petName: string;
-  ownerId: string;
+  petName?: string;
+  ownerId?: string;
+  ownerName?: string;
   doctorId: string;
-  doctorName: string;
+  doctorName?: string;
   subjective: string;
   objective: string;
   assessment: string;
   plan: string;
-  vitals: { temperatureC: string; weightKg: string; heartRate: string; respRate: string };
-  createdAt: string;
+  followUpDate?: string | null;
+  vitals?: ConsultationVitals;
+  createdAt?: string;
+}
+
+export interface AddConsultationPayload {
+  appointmentId: string;
+  doctorId: string;
+  petId: string;
+  subjective: string;
+  objective: string;
+  assessment: string;
+  plan: string;
+  followUpDate?: string | null;
+  vitals?: ConsultationVitals;
 }
 
 export interface Medicine {

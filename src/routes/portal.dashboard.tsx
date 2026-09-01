@@ -77,9 +77,9 @@ function PortalDashboard() {
             <ul className="space-y-3">
               {stats.pets.map((p) => (
                 <li key={p.id} className="flex items-center justify-between rounded-[1.25rem] bg-muted px-4 py-3">
-                  <span className="font-medium">{p.name}</span>
+                  <span className="font-medium">{p.name || p.petName}</span>
                   <span className="text-sm text-foreground/60">
-                    {p.species} · {p.breed}
+                    {p.species || "Pet"} · {p.breed || "General"}
                   </span>
                 </li>
               ))}

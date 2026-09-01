@@ -1,17 +1,18 @@
 import { useSyncExternalStore } from "react";
-import { apiClient } from "../api-client";
+import { apiClient, ApiError } from "../api-client";
 import { endpoints } from "../api/endpoints";
-import type { AuthUser, LoginResponse, Role } from "../api/types";
+import type { AuthUser, Role } from "../api/types";
 
 const STORAGE_KEY = "petgood.auth";
 
 export interface AuthState {
   token: string | null;
+  refreshToken: string | null;
   user: AuthUser | null;
   hydrated: boolean;
 }
 
-let state: AuthState = { token: null, user: null, hydrated: false };
+let state: AuthState = { token: null, refreshToken: null, user: null, hydrated: false };
 const listeners = new Set<() => void>();
 
 function emit() {
@@ -26,9 +27,41 @@ function setState(next: Partial<AuthState>) {
 function persist() {
   if (typeof window === "undefined") return;
   if (state.token && state.user) {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ token: state.token, user: state.user }));
+    window.localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ token: state.token, refreshToken: state.refreshToken, user: state.user })
+    );
   } else {
     window.localStorage.removeItem(STORAGE_KEY);
+  }
+}
+
+async function verifyTokenWithBackend() {
+  if (!state.token) return;
+  if (state.token === "mock-token") {
+    authStore.logout();
+    return;
+  }
+  try {
+    const me = await apiClient.get<any>(endpoints.auth.me);
+    if (me) {
+      const primaryRole = (me.roles?.[0] as Role) || state.user?.role || "SUPER_ADMIN";
+      const fullName = [me.firstName, me.lastName].filter(Boolean).join(" ");
+      const updatedUser: AuthUser = {
+        id: me.id || state.user?.id || "",
+        name: fullName || me.email || state.user?.name || "User",
+        email: me.email || state.user?.email || "",
+        role: primaryRole,
+        avatarUrl: null,
+        hospitalId: me.hospitalId || state.user?.hospitalId,
+      };
+      setState({ user: updatedUser });
+      persist();
+    }
+  } catch (err) {
+    if (err instanceof ApiError) {
+      authStore.logout();
+    }
   }
 }
 
@@ -37,8 +70,13 @@ export function hydrateAuth() {
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (raw) {
-      const parsed = JSON.parse(raw) as { token: string; user: AuthUser };
-      state = { token: parsed.token, user: parsed.user, hydrated: true };
+      const parsed = JSON.parse(raw) as { token: string; refreshToken?: string; user: AuthUser };
+      state = { token: parsed.token, refreshToken: parsed.refreshToken ?? null, user: parsed.user, hydrated: true };
+      if (parsed.token === "mock-token") {
+        authStore.logout();
+      } else {
+        verifyTokenWithBackend();
+      }
     } else {
       state = { ...state, hydrated: true };
     }
@@ -48,7 +86,7 @@ export function hydrateAuth() {
   emit();
 }
 
-const serverSnapshot: AuthState = { token: null, user: null, hydrated: false };
+const serverSnapshot: AuthState = { token: null, refreshToken: null, user: null, hydrated: false };
 
 export function useAuth() {
   const snapshot = useSyncExternalStore(
@@ -70,19 +108,75 @@ export function useAuth() {
 export const authStore = {
   get: () => state,
   async login(email: string, password: string, role?: Role) {
-    const user: AuthUser = { id: "mock-id", name: "Mock User", email, role: role || "SUPER_ADMIN", avatarUrl: null };
-    setState({ token: "mock-token", user, hydrated: true });
-    persist();
-    return user;
+    const res = await apiClient.post<any>(endpoints.auth.login, { email, password });
+    if (res && (res.accessToken || res.token)) {
+      const token = res.accessToken || res.token;
+      const refreshToken = res.refreshToken || null;
+      const backendUser = res.user;
+      const primaryRole = (backendUser?.roles?.[0] as Role) || role || "SUPER_ADMIN";
+      const fullName = [backendUser?.firstName, backendUser?.lastName].filter(Boolean).join(" ");
+      const user: AuthUser = {
+        id: backendUser?.id || "00000000-0000-0000-0000-000000000001",
+        name: fullName || backendUser?.email || email,
+        email: backendUser?.email || email,
+        role: primaryRole,
+        avatarUrl: null,
+        hospitalId: backendUser?.hospitalId,
+      };
+      setState({ token, refreshToken, user, hydrated: true });
+      persist();
+      return user;
+    }
+    throw new ApiError("ERR_INVALID_CREDENTIALS", "Invalid email or password.");
   },
   async signup(input: { name: string; email: string; password: string; role?: Role }) {
-    const user: AuthUser = { id: "mock-id", name: input.name, email: input.email, role: input.role || "SUPER_ADMIN", avatarUrl: null };
-    setState({ token: "mock-token", user, hydrated: true });
+    try {
+      const res = await apiClient.post<any>(endpoints.auth.signup, input);
+      if (res && (res.accessToken || res.token)) {
+        const token = res.accessToken || res.token;
+        const refreshToken = res.refreshToken || null;
+        const backendUser = res.user;
+        const primaryRole = (backendUser?.roles?.[0] as Role) || input.role || "PET_OWNER";
+        const fullName = [backendUser?.firstName, backendUser?.lastName].filter(Boolean).join(" ");
+        const user: AuthUser = {
+          id: backendUser?.id || "00000000-0000-0000-0000-000000000001",
+          name: fullName || input.name,
+          email: backendUser?.email || input.email,
+          role: primaryRole,
+          avatarUrl: null,
+          hospitalId: backendUser?.hospitalId,
+        };
+        setState({ token, refreshToken, user, hydrated: true });
+        persist();
+        return user;
+      }
+    } catch (e) {
+      if (e instanceof ApiError && !e.code.includes("404")) {
+        throw e;
+      }
+    }
+
+    const user: AuthUser = {
+      id: "00000000-0000-0000-0000-000000000001",
+      name: input.name,
+      email: input.email,
+      role: input.role || "PET_OWNER",
+      avatarUrl: null,
+    };
+    setState({ token: "mock-token", refreshToken: null, user, hydrated: true });
     persist();
     return user;
   },
-  logout() {
-    setState({ token: null, user: null, hydrated: true });
+  async logout() {
+    if (state.refreshToken) {
+      try {
+        await apiClient.post(endpoints.auth.logout, { refreshToken: state.refreshToken });
+      } catch {
+        // Ignore logout request errors
+      }
+    }
+    setState({ token: null, refreshToken: null, user: null, hydrated: true });
     persist();
   },
 };
+

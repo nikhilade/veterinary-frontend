@@ -26,7 +26,7 @@ export function PetPicker({ owner: ownerProp, onOwnerChange, value = null, onCha
 
   const { data: speciesList = [] } = useMasterData("species");
   const { data: breedsList = [] } = useMasterData("breeds");
-  const breeds = breedsList.filter((b) => !b.speciesId || b.speciesId === draft.speciesId);
+  const breeds = breedsList.filter((b: any) => !b.speciesId || b.speciesId === draft.speciesId);
 
   useEffect(() => {
     if (ownerProp !== undefined) setOwner(ownerProp);
@@ -106,7 +106,7 @@ export function PetPicker({ owner: ownerProp, onOwnerChange, value = null, onCha
                 <span>
                   <span className="block font-medium">{p.name || (p as any).petName || "Unnamed Pet"}</span>
                   <span className="block text-xs text-foreground/60">
-                    {p.species || speciesList.find(s => s.id === (p as any).speciesId)?.name || "Unknown Species"} · {p.breed || breedsList.find(b => b.id === (p as any).breedId)?.name || "Unknown Breed"} · {p.age}y
+                    {p.species || speciesList.find((s: any) => s.id === (p as any).speciesId)?.name || "Unknown Species"} · {p.breed || breedsList.find((b: any) => b.id === (p as any).breedId)?.name || "Unknown Breed"} · {p.age}y
                   </span>
                 </span>
               </button>
@@ -117,7 +117,7 @@ export function PetPicker({ owner: ownerProp, onOwnerChange, value = null, onCha
                 <div className="grid grid-cols-2 gap-2">
                   <select className={field} value={draft.speciesId} onChange={(e) => setDraft({ ...draft, speciesId: e.target.value, breedId: "" })}>
                     <option value="">Species</option>
-                    {speciesList.map((s) => (
+                    {speciesList.map((s: any) => (
                       <option key={s.id} value={s.id}>{s.name}</option>
                     ))}
                   </select>
@@ -127,7 +127,7 @@ export function PetPicker({ owner: ownerProp, onOwnerChange, value = null, onCha
                   </select>
                   <select className={field} value={draft.breedId} onChange={(e) => setDraft({ ...draft, breedId: e.target.value })}>
                     <option value="">Breed</option>
-                    {breeds.map((b) => (
+                    {breeds.map((b: any) => (
                       <option key={b.id} value={b.id}>{b.name}</option>
                     ))}
                   </select>
