@@ -3,8 +3,6 @@ import { useState } from "react";
 import { PawPrint } from "lucide-react";
 import { authStore } from "@/lib/auth/store";
 import { homeRouteFor } from "@/lib/auth/permissions";
-import { ROLES, type Role } from "@/lib/api/types";
-import { roleLabels } from "@/lib/auth/permissions";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
@@ -23,9 +21,8 @@ export const Route = createFileRoute("/login")({
 
 function LoginPage() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("owner@example.com");
-  const [password, setPassword] = useState("password");
-  const [role, setRole] = useState<Role | "">("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -34,7 +31,7 @@ function LoginPage() {
     setBusy(true);
     setError(null);
     try {
-      const user = await authStore.login(email, password, role || undefined);
+      const user = await authStore.login(email, password);
       navigate({ to: homeRouteFor(user.role), replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to sign in.");
@@ -70,18 +67,6 @@ function LoginPage() {
             placeholder="Password"
             className="w-full rounded-full border border-border bg-background px-5 py-3 text-[15px] outline-none focus:border-forest"
           />
-          <select
-            value={role}
-            onChange={(e) => setRole(e.target.value as Role | "")}
-            className="w-full rounded-full border border-border bg-background px-5 py-3 text-[15px] outline-none focus:border-forest"
-          >
-            <option value="">Detect role from email (demo)</option>
-            {ROLES.map((r) => (
-              <option key={r} value={r}>
-                {roleLabels[r]}
-              </option>
-            ))}
-          </select>
 
           {error ? <p className="text-sm text-destructive">{error}</p> : null}
 

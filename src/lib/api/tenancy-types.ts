@@ -53,6 +53,7 @@ export interface BranchRecord {
   id: string;
   tenant_id: string;
   name: string;
+  branchName?: string;
   address: string;
   city: string;
   phone: string;

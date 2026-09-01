@@ -95,9 +95,14 @@ function CalendarPage() {
     });
   }
 
-  const closedOn = (day: Date) => !!branch && !!branch.workingHours && !!branch.workingHours.closedDays && branch.workingHours.closedDays.includes(day.getDay());
-  const outsideHours = (day: Date, hour: number) =>
-    !!branch && !!branch.workingHours && (hour < branch.workingHours.openHour || hour >= branch.workingHours.closeHour || closedOn(day));
+  const closedOn = (day: Date) => {
+    const wh = (branch as any)?.workingHours;
+    return !!wh?.closedDays && wh.closedDays.includes(day.getDay());
+  };
+  const outsideHours = (day: Date, hour: number) => {
+    const wh = (branch as any)?.workingHours;
+    return !!wh && (hour < wh.openHour || hour >= wh.closeHour || closedOn(day));
+  };
 
   async function drop(day: Date, hour: number) {
     const id = dragId;

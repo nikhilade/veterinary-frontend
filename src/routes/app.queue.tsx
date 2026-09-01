@@ -23,8 +23,11 @@ export const Route = createFileRoute("/app/queue")({
   component: QueuePage,
 });
 
-function timeLabel(iso: string) {
-  return new Date(iso).toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+function timeLabel(val?: string | null) {
+  if (!val) return "Today";
+  const date = new Date(val);
+  if (isNaN(date.getTime())) return "Today";
+  return date.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
 }
 
 function QueuePage() {

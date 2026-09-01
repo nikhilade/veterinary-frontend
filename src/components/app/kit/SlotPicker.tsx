@@ -52,9 +52,10 @@ export function SlotPicker({
   loadedRef.current = onSlotsLoaded;
 
   const closedToday = (() => {
-    if (!branch || !branch.workingHours || !branch.workingHours.closedDays) return false;
+    const wh = (branch as any)?.workingHours;
+    if (!branch || !wh || !wh.closedDays) return false;
     const d = new Date(`${date}T00:00:00`);
-    return branch.workingHours.closedDays.includes(d.getDay());
+    return wh.closedDays.includes(d.getDay());
   })();
 
   const load = useCallback(() => {
@@ -99,10 +100,10 @@ export function SlotPicker({
       {branch ? (
         <p className="text-xs text-foreground/50">
           {branch.branchName}
-          {branch.workingHours ? (
+          {(branch as any)?.workingHours ? (
             <>
-              {" "}· open {String(branch.workingHours.openHour).padStart(2, "0")}:00–
-              {String(branch.workingHours.closeHour).padStart(2, "0")}:00
+              {" "}· open {String((branch as any).workingHours.openHour).padStart(2, "0")}:00–
+              {String((branch as any).workingHours.closeHour).padStart(2, "0")}:00
             </>
           ) : null}
         </p>
