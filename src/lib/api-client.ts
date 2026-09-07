@@ -22,6 +22,26 @@ function readToken(): string | null {
   }
 }
 
+function readHospitalId(): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(TOKEN_KEY);
+    return raw ? (JSON.parse(raw).user?.hospitalId as string) : null;
+  } catch {
+    return null;
+  }
+}
+
+function readRefreshToken(): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(TOKEN_KEY);
+    return raw ? (JSON.parse(raw).refreshToken as string) : null;
+  } catch {
+    return null;
+  }
+}
+
 export class ApiError extends Error {
   code: string;
   data: Record<string, unknown>;
@@ -38,6 +58,7 @@ type RequestOptions = {
   body?: unknown;
   query?: Record<string, string | number | boolean | undefined>;
   headers?: Record<string, string>;
+  _retry?: boolean;
 };
 
 function mapBackendResponse(data: any): any {
@@ -59,6 +80,18 @@ function mapBackendResponse(data: any): any {
 }
 
 let lockTimeoutSimulated = false;
+
+let isRefreshing = false;
+let refreshSubscribers: ((token: string) => void)[] = [];
+
+function onRefreshed(token: string) {
+  refreshSubscribers.forEach((cb) => cb(token));
+  refreshSubscribers = [];
+}
+
+function addRefreshSubscriber(cb: (token: string) => void) {
+  refreshSubscribers.push(cb);
+}
 
 async function request<T>(path: string, options: RequestOptions = {}): Promise<ApiResponse<T>> {
   const { method = "GET", body, query, headers } = options;
@@ -103,13 +136,16 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<A
   let payload: ApiResponse<T>;
 
   const token = readToken();
+  const hospitalId = readHospitalId();
   const url = `${BASE_URL}${path}${search.toString() ? `?${search}` : ""}`;
   const isFormData = body instanceof FormData;
+  
   const res = await fetch(url, {
     method,
     headers: {
       ...(isFormData ? {} : { "Content-Type": "application/json" }),
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(hospitalId ? { "hospital-id": hospitalId } : {}),
       ...(headers ?? {}),
     },
     body: body ? (isFormData ? body : JSON.stringify(body)) : undefined,
@@ -129,15 +165,93 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<A
     }
   } catch {
     if (!res.ok) {
-      throw new ApiError(`HTTP_${res.status}`, `Server returned error (${res.status}): ${text || res.statusText}`);
+      raw = { 
+        success: false, 
+        data: null, 
+        error: { code: `HTTP_${res.status}`, message: `Server returned error (${res.status}): ${text || res.statusText}` } as any, 
+        meta: {} as any 
+      };
+    } else {
+      raw = { success: true, data: text as any, error: null, meta: {} as any };
     }
-    raw = { success: true, data: text as any, error: null, meta: {} as any };
   }
 
   payload = { ...raw, data: mapBackendResponse(raw?.data) } as ApiResponse<T>;
 
-
   if (!payload.success && !res.ok) {
+    if (res.status === 401 && !options._retry && path !== "/api/auth/login" && path !== "/api/auth/refresh") {
+      const refreshToken = readRefreshToken();
+      if (refreshToken) {
+        if (!isRefreshing) {
+          isRefreshing = true;
+          try {
+            const refreshRes = await fetch(`${BASE_URL}/api/auth/refresh`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ refreshToken }),
+            });
+
+            if (refreshRes.ok) {
+              const resJson = await refreshRes.json();
+              const payloadData = resJson.data || resJson;
+              const newToken = payloadData.accessToken || payloadData.token;
+              if (newToken) {
+                // Update local storage directly to keep it in sync
+                const rawData = window.localStorage.getItem(TOKEN_KEY);
+                if (rawData) {
+                  const parsed = JSON.parse(rawData);
+                  parsed.token = newToken;
+                  if (payloadData.refreshToken) parsed.refreshToken = payloadData.refreshToken;
+                  window.localStorage.setItem(TOKEN_KEY, JSON.stringify(parsed));
+                  
+                  // Notify store.ts to update its memory state
+                  window.dispatchEvent(
+                    new CustomEvent("auth:refresh", {
+                      detail: { token: newToken, refreshToken: payloadData.refreshToken || parsed.refreshToken },
+                    })
+                  );
+                }
+                onRefreshed(newToken);
+                // Retry original request
+                return request<T>(path, {
+                  ...options,
+                  _retry: true,
+                  headers: { ...options.headers, Authorization: `Bearer ${newToken}` },
+                });
+              } else {
+                console.error("[Auth] Refresh succeeded but newToken is missing! payloadData:", payloadData);
+              }
+            } else {
+              console.error("[Auth] refreshRes.ok was false! Status:", refreshRes.status);
+            }
+            // Refresh failed (e.g., refresh token expired)
+            console.warn("[Auth] Dispatching auth:logout because token refresh failed.");
+            window.dispatchEvent(new Event("auth:logout"));
+          } catch (e) {
+            console.error("[Auth] Refresh token failed with exception:", e);
+            window.dispatchEvent(new Event("auth:logout"));
+          } finally {
+            isRefreshing = false;
+          }
+        } else {
+          // Wait for the active refresh to finish, then retry
+          return new Promise<ApiResponse<T>>((resolve, reject) => {
+            addRefreshSubscriber((newToken) => {
+              request<T>(path, {
+                ...options,
+                _retry: true,
+                headers: { ...options.headers, Authorization: `Bearer ${newToken}` },
+              })
+                .then(resolve)
+                .catch(reject);
+            });
+          });
+        }
+      } else {
+         window.dispatchEvent(new Event("auth:logout"));
+      }
+    }
+
     // Map Java backend response structure to the frontend expectations
     let code = payload.error?.code ?? `HTTP_${res.status}`;
     let message = payload.error?.message ?? payload.message ?? res.statusText ?? "Something went wrong.";
@@ -155,8 +269,8 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<A
 
 export const apiClient = {
   request,
-  async get<T>(path: string, query?: RequestOptions["query"]) {
-    return (await request<T>(path, { method: "GET", query })).data;
+  async get<T>(path: string, query?: RequestOptions["query"], headers?: Record<string, string>) {
+    return (await request<T>(path, { method: "GET", query, headers })).data;
   },
   async post<T>(path: string, body?: unknown, headers?: Record<string, string>, query?: RequestOptions["query"]) {
     return (await request<T>(path, { method: "POST", body, headers, query })).data;

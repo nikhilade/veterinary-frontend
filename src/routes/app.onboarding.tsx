@@ -1,11 +1,12 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Check, ChevronLeft, ChevronRight, PartyPopper } from "lucide-react";
 import { StaffLayout } from "@/components/app/StaffLayout";
 import { Panel } from "@/components/app/ui";
 import { apiClient, ApiError } from "@/lib/api-client";
 import { endpoints } from "@/lib/api/endpoints";
 import type { SubscriptionPlan, Tenant } from "@/lib/api/tenancy-types";
+import { useMasterData } from "@/hooks/use-master-data";
 
 export const Route = createFileRoute("/app/onboarding")({
   head: () => ({
@@ -65,7 +66,9 @@ const fallbackPlans: SubscriptionPlan[] = [
 
 const blank = {
   name: "",
-  city: "",
+  countryId: "",
+  stateId: "",
+  cityId: "",
   gstin: "",
   ownerName: "",
   owner_email: "",
@@ -86,6 +89,25 @@ function OnboardingPage() {
   const [error, setError] = useState("");
   const [created, setCreated] = useState<Tenant | null>(null);
   const [saving, setSaving] = useState(false);
+
+  const { data: allStates = [] } = useMasterData("states");
+  
+  const countries = useMemo(() => {
+    const map = new Map<string, any>();
+    allStates.forEach((s: any) => {
+      if (s.countryId && !map.has(s.countryId)) {
+        map.set(s.countryId, { id: s.countryId, name: s.countryName || s.countryId });
+      }
+    });
+    return Array.from(map.values()).sort((a: any, b: any) => a.name.localeCompare(b.name));
+  }, [allStates]);
+
+  const states = useMemo(() => {
+    if (!form.countryId) return [];
+    return allStates.filter((s: any) => s.countryId === form.countryId);
+  }, [allStates, form.countryId]);
+
+  const { data: cities = [] } = useMasterData(form.stateId ? `cities-by-state/${form.stateId}` : null);
 
   useEffect(() => {
     apiClient
@@ -134,6 +156,9 @@ function OnboardingPage() {
 
   function validate(current: number) {
     if (current === 0 && !form.name.trim()) return "Hospital name is required.";
+    if (current === 0 && !form.countryId) return "Country is required.";
+    if (current === 0 && !form.stateId) return "State is required.";
+    if (current === 0 && !form.cityId) return "City is required.";
     if (current === 1 && (!form.ownerName.trim() || !form.owner_email.trim()))
       return "Owner name and email are required.";
     if (current === 2 && !form.branch_name.trim()) return "First branch name is required.";
@@ -244,8 +269,31 @@ function OnboardingPage() {
                 <input className={field} placeholder="e.g. Apollo Pet Hospital" value={form.name} onChange={(e) => set("name", e.target.value)} />
               </label>
               <label className="space-y-1.5 text-sm">
+                <span className="text-foreground/70">Country</span>
+                <select className={field} value={form.countryId} onChange={(e) => { set("countryId", e.target.value); set("stateId", ""); set("cityId", ""); }}>
+                  <option value="">Select country</option>
+                  {countries.map((c: any) => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </select>
+              </label>
+              <label className="space-y-1.5 text-sm">
+                <span className="text-foreground/70">State</span>
+                <select className={field} value={form.stateId} onChange={(e) => { set("stateId", e.target.value); set("cityId", ""); }} disabled={!form.countryId}>
+                  <option value="">Select state</option>
+                  {states.map((s: any) => (
+                    <option key={s.id} value={s.id}>{s.name}</option>
+                  ))}
+                </select>
+              </label>
+              <label className="space-y-1.5 text-sm">
                 <span className="text-foreground/70">City</span>
-                <input className={field} placeholder="e.g. Mumbai" value={form.city} onChange={(e) => set("city", e.target.value)} />
+                <select className={field} value={form.cityId} onChange={(e) => set("cityId", e.target.value)} disabled={!form.stateId}>
+                  <option value="">Select city</option>
+                  {cities.map((c: any) => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </select>
               </label>
               <label className="space-y-1.5 text-sm">
                 <span className="text-foreground/70">GSTIN (optional)</span>
@@ -373,7 +421,7 @@ function OnboardingPage() {
             <dl className="sm:col-span-2 grid gap-3 rounded-[1.25rem] bg-muted p-5 text-sm sm:grid-cols-2">
               {[
                 ["Hospital", form.name],
-                ["City", form.city || "—"],
+                ["City ID", form.cityId || "—"],
                 ["Owner", `${form.ownerName} · ${form.owner_email}`],
                 ["Phone", form.phone || "—"],
                 ["First branch", `${form.branch_name}${form.branch_address ? ` · ${form.branch_address}` : ""}`],

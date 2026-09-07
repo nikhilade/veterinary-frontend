@@ -94,18 +94,29 @@ function OwnerDetailPage() {
     }
   }
 
+  const MAX_DOC_SIZE_MB = 10;
+
   async function uploadDoc(file: File | undefined) {
     if (!file) return;
-    const formData = new FormData();
-    formData.append("documentName", file.name);
-    formData.append("documentType", "Other");
-    formData.append("file", file);
+    if (file.size > MAX_DOC_SIZE_MB * 1024 * 1024) {
+      toast.error(`Document is too large (${(file.size / (1024 * 1024)).toFixed(1)}MB). Maximum allowed size is ${MAX_DOC_SIZE_MB}MB.`);
+      return;
+    }
+    try {
+      const formData = new FormData();
+      formData.append("documentName", file.name);
+      formData.append("documentType", "Other");
+      formData.append("file", file);
 
-    const created = await apiClient.post<OwnerDocument>(
-      endpoints.petOwners.documents(id),
-      formData
-    );
-    setDocs((d) => [...d, created]);
+      const created = await apiClient.post<OwnerDocument>(
+        endpoints.petOwners.documents(id),
+        formData
+      );
+      setDocs((d) => [...d, created]);
+      toast.success("Document uploaded successfully!");
+    } catch (e: any) {
+      toast.error(e instanceof ApiError ? e.message : "Failed to upload document. Please check the file format and size.");
+    }
   }
 
   return (

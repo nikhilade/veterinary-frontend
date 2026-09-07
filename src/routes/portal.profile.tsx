@@ -6,6 +6,7 @@ import { EmptyState, Loading, Panel, formatDate } from "@/components/app/ui";
 import { apiClient } from "@/lib/api-client";
 import { endpoints } from "@/lib/api/endpoints";
 import type { OwnerDocument, PetOwner } from "@/lib/api/types";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/portal/profile")({
   head: () => ({
@@ -25,6 +26,7 @@ export const Route = createFileRoute("/portal/profile")({
 const OWNER_ID = "own_1";
 const field =
   "w-full rounded-2xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-forest";
+const MAX_DOC_SIZE_MB = 10;
 
 function ProfilePage() {
   const [owner, setOwner] = useState<PetOwner | null>(null);
@@ -47,19 +49,33 @@ function ProfilePage() {
   }, []);
 
   async function save() {
-    const updated = await apiClient.patch<PetOwner>(endpoints.petOwners.update(OWNER_ID), draft);
-    setOwner(updated);
-    setSaved(true);
+    try {
+      const updated = await apiClient.patch<PetOwner>(endpoints.petOwners.update(OWNER_ID), draft);
+      setOwner(updated);
+      setSaved(true);
+      toast.success("Profile saved successfully!");
+    } catch {
+      toast.error("Failed to save profile.");
+    }
   }
 
   async function upload(file: File | undefined) {
     if (!file) return;
-    const created = await apiClient.post<OwnerDocument>(endpoints.petOwners.documents(OWNER_ID), {
-      name: file.name,
-      type: "Other",
-      sizeKb: Math.round(file.size / 1024),
-    });
-    setDocs((d) => [...d, created]);
+    if (file.size > MAX_DOC_SIZE_MB * 1024 * 1024) {
+      toast.error(`Document is too large (${(file.size / (1024 * 1024)).toFixed(1)}MB). Maximum allowed size is ${MAX_DOC_SIZE_MB}MB.`);
+      return;
+    }
+    try {
+      const created = await apiClient.post<OwnerDocument>(endpoints.petOwners.documents(OWNER_ID), {
+        name: file.name,
+        type: "Other",
+        sizeKb: Math.round(file.size / 1024),
+      });
+      setDocs((d) => [...d, created]);
+      toast.success("Document uploaded successfully!");
+    } catch {
+      toast.error("Failed to upload document.");
+    }
   }
 
   return (

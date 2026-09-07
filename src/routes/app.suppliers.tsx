@@ -9,6 +9,9 @@ import { can } from "@/lib/auth/permissions";
 import { useAuth } from "@/lib/auth/store";
 import type { Supplier } from "@/lib/api/billing-types";
 
+// Note: Hospital is not in billing-types, defining a simple inline type
+type Hospital = { id: string; name: string };
+
 export const Route = createFileRoute("/app/suppliers")({
   head: () => ({
     meta: [
@@ -27,22 +30,46 @@ export const Route = createFileRoute("/app/suppliers")({
 const field =
   "w-full rounded-2xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-forest";
 
-const blank = { name: "", contactPerson: "", phone: "", email: "", gstin: "", address: "", active: true };
+const blank = { name: "", contactPerson: "", phone: "", email: "", gstin: "", address: "", paymentTerms: "", leadTimeDays: 0, isActive: true };
 
 function SuppliersPage() {
-  const { role } = useAuth();
+  const { role, hospitalId } = useAuth();
   const canWrite = can(role, "suppliers:write");
   const [items, setItems] = useState<Supplier[] | null>(null);
+  const [hospitals, setHospitals] = useState<Hospital[]>([]);
+  const [selectedAdminHospitalId, setSelectedAdminHospitalId] = useState<string>("");
   const [form, setForm] = useState<typeof blank>(blank);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [error, setError] = useState("");
 
-  const load = useCallback(() => {
-    apiClient.get<Supplier[]>(endpoints.suppliers.list).then(setItems).catch(() => setItems([]));
-  }, []);
+  const activeHospitalId = role === "SUPER_ADMIN" ? selectedAdminHospitalId : hospitalId;
 
-  useEffect(() => load(), [load]);
+  const loadHospitals = useCallback(async () => {
+    if (role === "SUPER_ADMIN") {
+      try {
+        const data = await apiClient.get<Hospital[]>(endpoints.hospitals.list);
+        setHospitals(data || []);
+        if (data && data.length > 0 && !selectedAdminHospitalId) {
+          setSelectedAdminHospitalId(data[0].id);
+        }
+      } catch (e) {
+        console.error("Failed to load hospitals:", e);
+      }
+    }
+  }, [role, selectedAdminHospitalId]);
+
+  useEffect(() => {
+    loadHospitals();
+  }, [loadHospitals]);
+
+  const load = useCallback(() => {
+    if (role === "SUPER_ADMIN" && !selectedAdminHospitalId) return; // Wait until selected
+    const headers = selectedAdminHospitalId ? { "hospital-id": selectedAdminHospitalId } : undefined;
+    apiClient.get<Supplier[]>(endpoints.suppliers.list, undefined, headers).then(setItems).catch(() => setItems([]));
+  }, [role, selectedAdminHospitalId]);
+
+  useEffect(() => { load() }, [load]);
 
   async function save() {
     setError("");
@@ -51,8 +78,12 @@ function SuppliersPage() {
       return;
     }
     try {
-      if (editingId) await apiClient.patch<Supplier>(endpoints.suppliers.detail(editingId), { ...form });
-      else await apiClient.post<Supplier>(endpoints.suppliers.create, { ...form });
+      if (editingId) {
+        const existing = items?.find(i => i.id === editingId);
+        await apiClient.patch<Supplier>(endpoints.suppliers.detail(editingId), { ...form, hospitalId: existing?.hospitalId || activeHospitalId });
+      } else {
+        await apiClient.post<Supplier>(endpoints.suppliers.create, { ...form, hospitalId: activeHospitalId });
+      }
       setForm(blank);
       setEditingId(null);
       setOpen(false);
@@ -80,6 +111,21 @@ function SuppliersPage() {
         <div className="space-y-5">
           {error ? <p className="rounded-2xl bg-destructive/10 px-4 py-3 text-sm text-destructive">{error}</p> : null}
 
+          {role === "SUPER_ADMIN" && hospitals.length > 0 && (
+            <div className="flex items-center gap-3">
+              <label className="text-sm font-medium">Hospital Context:</label>
+              <select 
+                className="rounded-full border border-border px-3 py-1 text-sm bg-background"
+                value={selectedAdminHospitalId}
+                onChange={(e) => setSelectedAdminHospitalId(e.target.value)}
+              >
+                {hospitals.map(h => (
+                  <option key={h.id} value={h.id}>{h.name}</option>
+                ))}
+              </select>
+            </div>
+          )}
+
           {open && canWrite ? (
             <Panel title={editingId ? "Edit supplier" : "New supplier"}>
               <div className="grid gap-3 sm:grid-cols-2">
@@ -91,22 +137,30 @@ function SuppliersPage() {
                     ["email", "Email"],
                     ["gstin", "GSTIN"],
                     ["address", "Address"],
+                    ["paymentTerms", "Payment terms"],
                   ] as const
                 ).map(([key, label]) => (
                   <input
                     key={key}
                     className={field}
                     placeholder={label}
-                    value={form[key]}
+                    value={(form[key as keyof typeof form] ?? "") as string | number}
                     onChange={(e) => setForm({ ...form, [key]: e.target.value })}
                   />
                 ))}
+                <input
+                  type="number"
+                  className={field}
+                  placeholder="Lead time (days)"
+                  value={form.leadTimeDays || ""}
+                  onChange={(e) => setForm({ ...form, leadTimeDays: Number(e.target.value) })}
+                />
               </div>
               <label className="mt-3 flex items-center gap-2 text-sm">
                 <input
                   type="checkbox"
-                  checked={form.active}
-                  onChange={(e) => setForm({ ...form, active: e.target.checked })}
+                  checked={form.isActive}
+                  onChange={(e) => setForm({ ...form, isActive: e.target.checked })}
                   className="size-4"
                 />
                 Active supplier
@@ -153,6 +207,7 @@ function SuppliersPage() {
                       <th className="pb-3">Contact</th>
                       <th className="pb-3">Phone</th>
                       <th className="pb-3">GSTIN</th>
+                      <th className="pb-3">Terms</th>
                       <th className="pb-3">Status</th>
                       <th className="pb-3" />
                     </tr>
@@ -162,7 +217,11 @@ function SuppliersPage() {
                       <tr key={s.id} className="border-t border-border">
                         <td className="py-3">
                           <span className="font-medium">{s.name}</span>
-                          <span className="block text-xs text-foreground/55">{s.address}</span>
+                          {s.address ? (
+                            <span className="block text-xs text-foreground/55">{s.address}</span>
+                          ) : (
+                            <span className="block text-xs text-foreground/35 italic">No address provided</span>
+                          )}
                         </td>
                         <td className="py-3 text-foreground/70">
                           {s.contactPerson}
@@ -170,13 +229,17 @@ function SuppliersPage() {
                         </td>
                         <td className="py-3 text-foreground/70">{s.phone}</td>
                         <td className="py-3 font-mono text-xs text-foreground/70">{s.gstin}</td>
+                        <td className="py-3 text-xs text-foreground/70">
+                          {s.paymentTerms}
+                          {s.leadTimeDays ? <span className="block text-foreground/50">{s.leadTimeDays} days</span> : null}
+                        </td>
                         <td className="py-3">
                           <span
                             className={`rounded-full px-3 py-1 text-xs font-medium ${
-                              s.active ? "bg-forest/10 text-forest" : "bg-muted text-foreground/60"
+                              s.isActive ? "bg-forest/10 text-forest" : "bg-muted text-foreground/60"
                             }`}
                           >
-                            {s.active ? "active" : "inactive"}
+                            {s.isActive ? "active" : "inactive"}
                           </span>
                         </td>
                         <td className="py-3 text-right">
@@ -186,13 +249,15 @@ function SuppliersPage() {
                                 onClick={() => {
                                   setEditingId(s.id);
                                   setForm({
-                                    name: s.name,
-                                    contactPerson: s.contactPerson,
-                                    phone: s.phone,
-                                    email: s.email,
-                                    gstin: s.gstin,
-                                    address: s.address,
-                                    active: s.active,
+                                    name: s.name ?? "",
+                                    contactPerson: s.contactPerson ?? "",
+                                    phone: s.phone ?? "",
+                                    email: s.email ?? "",
+                                    gstin: s.gstin ?? "",
+                                    address: s.address ?? "",
+                                    paymentTerms: s.paymentTerms ?? "",
+                                    leadTimeDays: s.leadTimeDays ?? 0,
+                                    isActive: s.isActive ?? true,
                                   });
                                   setOpen(true);
                                 }}

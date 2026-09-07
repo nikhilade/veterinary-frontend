@@ -60,6 +60,7 @@ async function verifyTokenWithBackend() {
     }
   } catch (err) {
     if (err instanceof ApiError) {
+      console.error("[Auth] verifyTokenWithBackend failed! Logging out. Error:", err);
       authStore.logout();
     }
   }
@@ -101,6 +102,7 @@ export function useAuth() {
   return {
     ...snapshot,
     role: snapshot.user?.role ?? null,
+    hospitalId: snapshot.user?.hospitalId ?? null,
     isAuthenticated: Boolean(snapshot.token),
   };
 }
@@ -180,3 +182,15 @@ export const authStore = {
   },
 };
 
+if (typeof window !== "undefined") {
+  window.addEventListener("auth:logout", () => {
+    authStore.logout();
+  });
+  window.addEventListener("auth:refresh", (e: any) => {
+    setState({
+      token: e.detail.token,
+      refreshToken: e.detail.refreshToken || state.refreshToken,
+    });
+    persist();
+  });
+}

@@ -15,7 +15,7 @@ export function useMasterData(resource: string | null) {
       if (!resource) return [];
       const res = await apiClient.get<MasterDataItem[] | { content: MasterDataItem[] }>(
         endpoints.masterData.list(resource),
-        { size: 1000 },
+        { size: 10000 },
       );
       if (res && typeof res === "object" && "content" in res && Array.isArray((res as any).content)) {
         return (res as any).content;

@@ -138,11 +138,16 @@ export const endpoints = {
   },
 
   prescriptions: {
-    list: `${V1}/prescriptions`,
-    mine: `${V1}/prescriptions/mine`,
-    create: `${V1}/prescriptions`,
-    detail: (id: string) => `${V1}/prescriptions/${id}`,
-    pdf: (id: string) => `${V1}/prescriptions/${id}/pdf`,
+    list: `/v1/prescriptions`,
+    mine: `/v1/prescriptions/mine`,
+    create: `/v1/prescriptions`,
+    detail: (id: string) => `/v1/prescriptions/${id}`,
+    pdf: (id: string) => `/v1/prescriptions/${id}/pdf`,
+  },
+
+  pharmacy: {
+    queue: `${V1}/pharmacy/queue`,
+    dispense: `${V1}/pharmacy/dispense`,
   },
 
   invoices: {
@@ -171,17 +176,18 @@ export const endpoints = {
     list: `${V1}/credit-notes`,
   },
   inventory: {
-    list: `${V1}/inventory`,
+    list: `${V1}/inventory/items`,
+    create: `${V1}/inventory/items`,
     lowStock: `${V1}/inventory/low-stock`,
     expiry: `${V1}/inventory/expiry`,
     stockEntry: `${V1}/inventory/stock/entry`,
     stockAdjust: `${V1}/inventory/stock/adjust`,
-    movements: `${V1}/inventory/stock/transfer`,
+    movements: `${V1}/inventory/movements`,
   },
   suppliers: {
-    list: `${V1}/suppliers`,
-    create: `${V1}/suppliers`,
-    detail: (id: string) => `${V1}/suppliers/${id}`,
+    list: `${V1}/inventory/suppliers`,
+    create: `${V1}/inventory/suppliers`,
+    detail: (id: string) => `${V1}/inventory/suppliers/${id}`,
   },
   reports: {
     overview: `${V1}/reports/overview`,

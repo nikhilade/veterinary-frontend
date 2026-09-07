@@ -171,16 +171,59 @@ export interface Appointment {
 }
 
 
+export type PrescriptionStatus = "PENDING" | "DISPENSED" | "PARTIALLY_DISPENSED" | "CANCELLED";
+
+export interface PrescriptionMedicineItem {
+  id: string;
+  medicineName: string;
+  dosage: string;
+  frequency: string;
+  duration: string;
+  instructions?: string;
+  quantity?: number;
+  dispensedQuantity?: number;
+  inventoryItemId?: string;
+}
+
 export interface Prescription {
   id: string;
-  petId: string;
-  petName: string;
-  doctorName: string;
-  medication: string;
-  dosage: string;
-  instructions: string;
-  issuedAt: string;
-  refillsLeft: number;
+  consultationId?: string;
+  hospitalId?: string;
+  petId?: string;
+  petName?: string;
+  petSpecies?: string;
+  petBreed?: string;
+  ownerName?: string;
+  ownerPhone?: string;
+  doctorId?: string;
+  doctorName?: string;
+  status?: PrescriptionStatus;
+  issuedAt?: string;
+  dispensedAt?: string;
+  dispensedBy?: string;
+  dispensedByName?: string;
+  dispensedNotes?: string;
+  items?: PrescriptionMedicineItem[];
+  pdfUrl?: string;
+
+  // Legacy fallback fields for existing callers
+  medication?: string;
+  dosage?: string;
+  instructions?: string;
+  refillsLeft?: number;
+}
+
+export interface PharmacyDispenseItemRequest {
+  prescriptionItemId: string;
+  inventoryItemId: string;
+  batchNumber?: string;
+  quantity: number;
+}
+
+export interface PharmacyDispenseRequest {
+  prescriptionId: string;
+  items: PharmacyDispenseItemRequest[];
+  notes?: string;
 }
 
 export type InvoiceStatus = "PAID" | "DUE" | "OVERDUE";

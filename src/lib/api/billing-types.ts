@@ -112,13 +112,17 @@ export interface StockBatch {
 
 export interface StockItem {
   id: string;
+  sku: string;
   name: string;
   category: string;
-  stock: number;
+  currentStock: number;
+  unit: string;
   reorderLevel: number;
   unitPrice: number;
+  isActive: boolean;
   supplierId: string | null;
   supplierName: string | null;
+  supplierAddress?: string | null;
   batches: StockBatch[];
   /** Earliest expiry across batches. */
   nearestExpiry: string | null;
@@ -128,7 +132,7 @@ export interface StockMovement {
   id: string;
   itemId: string;
   itemName: string;
-  type: "ENTRY" | "ADJUST";
+  type: "PURCHASE" | "RETURN" | "OPENING" | "ADJUSTMENT" | "TRANSFER";
   quantity: number;
   reason: string;
   batchNo: string | null;
@@ -137,11 +141,14 @@ export interface StockMovement {
 
 export interface Supplier {
   id: string;
+  hospitalId: string;
   name: string;
   contactPerson: string;
   phone: string;
   email: string;
   gstin: string;
   address: string;
-  active: boolean;
+  paymentTerms: string;
+  leadTimeDays: number;
+  isActive: boolean;
 }
