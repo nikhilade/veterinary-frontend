@@ -29,29 +29,6 @@ export const Route = createFileRoute("/app/suppliers")({
   component: SuppliersPage,
 });
 
-
-import { EmptyState, Loading, Panel } from "@/components/app/ui";
-import { apiClient, ApiError } from "@/lib/api-client";
-import { endpoints } from "@/lib/api/endpoints";
-import { can } from "@/lib/auth/permissions";
-import { useAuth } from "@/lib/auth/store";
-import type { Supplier } from "@/lib/api/billing-types";
-
-export const Route = createFileRoute("/app/suppliers")({
-  head: () => ({
-    meta: [
-      { title: "Suppliers | Pet Good Console" },
-      { name: "description", content: "Manage the clinic's medicine and consumable suppliers." },
-      { property: "og:title", content: "Suppliers | Pet Good Console" },
-      { property: "og:description", content: "Supplier directory with GSTIN and contact details." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "robots", content: "noindex" },
-    ],
-  }),
-  component: SuppliersPage,
-});
-
 const field =
   "w-full rounded-2xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-forest";
 

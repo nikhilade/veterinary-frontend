@@ -40,41 +40,6 @@ const blankItem = {
   name: "",
   category: "MEDICINE",
   hsnCode: "",
-
-import { EmptyState, Loading, Panel, StatCard } from "@/components/app/ui";
-import { INR } from "@/components/app/kit/MoneyInput";
-import { IdempotentSubmitButton } from "@/components/app/kit/IdempotentSubmitButton";
-import { apiClient } from "@/lib/api-client";
-import { endpoints } from "@/lib/api/endpoints";
-import { can } from "@/lib/auth/permissions";
-import { useAuth } from "@/lib/auth/store";
-import type { StockItem, StockMovement, Supplier } from "@/lib/api/billing-types";
-
-export const Route = createFileRoute("/app/inventory")({
-  head: () => ({
-    meta: [
-      { title: "Inventory | Pet Good Console" },
-      { name: "description", content: "Stock levels with low-stock and expiry alerts, batch entry and adjustments." },
-      { property: "og:title", content: "Inventory | Pet Good Console" },
-      { property: "og:description", content: "Batch-tracked clinic stock control." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "robots", content: "noindex" },
-    ],
-  }),
-  component: InventoryPage,
-});
-
-const field =
-  "w-full rounded-2xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-forest";
-
-const daysUntil = (iso: string) => Math.ceil((new Date(iso).getTime() - Date.now()) / 86_400_000);
-
-const blankItem = {
-  sku: "",
-  name: "",
-  category: "MEDICINE",
-  hsnCode: "",
   taxRate: 5.0,
   unit: "VIAL",
   reorderLevel: 10,
