@@ -187,7 +187,7 @@ export interface PrescriptionMedicineItem {
 
 export interface Prescription {
   id: string;
-  consultationId?: string;
+  consultationId?: string | null;
   hospitalId?: string;
   petId?: string;
   petName?: string;
@@ -506,7 +506,7 @@ export interface PrescriptionItem {
   notes: string;
 }
 
-export interface PrescriptionDetail extends Prescription {
+export interface PrescriptionDetail extends Omit<Prescription, "items"> {
   ownerId: string;
   ownerName: string;
   appointmentId: string | null;

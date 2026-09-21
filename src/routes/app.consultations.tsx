@@ -26,6 +26,8 @@ import {
   User,
 } from "lucide-react";
 import { StaffLayout } from "@/components/app/StaffLayout";
+import { AdminHospitalSelector } from "@/components/app/AdminHospitalSelector";
+
 import { EmptyState, Loading, Panel, StatCard, formatDate } from "@/components/app/ui";
 import { StatusBadge } from "@/components/app/kit/StatusBadge";
 import { SpeciesName, BreedName } from "@/components/app/MasterData";
@@ -533,6 +535,7 @@ function ConsultationsPage() {
       subtitle="SOAP clinical notes, vitals, diagnoses and prescriptions"
       permission="consultations:read"
     >
+      <AdminHospitalSelector />
       <div className="space-y-6">
         {/* KPI Cards Header */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

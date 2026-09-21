@@ -10,7 +10,8 @@ export interface CrudField {
   key: string;
   label: string;
   type?: CrudFieldType;
-  options?: string[];
+  options?: any[];
+  optionsFilter?: (options: any[], form: Record<string, unknown>) => any[];
   /** Master data resource key to lookup for options, or a function returning the key based on form state. */
   lookup?: string | ((form: Record<string, unknown>) => string | null);
   /** Key in the record containing the display label (e.g. speciesName for speciesId) */
@@ -37,6 +38,8 @@ export interface CrudTableProps<T extends { id: string }> {
   pageSizeOptions?: number[];
   /** Enable server-side pagination parameters (default: true) */
   serverSidePagination?: boolean;
+  /** Custom headers to send with API requests */
+  headers?: Record<string, string>;
 }
 
 const field =
@@ -84,6 +87,7 @@ export function CrudTable<T extends { id: string }>({
   defaultPageSize = 10,
   pageSizeOptions = [5, 10, 20, 50],
   serverSidePagination = true,
+  headers,
 }: CrudTableProps<T>) {
   const [rows, setRows] = useState<T[] | null>(null);
   const [form, setForm] = useState<Record<string, unknown>>(() => blankFor(fields));
@@ -111,7 +115,7 @@ export function CrudTable<T extends { id: string }>({
       }
 
       apiClient
-        .get<T[] | SpringPage<T>>(listPath, serverSidePagination ? queryParams : undefined)
+        .get<T[] | SpringPage<T>>(listPath, serverSidePagination ? queryParams : undefined, headers)
         .then((res) => {
           if (res && typeof res === "object" && "content" in res && Array.isArray((res as SpringPage<T>).content)) {
             const pageData = res as SpringPage<T>;
@@ -155,8 +159,8 @@ export function CrudTable<T extends { id: string }>({
       return;
     }
     try {
-      if (editingId) await apiClient.put(detailPath(editingId), form);
-      else await apiClient.post(createPath, form);
+      if (editingId) await apiClient.put(detailPath(editingId), form, headers);
+      else await apiClient.post(createPath, form, headers);
       setOpen(false);
       setEditingId(null);
       setForm(blankFor(fields));
@@ -168,7 +172,7 @@ export function CrudTable<T extends { id: string }>({
 
   async function remove(id: string) {
     try {
-      await apiClient.delete(detailPath(id));
+      await apiClient.delete(detailPath(id), undefined, headers);
       load(currentPage, pageSize);
     } catch (e) {
       setError(e instanceof ApiError ? e.message : "Could not delete this record.");
@@ -258,11 +262,15 @@ export function CrudTable<T extends { id: string }>({
                     onChange={(e) => setForm((s) => ({ ...s, [f.key]: e.target.value }))}
                   >
                     <option value="">Select...</option>
-                    {(f.options ?? []).map((o) => (
-                      <option key={o} value={o}>
-                        {o}
-                      </option>
-                    ))}
+                    {(f.options ?? []).map((o) => {
+                      const val = typeof o === "string" ? o : o.id;
+                      const lbl = typeof o === "string" ? o : (o.name || val);
+                      return (
+                        <option key={val} value={val}>
+                          {lbl}
+                        </option>
+                      );
+                    })}
                   </select>
                 )
               ) : f.type === "boolean" ? (
@@ -546,6 +554,8 @@ function LookupSelect({
 }) {
   const lookupKey = typeof f.lookup === "function" ? f.lookup(form) : f.lookup!;
   const { data = [] } = useMasterData(lookupKey);
+  const filteredData = useMemo(() => (f.optionsFilter ? f.optionsFilter(data, form) : data), [data, form, f]);
+  
   return (
     <select
       className={field}
@@ -553,7 +563,7 @@ function LookupSelect({
       onChange={(e) => setForm((s) => ({ ...s, [f.key]: e.target.value }))}
     >
       <option value="">Select {f.label.toLowerCase()}...</option>
-      {data.map((o: any) => (
+      {filteredData.map((o: any) => (
         <option key={o.id} value={o.id}>
           {o.name || o.tenantName || o.hospitalName || o.branchName || o.firstName || o.id}
         </option>

@@ -15,6 +15,7 @@ import { SmoothScroll } from "../components/site/SmoothScroll";
 import { LoadingScreen } from "../components/site/LoadingScreen";
 import { Toaster } from "../components/ui/sonner";
 import dog404 from "../assets/404-dog-yellow.png";
+import { useAuth } from "../lib/auth/store";
 
 function NotFoundComponent() {
   return (
@@ -139,6 +140,7 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const { adminHospitalId } = useAuth();
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -146,7 +148,7 @@ function RootComponent() {
       <SmoothScroll />
       <Toaster position="top-right" richColors />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <Outlet key={adminHospitalId || 'default'} />
     </QueryClientProvider>
   );
 }

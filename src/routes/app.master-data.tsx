@@ -2,6 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { CrudTable, type CrudField } from "@/components/app/kit/CrudTable";
 import { StaffLayout } from "@/components/app/StaffLayout";
+import { AdminHospitalSelector } from "@/components/app/AdminHospitalSelector";
+
 import { endpoints } from "@/lib/api/endpoints";
 import { can } from "@/lib/auth/permissions";
 import { useAuth } from "@/lib/auth/store";
@@ -125,6 +127,7 @@ function MasterDataPage() {
 
   return (
     <StaffLayout title="Master Data" subtitle="Reference lists used across the app" permission="masterdata:read">
+      <AdminHospitalSelector />
       <div className="mb-5 flex flex-wrap gap-2">
         {collections.map((c) => (
           <button

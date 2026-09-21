@@ -4,13 +4,6 @@ import { apiClient } from "@/lib/api-client";
 import { endpoints } from "@/lib/api/endpoints";
 import type { PrescriptionPdf } from "@/lib/api/types";
 
-function base64ToBlobUrl(base64: string, mime: string) {
-  const binary = atob(base64);
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
-  return URL.createObjectURL(new Blob([bytes], { type: mime }));
-}
-
 /** Fetches GET /prescriptions/{id}/pdf, shows an inline preview, then downloads. */
 export function PrescriptionPdfButton({
   prescriptionId,
@@ -34,9 +27,24 @@ export function PrescriptionPdfButton({
     setLoading(true);
     setError("");
     try {
-      const result = await apiClient.get<PrescriptionPdf>(endpoints.prescriptions.pdf(prescriptionId));
-      setPdf(result);
-      setHref(base64ToBlobUrl(result.contentBase64, result.mimeType));
+      const url = `${import.meta.env.VITE_API_BASE_URL || ""}${endpoints.prescriptions.pdf(prescriptionId)}`;
+      const authData = window.localStorage.getItem("petgood.auth");
+      const token = authData ? JSON.parse(authData).token : null;
+      const hospitalId = authData ? JSON.parse(authData).user?.hospitalId : null;
+
+      const headers: Record<string, string> = {};
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+      if (hospitalId) headers["hospital-id"] = hospitalId;
+
+      const res = await fetch(url, { headers });
+      if (!res.ok) throw new Error(`Could not generate PDF (${res.status})`);
+      
+      const blob = await res.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      
+      const filename = `prescription-${prescriptionId}.pdf`;
+      setPdf({ filename, mimeType: "application/pdf", contentBase64: "" });
+      setHref(objectUrl);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not generate the PDF.");
     } finally {

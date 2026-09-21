@@ -26,7 +26,9 @@ function readHospitalId(): string | null {
   if (typeof window === "undefined") return null;
   try {
     const raw = window.localStorage.getItem(TOKEN_KEY);
-    return raw ? (JSON.parse(raw).user?.hospitalId as string) : null;
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return (parsed.adminHospitalId as string) || (parsed.user?.hospitalId as string) || null;
   } catch {
     return null;
   }
@@ -281,8 +283,8 @@ export const apiClient = {
   async put<T>(path: string, body?: unknown, headers?: Record<string, string>) {
     return (await request<T>(path, { method: "PUT", body, headers })).data;
   },
-  async delete<T>(path: string) {
-    return (await request<T>(path, { method: "DELETE" })).data;
+  async delete<T>(path: string, query?: RequestOptions["query"], headers?: Record<string, string>) {
+    return (await request<T>(path, { method: "DELETE", query, headers })).data;
   },
   /** Use when the caller needs pagination meta alongside the data. */
   async list<T>(path: string, query?: RequestOptions["query"]) {

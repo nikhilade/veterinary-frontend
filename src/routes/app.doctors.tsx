@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Plus, Stethoscope, CalendarClock } from "lucide-react";
 import { StaffLayout } from "@/components/app/StaffLayout";
+import { AdminHospitalSelector } from "@/components/app/AdminHospitalSelector";
+
 import { EmptyState, Loading, Panel } from "@/components/app/ui";
 import { apiClient } from "@/lib/api-client";
 import { endpoints } from "@/lib/api/endpoints";
@@ -124,6 +126,7 @@ function DoctorsPage() {
 
   return (
     <StaffLayout title="Doctors" subtitle="Clinical team directory" permission="doctors:read">
+      <AdminHospitalSelector />
       {canWrite ? (
         <div className="mb-5 flex justify-end">
           <button

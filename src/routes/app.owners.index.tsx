@@ -2,6 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useMemo, useState } from "react";
 import { Plus, Trash2, Users, Loader2 } from "lucide-react";
 import { StaffLayout } from "@/components/app/StaffLayout";
+import { AdminHospitalSelector } from "@/components/app/AdminHospitalSelector";
+
 import { EmptyState, Panel } from "@/components/app/ui";
 import { DataTable, type DataTableColumn } from "@/components/app/kit/DataTable";
 import { apiClient, ApiError } from "@/lib/api-client";
@@ -108,6 +110,7 @@ function OwnersPage() {
 
   return (
     <StaffLayout title="Pet Owners" subtitle="Client directory" permission="owners:read">
+      <AdminHospitalSelector />
       <Panel
         title="Owners"
         action={

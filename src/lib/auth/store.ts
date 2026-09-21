@@ -9,10 +9,11 @@ export interface AuthState {
   token: string | null;
   refreshToken: string | null;
   user: AuthUser | null;
+  adminHospitalId: string | null;
   hydrated: boolean;
 }
 
-let state: AuthState = { token: null, refreshToken: null, user: null, hydrated: false };
+let state: AuthState = { token: null, refreshToken: null, user: null, adminHospitalId: null, hydrated: false };
 const listeners = new Set<() => void>();
 
 function emit() {
@@ -29,7 +30,7 @@ function persist() {
   if (state.token && state.user) {
     window.localStorage.setItem(
       STORAGE_KEY,
-      JSON.stringify({ token: state.token, refreshToken: state.refreshToken, user: state.user })
+      JSON.stringify({ token: state.token, refreshToken: state.refreshToken, user: state.user, adminHospitalId: state.adminHospitalId })
     );
   } else {
     window.localStorage.removeItem(STORAGE_KEY);
@@ -71,8 +72,8 @@ export function hydrateAuth() {
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (raw) {
-      const parsed = JSON.parse(raw) as { token: string; refreshToken?: string; user: AuthUser };
-      state = { token: parsed.token, refreshToken: parsed.refreshToken ?? null, user: parsed.user, hydrated: true };
+      const parsed = JSON.parse(raw) as { token: string; refreshToken?: string; user: AuthUser; adminHospitalId?: string };
+      state = { token: parsed.token, refreshToken: parsed.refreshToken ?? null, user: parsed.user, adminHospitalId: parsed.adminHospitalId ?? null, hydrated: true };
       if (parsed.token === "mock-token") {
         authStore.logout();
       } else {
@@ -87,7 +88,7 @@ export function hydrateAuth() {
   emit();
 }
 
-const serverSnapshot: AuthState = { token: null, refreshToken: null, user: null, hydrated: false };
+const serverSnapshot: AuthState = { token: null, refreshToken: null, user: null, adminHospitalId: null, hydrated: false };
 
 export function useAuth() {
   const snapshot = useSyncExternalStore(
@@ -103,12 +104,17 @@ export function useAuth() {
     ...snapshot,
     role: snapshot.user?.role ?? null,
     hospitalId: snapshot.user?.hospitalId ?? null,
+    adminHospitalId: snapshot.adminHospitalId ?? null,
     isAuthenticated: Boolean(snapshot.token),
   };
 }
 
 export const authStore = {
   get: () => state,
+  setAdminHospital: (id: string | null) => {
+    setState({ adminHospitalId: id });
+    persist();
+  },
   async login(email: string, password: string, role?: Role) {
     const res = await apiClient.post<any>(endpoints.auth.login, { email, password });
     if (res && (res.accessToken || res.token)) {
@@ -125,7 +131,7 @@ export const authStore = {
         avatarUrl: null,
         hospitalId: backendUser?.hospitalId,
       };
-      setState({ token, refreshToken, user, hydrated: true });
+      setState({ token, refreshToken, user, adminHospitalId: null, hydrated: true });
       persist();
       return user;
     }
@@ -148,7 +154,7 @@ export const authStore = {
           avatarUrl: null,
           hospitalId: backendUser?.hospitalId,
         };
-        setState({ token, refreshToken, user, hydrated: true });
+        setState({ token, refreshToken, user, adminHospitalId: null, hydrated: true });
         persist();
         return user;
       }
@@ -165,7 +171,7 @@ export const authStore = {
       role: input.role || "PET_OWNER",
       avatarUrl: null,
     };
-    setState({ token: "mock-token", refreshToken: null, user, hydrated: true });
+    setState({ token: "mock-token", refreshToken: null, user, adminHospitalId: null, hydrated: true });
     persist();
     return user;
   },
@@ -177,7 +183,7 @@ export const authStore = {
         // Ignore logout request errors
       }
     }
-    setState({ token: null, refreshToken: null, user: null, hydrated: true });
+    setState({ token: null, refreshToken: null, user: null, adminHospitalId: null, hydrated: true });
     persist();
   },
 };

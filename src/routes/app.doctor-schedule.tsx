@@ -12,6 +12,8 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { StaffLayout } from "@/components/app/StaffLayout";
+import { AdminHospitalSelector } from "@/components/app/AdminHospitalSelector";
+
 import { EmptyState, Loading, Panel } from "@/components/app/ui";
 import { apiClient } from "@/lib/api-client";
 import { endpoints } from "@/lib/api/endpoints";
@@ -465,6 +467,7 @@ function SchedulePage() {
       subtitle={isDoctor ? "Your consulting hours & scheduled leave" : "Weekly hours and leave for the clinical team"}
       permission="doctors:read"
     >
+      <AdminHospitalSelector />
       {!doctors ? (
         <Loading />
       ) : (

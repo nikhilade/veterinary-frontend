@@ -6,6 +6,7 @@ import { EmptyState, Panel } from "@/components/app/ui";
 import { DataTable, type DataTableColumn } from "@/components/app/kit/DataTable";
 import { PetPicker } from "@/components/app/kit/PetPicker";
 import { apiClient, ApiError } from "@/lib/api-client";
+import { AdminHospitalSelector } from "@/components/app/AdminHospitalSelector";
 import { endpoints } from "@/lib/api/endpoints";
 import type { Pet, Vaccine } from "@/lib/api/types";
 
@@ -92,6 +93,7 @@ function VaccinationsPage() {
 
   return (
     <StaffLayout title="Vaccinations" subtitle="Due list and new entries" permission="pets:read">
+      <AdminHospitalSelector />
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
         <Panel title="Due in the next 30 days">
           {empty ? (

@@ -26,7 +26,7 @@ export const Route = createFileRoute("/app/onboarding")({
 const field =
   "w-full rounded-2xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-forest";
 
-const steps = ["Hospital", "Owner", "First branch", "Plan", "Review"];
+const steps = ["Hospital", "Owner", "Plan", "Review"];
 
 const fallbackPlans: SubscriptionPlan[] = [
   {
@@ -69,14 +69,12 @@ const blank = {
   countryId: "",
   stateId: "",
   cityId: "",
+  branch_address: "",
+  pincode: "",
   gstin: "",
   ownerName: "",
   owner_email: "",
   phone: "",
-  branch_name: "",
-  branch_address: "",
-  latitude: "",
-  longitude: "",
   plan_id: "",
   billing_cycle: "MONTHLY" as "MONTHLY" | "YEARLY",
 };
@@ -161,7 +159,6 @@ function OnboardingPage() {
     if (current === 0 && !form.cityId) return "City is required.";
     if (current === 1 && (!form.ownerName.trim() || !form.owner_email.trim()))
       return "Owner name and email are required.";
-    if (current === 2 && !form.branch_name.trim()) return "First branch name is required.";
     return "";
   }
 
@@ -180,8 +177,6 @@ function OnboardingPage() {
       const res = await apiClient.post<any>(endpoints.tenants.provision, {
         ...form,
         plan_id: selectedPlanId,
-        latitude: form.latitude === "" ? null : Number(form.latitude),
-        longitude: form.longitude === "" ? null : Number(form.longitude),
       });
 
       const tenantData: Tenant = res?.tenant || res;
@@ -209,8 +204,8 @@ function OnboardingPage() {
             <PartyPopper className="size-8 text-clay" />
             <h2 className="text-xl text-forest">{hospitalName} is live</h2>
             <p className="max-w-md text-sm text-foreground/60">
-              A 14-day trial has started on the {planName} plan, and the first branch has been created. The
-              owner can sign in with {ownerEmail}.
+              A 14-day trial has started on the {planName} plan. The
+              owner can sign in with {ownerEmail} to add branches and staff.
             </p>
             <div className="mt-2 flex flex-wrap justify-center gap-3">
               <button
@@ -296,7 +291,15 @@ function OnboardingPage() {
                 </select>
               </label>
               <label className="space-y-1.5 text-sm">
-                <span className="text-foreground/70">GSTIN (optional)</span>
+                <span className="text-foreground/70">Address (Optional)</span>
+                <input className={field} placeholder="e.g. 123 Main Street" value={form.branch_address} onChange={(e) => set("branch_address", e.target.value)} />
+              </label>
+              <label className="space-y-1.5 text-sm">
+                <span className="text-foreground/70">Pincode (Optional)</span>
+                <input className={field} placeholder="e.g. 110001" value={form.pincode} onChange={(e) => set("pincode", e.target.value)} />
+              </label>
+              <label className="space-y-1.5 text-sm">
+                <span className="text-foreground/70">GSTIN (Optional)</span>
                 <input className={field} placeholder="e.g. 27AAAAA0000A1Z5" value={form.gstin} onChange={(e) => set("gstin", e.target.value)} />
               </label>
             </>
@@ -325,50 +328,8 @@ function OnboardingPage() {
             </>
           ) : null}
 
-          {step === 2 ? (
-            <>
-              <label className="space-y-1.5 text-sm">
-                <span className="text-foreground/70">Branch name</span>
-                <input
-                  className={field}
-                  placeholder="e.g. Main Clinic - Bandra"
-                  value={form.branch_name}
-                  onChange={(e) => set("branch_name", e.target.value)}
-                />
-              </label>
-              <label className="space-y-1.5 text-sm">
-                <span className="text-foreground/70">Address</span>
-                <input
-                  className={field}
-                  placeholder="e.g. 42 Hill Road, Bandra West"
-                  value={form.branch_address}
-                  onChange={(e) => set("branch_address", e.target.value)}
-                />
-              </label>
-              <label className="space-y-1.5 text-sm">
-                <span className="text-foreground/70">Latitude (optional)</span>
-                <input
-                  className={field}
-                  inputMode="decimal"
-                  placeholder="e.g. 19.0596"
-                  value={form.latitude}
-                  onChange={(e) => set("latitude", e.target.value)}
-                />
-              </label>
-              <label className="space-y-1.5 text-sm">
-                <span className="text-foreground/70">Longitude (optional)</span>
-                <input
-                  className={field}
-                  inputMode="decimal"
-                  placeholder="e.g. 72.8295"
-                  value={form.longitude}
-                  onChange={(e) => set("longitude", e.target.value)}
-                />
-              </label>
-            </>
-          ) : null}
 
-          {step === 3 ? (
+          {step === 2 ? (
             <div className="sm:col-span-2 space-y-4">
               <div className="grid gap-3 md:grid-cols-3">
                 {plans.map((p) => {
@@ -417,15 +378,13 @@ function OnboardingPage() {
             </div>
           ) : null}
 
-          {step === 4 ? (
+          {step === 3 ? (
             <dl className="sm:col-span-2 grid gap-3 rounded-[1.25rem] bg-muted p-5 text-sm sm:grid-cols-2">
               {[
                 ["Hospital", form.name],
                 ["City ID", form.cityId || "—"],
                 ["Owner", `${form.ownerName} · ${form.owner_email}`],
                 ["Phone", form.phone || "—"],
-                ["First branch", `${form.branch_name}${form.branch_address ? ` · ${form.branch_address}` : ""}`],
-                ["GPS", form.latitude && form.longitude ? `${form.latitude}, ${form.longitude}` : "Not set"],
                 ["Plan", `${currentPlan?.name ?? "Starter"} · ${form.billing_cycle}`],
               ].map(([k, v]) => (
                 <div key={k}>

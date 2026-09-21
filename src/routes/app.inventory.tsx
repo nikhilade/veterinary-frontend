@@ -2,6 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { AlertTriangle, CalendarClock, ChevronDown, ChevronUp, Package, PackagePlus, Plus, Search, SlidersHorizontal, X } from "lucide-react";
 import { StaffLayout } from "@/components/app/StaffLayout";
+import { AdminHospitalSelector } from "@/components/app/AdminHospitalSelector";
+
 import { EmptyState, Loading, Panel, StatCard } from "@/components/app/ui";
 import { INR } from "@/components/app/kit/MoneyInput";
 import { IdempotentSubmitButton } from "@/components/app/kit/IdempotentSubmitButton";
@@ -38,17 +40,50 @@ const blankItem = {
   name: "",
   category: "MEDICINE",
   hsnCode: "",
+
+import { EmptyState, Loading, Panel, StatCard } from "@/components/app/ui";
+import { INR } from "@/components/app/kit/MoneyInput";
+import { IdempotentSubmitButton } from "@/components/app/kit/IdempotentSubmitButton";
+import { apiClient } from "@/lib/api-client";
+import { endpoints } from "@/lib/api/endpoints";
+import { can } from "@/lib/auth/permissions";
+import { useAuth } from "@/lib/auth/store";
+import type { StockItem, StockMovement, Supplier } from "@/lib/api/billing-types";
+
+export const Route = createFileRoute("/app/inventory")({
+  head: () => ({
+    meta: [
+      { title: "Inventory | Pet Good Console" },
+      { name: "description", content: "Stock levels with low-stock and expiry alerts, batch entry and adjustments." },
+      { property: "og:title", content: "Inventory | Pet Good Console" },
+      { property: "og:description", content: "Batch-tracked clinic stock control." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "robots", content: "noindex" },
+    ],
+  }),
+  component: InventoryPage,
+});
+
+const field =
+  "w-full rounded-2xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-forest";
+
+const daysUntil = (iso: string) => Math.ceil((new Date(iso).getTime() - Date.now()) / 86_400_000);
+
+const blankItem = {
+  sku: "",
+  name: "",
+  category: "MEDICINE",
+  hsnCode: "",
   taxRate: 5.0,
   unit: "VIAL",
   reorderLevel: 10,
 };
 
 function InventoryPage() {
-  const { role, hospitalId } = useAuth();
+  const { role, hospitalId, adminHospitalId } = useAuth();
   const canWrite = can(role, "inventory:write");
   const [items, setItems] = useState<StockItem[] | null>(null);
-  const [hospitals, setHospitals] = useState<Hospital[]>([]);
-  const [selectedAdminHospitalId, setSelectedAdminHospitalId] = useState<string>("");
   const [expiring, setExpiring] = useState<StockItem[]>([]);
   const [movements, setMovements] = useState<StockMovement[]>([]);
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
@@ -70,43 +105,21 @@ function InventoryPage() {
     });
   };
 
-  const activeHospitalId = role === "SUPER_ADMIN" ? selectedAdminHospitalId : hospitalId;
-
-  const loadHospitals = useCallback(async () => {
-    if (role === "SUPER_ADMIN") {
-      try {
-        const data = await apiClient.get<Hospital[]>(endpoints.hospitals.list);
-        setHospitals(data || []);
-        if (data && data.length > 0 && !selectedAdminHospitalId) {
-          setSelectedAdminHospitalId(data[0].id);
-        }
-      } catch (e) {
-        console.error("Failed to load hospitals:", e);
-      }
-    }
-  }, [role, selectedAdminHospitalId]);
-
-  useEffect(() => {
-    loadHospitals();
-  }, [loadHospitals]);
+  const activeHospitalId = role === "SUPER_ADMIN" ? (adminHospitalId || hospitalId) : hospitalId;
 
   const load = useCallback(() => {
-    if (role === "SUPER_ADMIN" && !selectedAdminHospitalId) return;
-    const headers = selectedAdminHospitalId ? { "hospital-id": selectedAdminHospitalId } : undefined;
-    
-    apiClient.get<StockItem[]>(endpoints.inventory.list, undefined, headers).then(setItems).catch(() => setItems([]));
+    apiClient.get<StockItem[]>(endpoints.inventory.list).then(setItems).catch(() => setItems([]));
     apiClient
-      .get<any[]>(endpoints.inventory.expiry, { days: 90, within_days: 90 }, headers)
+      .get<any[]>(endpoints.inventory.expiry, { days: 90, within_days: 90 })
       .then(setExpiring)
       .catch(() => setExpiring([]));
-    apiClient.get<StockMovement[]>(endpoints.inventory.movements, undefined, headers).then(setMovements).catch(() => setMovements([]));
-  }, [role, selectedAdminHospitalId]);
+    apiClient.get<StockMovement[]>(endpoints.inventory.movements).then(setMovements).catch(() => setMovements([]));
+  }, []);
 
   useEffect(() => {
     load();
-    const headers = selectedAdminHospitalId ? { "hospital-id": selectedAdminHospitalId } : undefined;
-    apiClient.get<Supplier[]>(endpoints.suppliers.list, undefined, headers).then(setSuppliers).catch(() => setSuppliers([]));
-  }, [load, selectedAdminHospitalId]);
+    apiClient.get<Supplier[]>(endpoints.suppliers.list).then(setSuppliers).catch(() => setSuppliers([]));
+  }, [load]);
 
   const lowStock = useMemo(() => (items ?? []).filter((i) => i.currentStock <= i.reorderLevel), [items]);
   const expiringIds = useMemo(() => new Set(expiring.map((i: any) => i.itemId ?? i.id).filter(Boolean)), [expiring]);
@@ -158,24 +171,11 @@ function InventoryPage() {
 
   return (
     <StaffLayout title="Inventory" subtitle="Stock, batches and expiry" permission="inventory:read">
+      <AdminHospitalSelector />
       {!items ? (
         <Loading />
       ) : (
         <div className="space-y-5">
-          {role === "SUPER_ADMIN" && hospitals.length > 0 && (
-            <div className="flex items-center gap-3">
-              <label className="text-sm font-medium">Hospital Context:</label>
-              <select 
-                className="rounded-full border border-border px-3 py-1 text-sm bg-background"
-                value={selectedAdminHospitalId}
-                onChange={(e) => setSelectedAdminHospitalId(e.target.value)}
-              >
-                {hospitals.map(h => (
-                  <option key={h.id} value={h.id}>{h.name}</option>
-                ))}
-              </select>
-            </div>
-          )}
           <div className="grid gap-4 sm:grid-cols-4">
             <StatCard label="Items tracked" value={items.length} hint="Across all categories" />
             <StatCard label="Low stock" value={lowStock.length} hint="At or below reorder level" />

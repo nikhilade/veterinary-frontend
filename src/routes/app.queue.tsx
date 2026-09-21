@@ -2,6 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { CheckCircle2, MonitorPlay, RefreshCw, Users } from "lucide-react";
 import { StaffLayout } from "@/components/app/StaffLayout";
+import { AdminHospitalSelector } from "@/components/app/AdminHospitalSelector";
+
 import { EmptyState, Loading, Panel, StatCard } from "@/components/app/ui";
 import { StatusBadge } from "@/components/app/kit/StatusBadge";
 import { apiClient } from "@/lib/api-client";
@@ -124,6 +126,7 @@ function QueuePage() {
 
   return (
     <StaffLayout title="Reception & Queue" subtitle="Today's check-ins" permission="appointments:read">
+      <AdminHospitalSelector />
       <div className="space-y-5">
         <div className="grid gap-4 sm:grid-cols-4">
           <StatCard label="Now serving" value={serving?.tokenNumber ? `#${serving.tokenNumber}` : "—"} hint={serving?.petName} />

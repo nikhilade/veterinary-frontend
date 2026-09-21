@@ -2,6 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Banknote, CreditCard, Globe, Loader2, Smartphone, CheckCircle2, XCircle } from "lucide-react";
 import { StaffLayout } from "@/components/app/StaffLayout";
+import { AdminHospitalSelector } from "@/components/app/AdminHospitalSelector";
+
 import { EmptyState, Loading, Panel } from "@/components/app/ui";
 import { INR, MoneyInput } from "@/components/app/kit/MoneyInput";
 import { IdempotentSubmitButton } from "@/components/app/kit/IdempotentSubmitButton";
@@ -118,6 +120,7 @@ function PaymentsPage() {
 
   return (
     <StaffLayout title="Payments" subtitle="Collect and reconcile" permission="payments:write">
+      <AdminHospitalSelector />
       {!invoices ? (
         <Loading />
       ) : (

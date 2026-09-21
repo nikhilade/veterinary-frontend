@@ -8,7 +8,7 @@ The 5-Day Integration plan covers the core medical and administrative flows, but
 These modules have full UI screens in the frontend, but there are no corresponding endpoints defined in `api-endpoints.md` to power them.
 
 - **Grooming (`app.grooming.tsx`)**: The UI has a grooming section, but the backend lacks a `GroomingController` or endpoints for grooming appointments/services.
-- **Pharmacy (`app.pharmacy.tsx`)**: While the backend handles `Prescriptions` and `Inventory`, there are no specific Pharmacy POS/Dispensation APIs.
+
 - **Refunds (`app.refunds.tsx`)**: The frontend has a refunds screen, but the backend `BillingController` and `PaymentController` do not explicitly define refund processing endpoints.
 - **Tenant Management (`app.tenants.tsx`)**: The frontend has a Super-Admin tenant onboarding screen, but the backend only has multi-tenancy *filters* (TenantContext), not actual CRUD endpoints for managing Tenants.
 

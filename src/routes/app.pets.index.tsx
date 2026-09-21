@@ -3,6 +3,8 @@ import { useCallback, useMemo, useState } from "react";
 import { Dog, Plus, Trash2, Loader2 } from "lucide-react";
 import { SpeciesName, BreedName } from "@/components/app/MasterData";
 import { StaffLayout } from "@/components/app/StaffLayout";
+import { AdminHospitalSelector } from "@/components/app/AdminHospitalSelector";
+
 import { Panel } from "@/components/app/ui";
 import { DataTable, type DataTableColumn } from "@/components/app/kit/DataTable";
 import { apiClient, ApiError } from "@/lib/api-client";
@@ -109,6 +111,7 @@ function PetsPage() {
 
   return (
     <StaffLayout title="Patients" subtitle="Registered pets" permission="pets:read">
+      <AdminHospitalSelector />
       <Panel
         title="Patients"
         action={

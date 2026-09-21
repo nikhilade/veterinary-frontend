@@ -2,6 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { StaffLayout } from "@/components/app/StaffLayout";
+import { AdminHospitalSelector } from "@/components/app/AdminHospitalSelector";
+
 import { EmptyState, Loading, Panel } from "@/components/app/ui";
 import { apiClient, ApiError } from "@/lib/api-client";
 import { endpoints } from "@/lib/api/endpoints";
@@ -27,47 +29,48 @@ export const Route = createFileRoute("/app/suppliers")({
   component: SuppliersPage,
 });
 
+
+import { EmptyState, Loading, Panel } from "@/components/app/ui";
+import { apiClient, ApiError } from "@/lib/api-client";
+import { endpoints } from "@/lib/api/endpoints";
+import { can } from "@/lib/auth/permissions";
+import { useAuth } from "@/lib/auth/store";
+import type { Supplier } from "@/lib/api/billing-types";
+
+export const Route = createFileRoute("/app/suppliers")({
+  head: () => ({
+    meta: [
+      { title: "Suppliers | Pet Good Console" },
+      { name: "description", content: "Manage the clinic's medicine and consumable suppliers." },
+      { property: "og:title", content: "Suppliers | Pet Good Console" },
+      { property: "og:description", content: "Supplier directory with GSTIN and contact details." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "robots", content: "noindex" },
+    ],
+  }),
+  component: SuppliersPage,
+});
+
 const field =
   "w-full rounded-2xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-forest";
 
 const blank = { name: "", contactPerson: "", phone: "", email: "", gstin: "", address: "", paymentTerms: "", leadTimeDays: 0, isActive: true };
 
 function SuppliersPage() {
-  const { role, hospitalId } = useAuth();
+  const { role, hospitalId, adminHospitalId } = useAuth();
   const canWrite = can(role, "suppliers:write");
   const [items, setItems] = useState<Supplier[] | null>(null);
-  const [hospitals, setHospitals] = useState<Hospital[]>([]);
-  const [selectedAdminHospitalId, setSelectedAdminHospitalId] = useState<string>("");
   const [form, setForm] = useState<typeof blank>(blank);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [error, setError] = useState("");
 
-  const activeHospitalId = role === "SUPER_ADMIN" ? selectedAdminHospitalId : hospitalId;
-
-  const loadHospitals = useCallback(async () => {
-    if (role === "SUPER_ADMIN") {
-      try {
-        const data = await apiClient.get<Hospital[]>(endpoints.hospitals.list);
-        setHospitals(data || []);
-        if (data && data.length > 0 && !selectedAdminHospitalId) {
-          setSelectedAdminHospitalId(data[0].id);
-        }
-      } catch (e) {
-        console.error("Failed to load hospitals:", e);
-      }
-    }
-  }, [role, selectedAdminHospitalId]);
-
-  useEffect(() => {
-    loadHospitals();
-  }, [loadHospitals]);
+  const activeHospitalId = role === "SUPER_ADMIN" ? (adminHospitalId || hospitalId) : hospitalId;
 
   const load = useCallback(() => {
-    if (role === "SUPER_ADMIN" && !selectedAdminHospitalId) return; // Wait until selected
-    const headers = selectedAdminHospitalId ? { "hospital-id": selectedAdminHospitalId } : undefined;
-    apiClient.get<Supplier[]>(endpoints.suppliers.list, undefined, headers).then(setItems).catch(() => setItems([]));
-  }, [role, selectedAdminHospitalId]);
+    apiClient.get<Supplier[]>(endpoints.suppliers.list).then(setItems).catch(() => setItems([]));
+  }, []);
 
   useEffect(() => { load() }, [load]);
 
@@ -105,26 +108,12 @@ function SuppliersPage() {
 
   return (
     <StaffLayout title="Suppliers" subtitle="Vendors and purchase contacts" permission="suppliers:read">
+      <AdminHospitalSelector />
       {!items ? (
         <Loading />
       ) : (
         <div className="space-y-5">
           {error ? <p className="rounded-2xl bg-destructive/10 px-4 py-3 text-sm text-destructive">{error}</p> : null}
-
-          {role === "SUPER_ADMIN" && hospitals.length > 0 && (
-            <div className="flex items-center gap-3">
-              <label className="text-sm font-medium">Hospital Context:</label>
-              <select 
-                className="rounded-full border border-border px-3 py-1 text-sm bg-background"
-                value={selectedAdminHospitalId}
-                onChange={(e) => setSelectedAdminHospitalId(e.target.value)}
-              >
-                {hospitals.map(h => (
-                  <option key={h.id} value={h.id}>{h.name}</option>
-                ))}
-              </select>
-            </div>
-          )}
 
           {open && canWrite ? (
             <Panel title={editingId ? "Edit supplier" : "New supplier"}>

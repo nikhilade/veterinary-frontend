@@ -75,7 +75,7 @@ export function StaffLayout({
   children: ReactNode;
   permission?: Permission;
 }) {
-  const { user, role } = useAuth();
+  const { user, role, adminHospitalId } = useAuth();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
@@ -150,7 +150,7 @@ export function StaffLayout({
               </button>
             </div>
           </header>
-          <main className="p-5 lg:p-8">{children}</main>
+          <main key={adminHospitalId || 'default'} className="p-5 lg:p-8">{children}</main>
         </div>
       </div>
     </RequireAuth>

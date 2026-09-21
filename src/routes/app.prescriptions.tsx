@@ -3,12 +3,13 @@ import { useEffect, useRef, useState } from "react";
 import { Pill, Plus, Trash2 } from "lucide-react";
 import { StaffLayout } from "@/components/app/StaffLayout";
 import { EmptyState, Loading, Panel, formatDate } from "@/components/app/ui";
+import { AdminHospitalSelector } from "@/components/app/AdminHospitalSelector";
 import { PetPicker } from "@/components/app/kit/PetPicker";
 import { PrescriptionPdfButton } from "@/components/app/kit/PrescriptionPdfButton";
 import { apiClient } from "@/lib/api-client";
 import { endpoints } from "@/lib/api/endpoints";
 import { useAuth } from "@/lib/auth/store";
-import type { Medicine, Pet, PrescriptionDetail, PrescriptionItem } from "@/lib/api/types";
+import type { Consultation, Medicine, Pet, PrescriptionDetail, PrescriptionItem } from "@/lib/api/types";
 
 export const Route = createFileRoute("/app/prescriptions")({
   head: () => ({
@@ -118,6 +119,8 @@ function PrescriptionsPage() {
   const { user } = useAuth();
   const [list, setList] = useState<PrescriptionDetail[] | null>(null);
   const [pet, setPet] = useState<Pet | null>(null);
+  const [consultations, setConsultations] = useState<Consultation[]>([]);
+  const [consultationId, setConsultationId] = useState<string>("");
   const [items, setItems] = useState<PrescriptionItem[]>([blankItem()]);
   const [refills, setRefills] = useState("0");
   const [instructions, setInstructions] = useState("");
@@ -131,6 +134,28 @@ function PrescriptionsPage() {
 
   useEffect(load, []);
 
+  useEffect(() => {
+    if (!pet) {
+      setConsultations([]);
+      setConsultationId("");
+      return;
+    }
+    apiClient.get<Consultation[]>(endpoints.consultations.byPet(pet.id))
+      .then((list) => {
+        const sorted = list.sort((a, b) => new Date(b.createdAt || "").getTime() - new Date(a.createdAt || "").getTime());
+        setConsultations(sorted);
+        if (sorted.length > 0) {
+          setConsultationId(sorted[0].id);
+        } else {
+          setConsultationId("");
+        }
+      })
+      .catch(() => {
+        setConsultations([]);
+        setConsultationId("");
+      });
+  }, [pet]);
+
   function patchItem(index: number, patch: Partial<PrescriptionItem>) {
     setItems((prev) => prev.map((it, i) => (i === index ? { ...it, ...patch } : it)));
   }
@@ -140,10 +165,18 @@ function PrescriptionsPage() {
     setError("");
     setCreatedId(null);
     try {
+      const payloadItems = items.map((it) => ({
+        medicineName: it.name,
+        dosage: it.dosage,
+        frequency: it.frequency,
+        duration: String(it.durationDays),
+        instructions: it.notes,
+        inventoryItemId: it.medicineId,
+      }));
+
       const created = await apiClient.post<PrescriptionDetail>(endpoints.prescriptions.create, {
-        petId: pet?.id,
-        doctorName: user?.name ?? "Clinic doctor",
-        items,
+        consultationId,
+        items: payloadItems,
         refillsLeft: Number(refills) || 0,
         instructions,
       });
@@ -161,9 +194,32 @@ function PrescriptionsPage() {
 
   return (
     <StaffLayout title="Prescriptions" subtitle="Build and issue medication plans" permission="prescriptions:write">
+      <AdminHospitalSelector />
       <div className="space-y-6">
         <Panel title="New prescription">
           <PetPicker value={pet} onChange={setPet} />
+
+          {pet && consultations.length > 0 ? (
+            <div className="mt-4">
+              <label className={labelCls} htmlFor="consultation">Select Consultation</label>
+              <select 
+                id="consultation"
+                className={`${field} mt-1.5`}
+                value={consultationId}
+                onChange={(e) => setConsultationId(e.target.value)}
+              >
+                {consultations.map(c => (
+                  <option key={c.id} value={c.id}>
+                    {formatDate(c.createdAt || "")} - Dr. {c.doctorName || "Unknown"}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ) : pet ? (
+            <div className="mt-4 rounded-xl border border-destructive/20 bg-destructive/10 p-3 text-sm text-destructive">
+              This pet has no active consultations. A consultation is required to issue a prescription.
+            </div>
+          ) : null}
 
           <div className="mt-6 space-y-4">
             {items.map((item, i) => (
@@ -257,12 +313,16 @@ function PrescriptionsPage() {
           {error ? <p className="mt-3 text-sm text-destructive">{error}</p> : null}
           <button
             onClick={save}
-            disabled={saving || !pet}
+            disabled={saving || !pet || !consultationId}
             className="mt-5 rounded-full bg-forest px-6 py-3 text-sm font-medium text-primary-foreground disabled:opacity-60"
           >
             {saving ? "Saving…" : "Save prescription"}
           </button>
-          {!pet ? <p className="mt-2 text-xs text-foreground/50">Select an owner and pet to continue.</p> : null}
+          {!pet ? (
+            <p className="mt-2 text-xs text-foreground/50">Select an owner and pet to continue.</p>
+          ) : !consultationId ? (
+            <p className="mt-2 text-xs text-destructive">A consultation must be selected.</p>
+          ) : null}
 
           {createdId ? (
             <div className="mt-5 rounded-[1.25rem] bg-forest/5 p-4">

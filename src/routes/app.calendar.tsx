@@ -2,6 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { CalendarDays, ChevronLeft, ChevronRight, Plus, X, AlertTriangle } from "lucide-react";
 import { StaffLayout } from "@/components/app/StaffLayout";
+import { AdminHospitalSelector } from "@/components/app/AdminHospitalSelector";
+
 import { EmptyState, Loading, Panel } from "@/components/app/ui";
 import { StatusBadge, statusAccent } from "@/components/app/kit/StatusBadge";
 import { NewAppointmentForm } from "@/components/app/kit/NewAppointmentForm";
@@ -134,6 +136,7 @@ function CalendarPage() {
 
   return (
     <StaffLayout title="Appointment Calendar" subtitle="Day & week schedule" permission="appointments:read">
+      <AdminHospitalSelector />
       <div className="space-y-5">
         <Panel>
           <div className="flex flex-wrap items-center justify-between gap-3">

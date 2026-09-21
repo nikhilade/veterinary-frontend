@@ -2,6 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { Plus, X } from "lucide-react";
 import { StaffLayout } from "@/components/app/StaffLayout";
+import { AdminHospitalSelector } from "@/components/app/AdminHospitalSelector";
+
 import { Loading, Panel, StatusPill, formatDate } from "@/components/app/ui";
 import { NewAppointmentForm } from "@/components/app/kit/NewAppointmentForm";
 import { todayISODate } from "@/components/app/kit/SlotPicker";
@@ -44,6 +46,7 @@ function AppointmentsPage() {
 
   return (
     <StaffLayout title="Appointments" subtitle="Clinic schedule" permission="appointments:read">
+      <AdminHospitalSelector />
       <div className="space-y-5">
         {creating && (
           <Panel title="New appointment">

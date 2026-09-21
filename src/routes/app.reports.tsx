@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { StaffLayout } from "@/components/app/StaffLayout";
+import { AdminHospitalSelector } from "@/components/app/AdminHospitalSelector";
+
 import { Loading, Panel, formatMoney } from "@/components/app/ui";
 import { apiClient } from "@/lib/api-client";
 import { endpoints } from "@/lib/api/endpoints";
@@ -37,6 +39,7 @@ function ReportsPage() {
 
   return (
     <StaffLayout title="Reports" subtitle="Performance overview" permission="reports:read">
+      <AdminHospitalSelector />
       {!data ? (
         <Loading />
       ) : (

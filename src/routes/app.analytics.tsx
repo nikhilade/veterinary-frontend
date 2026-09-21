@@ -19,6 +19,8 @@ import {
   PackageSearch,
 } from "lucide-react";
 import { StaffLayout } from "@/components/app/StaffLayout";
+import { AdminHospitalSelector } from "@/components/app/AdminHospitalSelector";
+
 import { Loading, Panel } from "@/components/app/ui";
 import { endpoints } from "@/lib/api/endpoints";
 import type {
@@ -91,6 +93,7 @@ function AnalyticsDashboard() {
       subtitle="Hospital performance — live operations every 15s, aggregates every 15 min"
       permission="reports:read"
     >
+      <AdminHospitalSelector />
       <div className="space-y-6">
         {/* 1 — KPI row */}
         {!kpis.data ? (

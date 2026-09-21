@@ -16,6 +16,65 @@ import {
   X,
 } from "lucide-react";
 import { StaffLayout } from "@/components/app/StaffLayout";
+import { AdminHospitalSelector } from "@/components/app/AdminHospitalSelector";
+
+import { EmptyState, Loading, Panel, StatCard, formatDate } from "@/components/app/ui";
+import { apiClient } from "@/lib/api-client";
+import { endpoints } from "@/lib/api/endpoints";
+import { can } from "@/lib/auth/permissions";
+import { useAuth } from "@/lib/auth/store";
+import type { Prescription, PrescriptionMedicineItem, PharmacyDispenseRequest } from "@/lib/api/types";
+import type { StockItem } from "@/lib/api/billing-types";
+import { toast } from "sonner";
+
+type Hospital = { id: string; name: string };
+
+export const Route = createFileRoute("/app/pharmacy")({
+  head: () => ({
+    meta: [
+      { title: "Pharmacy | Pet Good Console" },
+      { name: "description", content: "Dispense prescriptions and review medication instructions, live inventory matching and batch deduction." },
+      { property: "og:title", content: "Pharmacy | Pet Good Console" },
+      { property: "og:description", content: "Prescription queue and inventory dispensing for the pharmacy team." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "robots", content: "noindex" },
+    ],
+  }),
+  component: PharmacyPage,
+});
+
+const field =
+  "w-full rounded-2xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-forest transition-colors";
+
+function statusBadge(status?: string) {
+  switch (status) {
+    case "DISPENSED":
+      return (
+        <span className="inline-flex items-center gap-1 rounded-full bg-forest/15 px-2.5 py-0.5 text-xs font-medium text-forest">
+          <CheckCircle2 className="size-3.5" /> Dispensed
+        </span>
+      );
+    case "PARTIALLY_DISPENSED":
+      return (
+        <span className="inline-flex items-center gap-1 rounded-full bg-sky-500/15 px-2.5 py-0.5 text-xs font-medium text-sky-600 dark:text-sky-400">
+          <Clock className="size-3.5" /> Partial
+        </span>
+      );
+    case "CANCELLED":
+      return (
+        <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-foreground/50">
+          <X className="size-3.5" /> Cancelled
+        </span>
+      );
+    default:
+      return (
+        <span className="inline-flex items-center gap-1 rounded-full bg-clay/20 px-2.5 py-0.5 text-xs font-medium text-clay">
+          <Clock className="size-3.5" /> Pending Dispense
+        </span>
+      );
+  }
+
 import { EmptyState, Loading, Panel, StatCard, formatDate } from "@/components/app/ui";
 import { apiClient } from "@/lib/api-client";
 import { endpoints } from "@/lib/api/endpoints";
@@ -80,57 +139,32 @@ function PharmacyPage() {
 
   const [prescriptions, setPrescriptions] = useState<Prescription[] | null>(null);
   const [inventoryItems, setInventoryItems] = useState<StockItem[]>([]);
-  const [hospitals, setHospitals] = useState<Hospital[]>([]);
-  const [selectedAdminHospitalId, setSelectedAdminHospitalId] = useState<string>("");
 
   const [activeTab, setActiveTab] = useState<"PENDING" | "DISPENSED" | "ALL">("PENDING");
   const [searchQuery, setSearchQuery] = useState("");
   const [dispenseModalPrescription, setDispenseModalPrescription] = useState<Prescription | null>(null);
 
-  const activeHospitalId = role === "SUPER_ADMIN" ? selectedAdminHospitalId : hospitalId;
-
-  const loadHospitals = useCallback(async () => {
-    if (role === "SUPER_ADMIN") {
-      try {
-        const data = await apiClient.get<Hospital[]>(endpoints.hospitals.list);
-        setHospitals(data || []);
-        if (data && data.length > 0 && !selectedAdminHospitalId) {
-          setSelectedAdminHospitalId(data[0].id);
-        }
-      } catch (e) {
-        console.error("Failed to load hospitals:", e);
-      }
-    }
-  }, [role, selectedAdminHospitalId]);
-
-  useEffect(() => {
-    loadHospitals();
-  }, [loadHospitals]);
-
   const loadData = useCallback(() => {
-    if (role === "SUPER_ADMIN" && !selectedAdminHospitalId) return;
-    const headers = selectedAdminHospitalId ? { "hospital-id": selectedAdminHospitalId } : undefined;
-
     // Fetch queue from backend
     apiClient
-      .get<Prescription[]>(endpoints.pharmacy.queue, undefined, headers)
+      .get<Prescription[]>(endpoints.pharmacy.queue)
       .then((res) => {
         setPrescriptions(res || []);
       })
       .catch(() => {
         // Fallback to prescriptions list if needed
         apiClient
-          .get<Prescription[]>(endpoints.prescriptions.list, undefined, headers)
+          .get<Prescription[]>(endpoints.prescriptions.list)
           .then((res) => setPrescriptions(res || []))
           .catch(() => setPrescriptions([]));
       });
 
     // Fetch inventory items to match medications and check stock
     apiClient
-      .get<StockItem[]>(endpoints.inventory.list, undefined, headers)
+      .get<StockItem[]>(endpoints.inventory.list)
       .then((items) => setInventoryItems(items || []))
       .catch(() => setInventoryItems([]));
-  }, [role, selectedAdminHospitalId]);
+  }, []);
 
   useEffect(() => {
     loadData();
@@ -189,51 +223,37 @@ function PharmacyPage() {
   async function downloadPdf(prescriptionId: string) {
     try {
       toast.info("Preparing prescription PDF...");
-      const response = await fetch(`/v1/prescriptions/${prescriptionId}/pdf`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
-        },
-      });
+      const url = `${import.meta.env.VITE_API_BASE_URL || ""}${endpoints.prescriptions.pdf(prescriptionId)}`;
+      const authData = window.localStorage.getItem("petgood.auth");
+      const token = authData ? JSON.parse(authData).token : null;
+      const headers: Record<string, string> = {};
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+
+      const response = await fetch(url, { headers });
       if (!response.ok) throw new Error("Failed to download PDF");
       const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
+      const objectUrl = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
-      a.href = url;
-      a.download = `Prescription-${prescriptionId.slice(0, 8)}.pdf`;
+      a.href = objectUrl;
+      a.download = `prescription-${prescriptionId}.pdf`;
       document.body.appendChild(a);
       a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-      toast.success("PDF downloaded successfully");
+      a.remove();
+      window.URL.revokeObjectURL(objectUrl);
+      toast.success("PDF downloaded!");
     } catch (e: any) {
       toast.error(e?.message || "Could not download PDF");
     }
   }
 
+
   return (
     <StaffLayout title="Pharmacy" subtitle="Prescription queue and inventory dispensing" permission="pharmacy:read">
+      <AdminHospitalSelector />
       {!prescriptions ? (
         <Loading />
       ) : (
         <div className="space-y-6">
-          {/* Hospital Context (for Super Admin) */}
-          {role === "SUPER_ADMIN" && hospitals.length > 0 && (
-            <div className="flex items-center gap-3">
-              <label className="text-sm font-medium">Hospital Context:</label>
-              <select
-                className="rounded-full border border-border px-3 py-1 text-sm bg-background"
-                value={selectedAdminHospitalId}
-                onChange={(e) => setSelectedAdminHospitalId(e.target.value)}
-              >
-                {hospitals.map((h) => (
-                  <option key={h.id} value={h.id}>
-                    {h.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-
           {/* Metric Stat Cards */}
           <div className="grid gap-4 sm:grid-cols-4">
             <StatCard label="Pending Dispense" value={pendingCount} hint="Waiting in queue" />
@@ -652,7 +672,6 @@ function DispenseModal({
                     >
                       <option value="">Select inventory medicine…</option>
                       {inventoryItems
-                        .filter((i) => i.category === "MEDICINE" || i.category === "CONSUMABLE")
                         .map((inv) => (
                           <option key={inv.id} value={inv.id}>
                             {inv.name} ({inv.currentStock} {inv.unit} in stock)

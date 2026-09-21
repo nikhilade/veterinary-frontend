@@ -23,6 +23,8 @@ export const endpoints = {
   },
   hospitals: {
     list: `${V1}/hospitals`,
+    departments: (hospitalId: string) => `${V1}/hospitals/${hospitalId}/departments`,
+    departmentDetail: (hospitalId: string, departmentId: string) => `${V1}/hospitals/${hospitalId}/departments/${departmentId}`,
   },
   petOwners: {
     list: `${V1}/pet-owners`,
@@ -224,9 +226,14 @@ export const endpoints = {
   },
   staff: {
     list: `${V1}/staff`,
+    me: `${V1}/staff/me`,
     create: `${V1}/staff`,
     detail: (id: string) => `${V1}/staff/${id}`,
     attendance: (id: string) => `${V1}/staff-attendance/staff/${id}`,
+    markAttendance: `${V1}/staff-attendance/mark`,
+    checkIn: `${V1}/staff-attendance/check-in`,
+    checkOut: (id: string) => `${V1}/staff-attendance/${id}/check-out`,
+    attendanceByDate: (date: string) => `${V1}/staff-attendance/date?attendanceDate=${date}`,
   },
   masterData: {
     list: (resource: string) => {

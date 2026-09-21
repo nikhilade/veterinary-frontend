@@ -2,6 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { AlertTriangle, Check, FileText, ShieldCheck, X } from "lucide-react";
 import { StaffLayout } from "@/components/app/StaffLayout";
+import { AdminHospitalSelector } from "@/components/app/AdminHospitalSelector";
+
 import { EmptyState, Loading, Panel } from "@/components/app/ui";
 import { INR, MoneyInput } from "@/components/app/kit/MoneyInput";
 import { IdempotentSubmitButton } from "@/components/app/kit/IdempotentSubmitButton";
@@ -90,6 +92,7 @@ function RefundsPage() {
 
   return (
     <StaffLayout title="Refunds" subtitle="Dual authorisation and credit notes" permission="billing:read">
+      <AdminHospitalSelector />
       {!invoices ? (
         <Loading />
       ) : (

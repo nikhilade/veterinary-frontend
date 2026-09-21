@@ -2,6 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Lock, Plus, Trash2, X } from "lucide-react";
 import { StaffLayout } from "@/components/app/StaffLayout";
+import { AdminHospitalSelector } from "@/components/app/AdminHospitalSelector";
+
 import { EmptyState, Loading, Panel } from "@/components/app/ui";
 import { GstBreakdown } from "@/components/app/kit/GstBreakdown";
 import { INR, MoneyInput } from "@/components/app/kit/MoneyInput";
@@ -81,6 +83,7 @@ function BillingPage() {
 
   return (
     <StaffLayout title="Billing" subtitle="Invoices, line items and GST" permission="billing:read">
+      <AdminHospitalSelector />
       {!invoices ? (
         <Loading />
       ) : building || editing ? (
