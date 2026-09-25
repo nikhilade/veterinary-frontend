@@ -5,25 +5,29 @@ import { useAuth, authStore } from "@/lib/auth/store";
 
 export function AdminHospitalSelector() {
   const { role, adminHospitalId } = useAuth();
-  const [hospitals, setHospitals] = useState<{ id: string; name: string }[]>([]);
+  const [hospitals, setHospitals] = useState<{ id: string; name: string; hospitalStatus?: string }[]>([]);
 
   useEffect(() => {
     if (role === "SUPER_ADMIN") {
       apiClient.get<any[]>(endpoints.tenants.list).then((res: any) => {
-        let arr: { id: string; name: string }[] = [];
+        let arr: any[] = [];
         if (Array.isArray(res)) arr = res;
         else if (res && Array.isArray(res.data)) arr = res.data;
         else if (res && Array.isArray(res.content)) arr = res.content;
         else if (res && Array.isArray(res.items)) arr = res.items;
 
-        const mapped = arr.map(t => ({
+        const mapped = arr.map((t: any) => ({
           id: t.hospitalId || t.id,
-          name: t.name || t.hospitalName || "Unnamed Hospital"
+          name: t.name || t.hospitalName || "Unnamed Hospital",
+          hospitalStatus: t.hospitalStatus
         }));
 
         setHospitals(mapped);
         if (mapped.length > 0 && !authStore.get().adminHospitalId) {
-          authStore.setAdminHospital(mapped[0].id);
+          const firstActive = mapped.find(h => h.hospitalStatus !== 'PENDING');
+          if (firstActive) {
+            authStore.setAdminHospital(firstActive.id);
+          }
         }
       }).catch(console.error);
     }
@@ -40,7 +44,9 @@ export function AdminHospitalSelector() {
         onChange={(e) => authStore.setAdminHospital(e.target.value)}
       >
         {hospitals.map(h => (
-          <option key={h.id} value={h.id}>{h.name}</option>
+          <option key={h.id} value={h.id} disabled={h.hospitalStatus === 'PENDING'}>
+            {h.name} {h.hospitalStatus === 'PENDING' ? '(Pending Verification)' : ''}
+          </option>
         ))}
       </select>
     </div>

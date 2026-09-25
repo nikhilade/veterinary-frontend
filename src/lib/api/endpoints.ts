@@ -17,6 +17,9 @@ export const endpoints = {
     signup: "/api/auth/signup",
     me: "/api/auth/me",
     logout: "/api/auth/logout",
+    verifyEmail: "/api/auth/verify-email",
+    resendVerificationOtp: "/api/auth/resend-verification-otp",
+    setupPassword: "/api/auth/setup-password",
   },
   files: {
     upload: `${V1}/files/upload`,
@@ -25,6 +28,7 @@ export const endpoints = {
     list: `${V1}/hospitals`,
     departments: (hospitalId: string) => `${V1}/hospitals/${hospitalId}/departments`,
     departmentDetail: (hospitalId: string, departmentId: string) => `${V1}/hospitals/${hospitalId}/departments/${departmentId}`,
+    settings: (hospitalId: string) => `${V1}/hospitals/settings/${hospitalId}`,
   },
   petOwners: {
     list: `${V1}/pet-owners`,

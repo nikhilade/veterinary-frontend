@@ -20,6 +20,7 @@ export interface Tenant {
   renews_at: string | null;
   mrr: number;
   createdAt: string;
+  hospitalStatus?: string;
 }
 
 export interface SubscriptionPlan {
@@ -78,6 +79,8 @@ export interface StaffMember {
   active: boolean;
   attendanceToday: AttendanceStatus;
   presentDays30: number;
+  userStatus?: string;
+  emailVerified?: boolean;
 }
 
 export interface MasterDataRecord {

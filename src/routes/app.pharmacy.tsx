@@ -18,68 +18,12 @@ import {
 import { StaffLayout } from "@/components/app/StaffLayout";
 import { AdminHospitalSelector } from "@/components/app/AdminHospitalSelector";
 
-import { EmptyState, Loading, Panel, StatCard, formatDate } from "@/components/app/ui";
-import { apiClient } from "@/lib/api-client";
-import { endpoints } from "@/lib/api/endpoints";
-import { can } from "@/lib/auth/permissions";
-import { useAuth } from "@/lib/auth/store";
-import type { Prescription, PrescriptionMedicineItem, PharmacyDispenseRequest } from "@/lib/api/types";
-import type { StockItem } from "@/lib/api/billing-types";
-import { toast } from "sonner";
-
-type Hospital = { id: string; name: string };
-
-export const Route = createFileRoute("/app/pharmacy")({
-  head: () => ({
-    meta: [
-      { title: "Pharmacy | Pet Good Console" },
-      { name: "description", content: "Dispense prescriptions and review medication instructions, live inventory matching and batch deduction." },
-      { property: "og:title", content: "Pharmacy | Pet Good Console" },
-      { property: "og:description", content: "Prescription queue and inventory dispensing for the pharmacy team." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "robots", content: "noindex" },
-    ],
-  }),
-  component: PharmacyPage,
-});
-
-const field =
-  "w-full rounded-2xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-forest transition-colors";
-
-function statusBadge(status?: string) {
-  switch (status) {
-    case "DISPENSED":
-      return (
-        <span className="inline-flex items-center gap-1 rounded-full bg-forest/15 px-2.5 py-0.5 text-xs font-medium text-forest">
-          <CheckCircle2 className="size-3.5" /> Dispensed
-        </span>
-      );
-    case "PARTIALLY_DISPENSED":
-      return (
-        <span className="inline-flex items-center gap-1 rounded-full bg-sky-500/15 px-2.5 py-0.5 text-xs font-medium text-sky-600 dark:text-sky-400">
-          <Clock className="size-3.5" /> Partial
-        </span>
-      );
-    case "CANCELLED":
-      return (
-        <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-foreground/50">
-          <X className="size-3.5" /> Cancelled
-        </span>
-      );
-    default:
-      return (
-        <span className="inline-flex items-center gap-1 rounded-full bg-clay/20 px-2.5 py-0.5 text-xs font-medium text-clay">
-          <Clock className="size-3.5" /> Pending Dispense
-        </span>
-      );
-  }
 
 import { EmptyState, Loading, Panel, StatCard, formatDate } from "@/components/app/ui";
 import { apiClient } from "@/lib/api-client";
 import { endpoints } from "@/lib/api/endpoints";
 import { can } from "@/lib/auth/permissions";
-import { useAuth } from "@/lib/auth/store";
+import { useAuth, authStore } from "@/lib/auth/store";
 import type { Prescription, PrescriptionMedicineItem, PharmacyDispenseRequest } from "@/lib/api/types";
 import type { StockItem } from "@/lib/api/billing-types";
 import { toast } from "sonner";
@@ -136,6 +80,7 @@ function statusBadge(status?: string) {
 function PharmacyPage() {
   const { role, hospitalId } = useAuth();
   const canWrite = can(role, "pharmacy:write");
+  const activeHospitalId = role === "SUPER_ADMIN" ? authStore.get().adminHospitalId : hospitalId;
 
   const [prescriptions, setPrescriptions] = useState<Prescription[] | null>(null);
   const [inventoryItems, setInventoryItems] = useState<StockItem[]>([]);
@@ -270,33 +215,30 @@ function PharmacyPage() {
                 <button
                   type="button"
                   onClick={() => setActiveTab("PENDING")}
-                  className={`rounded-full px-3.5 py-1.5 font-medium transition-colors ${
-                    activeTab === "PENDING"
+                  className={`rounded-full px-3.5 py-1.5 font-medium transition-colors ${activeTab === "PENDING"
                       ? "bg-forest text-primary-foreground shadow-xs"
                       : "text-foreground/70 hover:text-foreground"
-                  }`}
+                    }`}
                 >
                   Pending ({pendingCount})
                 </button>
                 <button
                   type="button"
                   onClick={() => setActiveTab("DISPENSED")}
-                  className={`rounded-full px-3.5 py-1.5 font-medium transition-colors ${
-                    activeTab === "DISPENSED"
+                  className={`rounded-full px-3.5 py-1.5 font-medium transition-colors ${activeTab === "DISPENSED"
                       ? "bg-forest text-primary-foreground shadow-xs"
                       : "text-foreground/70 hover:text-foreground"
-                  }`}
+                    }`}
                 >
                   Dispensed ({prescriptions.length - pendingCount})
                 </button>
                 <button
                   type="button"
                   onClick={() => setActiveTab("ALL")}
-                  className={`rounded-full px-3.5 py-1.5 font-medium transition-colors ${
-                    activeTab === "ALL"
+                  className={`rounded-full px-3.5 py-1.5 font-medium transition-colors ${activeTab === "ALL"
                       ? "bg-forest text-primary-foreground shadow-xs"
                       : "text-foreground/70 hover:text-foreground"
-                  }`}
+                    }`}
                 >
                   All ({prescriptions.length})
                 </button>
@@ -333,8 +275,8 @@ function PharmacyPage() {
                   searchQuery
                     ? "No prescriptions match your search query."
                     : activeTab === "PENDING"
-                    ? "No pending prescriptions in the pharmacy queue! All medications are up to date."
-                    : "No prescriptions found in this view."
+                      ? "No pending prescriptions in the pharmacy queue! All medications are up to date."
+                      : "No prescriptions found in this view."
                 }
               />
             ) : (
@@ -450,9 +392,8 @@ function PharmacyPage() {
                                 <div className="mt-2.5 pt-2 border-t border-border/40 flex items-center justify-between text-[11px]">
                                   {matchedInv ? (
                                     <span
-                                      className={`inline-flex items-center gap-1 font-medium ${
-                                        isStockAvailable ? "text-forest" : "text-destructive"
-                                      }`}
+                                      className={`inline-flex items-center gap-1 font-medium ${isStockAvailable ? "text-forest" : "text-destructive"
+                                        }`}
                                     >
                                       <Package className="size-3" />
                                       {matchedInv.currentStock} {matchedInv.unit} in stock
@@ -531,7 +472,7 @@ function DispenseModal({
   const items = prescription.items && prescription.items.length > 0
     ? prescription.items
     : prescription.medication
-    ? [{
+      ? [{
         id: "legacy",
         medicineName: prescription.medication,
         dosage: prescription.dosage || "",
@@ -541,7 +482,7 @@ function DispenseModal({
         quantity: 1,
         dispensedQuantity: 0,
       }]
-    : [];
+      : [];
 
   // Match items to inventory items by default
   const [dispenseItems, setDispenseItems] = useState(() => {

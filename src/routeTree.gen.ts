@@ -17,6 +17,7 @@ import { Route as PlaygroundRouteImport } from './routes/playground'
 import { Route as PortalRouteImport } from './routes/portal'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as VerifyRouteImport } from './routes/verify'
 import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as AppAnalyticsRouteImport } from './routes/app.analytics'
 import { Route as AppAppointmentsRouteImport } from './routes/app.appointments'
@@ -97,6 +98,11 @@ const PricingRoute = PricingRouteImport.update({
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VerifyRoute = VerifyRouteImport.update({
+  id: '/verify',
+  path: '/verify',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppIndexRoute = AppIndexRouteImport.update({
@@ -314,6 +320,7 @@ export interface FileRoutesByFullPath {
   '/portal': typeof PortalRouteWithChildren
   '/pricing': typeof PricingRoute
   '/signup': typeof SignupRoute
+  '/verify': typeof VerifyRoute
   '/app/analytics': typeof AppAnalyticsRoute
   '/app/appointments': typeof AppAppointmentsRoute
   '/app/billing': typeof AppBillingRoute
@@ -363,6 +370,7 @@ export interface FileRoutesByTo {
   '/playground': typeof PlaygroundRoute
   '/pricing': typeof PricingRoute
   '/signup': typeof SignupRoute
+  '/verify': typeof VerifyRoute
   '/app/analytics': typeof AppAnalyticsRoute
   '/app/appointments': typeof AppAppointmentsRoute
   '/app/billing': typeof AppBillingRoute
@@ -415,6 +423,7 @@ export interface FileRoutesById {
   '/portal': typeof PortalRouteWithChildren
   '/pricing': typeof PricingRoute
   '/signup': typeof SignupRoute
+  '/verify': typeof VerifyRoute
   '/app/analytics': typeof AppAnalyticsRoute
   '/app/appointments': typeof AppAppointmentsRoute
   '/app/billing': typeof AppBillingRoute
@@ -468,6 +477,7 @@ export interface FileRouteTypes {
     | '/portal'
     | '/pricing'
     | '/signup'
+    | '/verify'
     | '/app/analytics'
     | '/app/appointments'
     | '/app/billing'
@@ -517,6 +527,7 @@ export interface FileRouteTypes {
     | '/playground'
     | '/pricing'
     | '/signup'
+    | '/verify'
     | '/app/analytics'
     | '/app/appointments'
     | '/app/billing'
@@ -568,6 +579,7 @@ export interface FileRouteTypes {
     | '/portal'
     | '/pricing'
     | '/signup'
+    | '/verify'
     | '/app/analytics'
     | '/app/appointments'
     | '/app/billing'
@@ -620,6 +632,7 @@ export interface RootRouteChildren {
   PortalRoute: typeof PortalRouteWithChildren
   PricingRoute: typeof PricingRoute
   SignupRoute: typeof SignupRoute
+  VerifyRoute: typeof VerifyRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -678,6 +691,13 @@ declare module '@tanstack/react-router' {
       path: '/signup'
       fullPath: '/signup'
       preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/verify': {
+      id: '/verify'
+      path: '/verify'
+      fullPath: '/verify'
+      preLoaderRoute: typeof VerifyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app/': {
@@ -1078,6 +1098,7 @@ const rootRouteChildren: RootRouteChildren = {
   PortalRoute: PortalRouteWithChildren,
   PricingRoute: PricingRoute,
   SignupRoute: SignupRoute,
+  VerifyRoute: VerifyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

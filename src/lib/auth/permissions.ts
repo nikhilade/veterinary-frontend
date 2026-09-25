@@ -79,6 +79,9 @@ const ALL_STAFF: Permission[] = [
 
 export const rolePermissions: Record<Role, Permission[]> = {
   SUPER_ADMIN: [...ALL_STAFF, "tenants:manage"],
+  WEBSITE_ADMIN: ["settings:write"],
+  WEBSITE_STAFF: [],
+  PUBLIC_USER: [],
   HOSPITAL_ADMIN: ALL_STAFF,
   RECEPTIONIST: [
     "staff:access",
@@ -106,7 +109,7 @@ export const rolePermissions: Record<Role, Permission[]> = {
     "lab:read",
     "pharmacy:read",
   ],
-  LAB_TECH: ["staff:access", "pets:read", "appointments:read", "lab:read", "lab:write"],
+  LAB_TECHNICIAN: ["staff:access", "pets:read", "appointments:read", "lab:read", "lab:write"],
   PHARMACIST: [
     "staff:access",
     "pets:read",
@@ -118,7 +121,7 @@ export const rolePermissions: Record<Role, Permission[]> = {
     "suppliers:read",
   ],
   GROOMER: ["staff:access", "pets:read", "appointments:read", "grooming:read"],
-  BILLING_STAFF: [
+  GENERAL_STAFF: [
     "staff:access",
     "owners:read",
     "billing:read",
@@ -133,13 +136,16 @@ export const rolePermissions: Record<Role, Permission[]> = {
 
 export const roleLabels: Record<Role, string> = {
   SUPER_ADMIN: "Super Admin",
+  WEBSITE_ADMIN: "Website Admin",
+  WEBSITE_STAFF: "Website Staff",
+  PUBLIC_USER: "Public User",
   HOSPITAL_ADMIN: "Hospital Admin",
   RECEPTIONIST: "Receptionist",
   DOCTOR: "Doctor",
-  LAB_TECH: "Lab Technician",
+  LAB_TECHNICIAN: "Lab Technician",
   PHARMACIST: "Pharmacist",
   GROOMER: "Groomer",
-  BILLING_STAFF: "Billing Staff",
+  GENERAL_STAFF: "General Staff",
   PET_OWNER: "Pet Owner",
 };
 

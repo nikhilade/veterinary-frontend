@@ -23,14 +23,17 @@ export interface ApiResponse<T> {
 
 export const ROLES = [
   "SUPER_ADMIN",
+  "WEBSITE_ADMIN",
+  "WEBSITE_STAFF",
+  "PUBLIC_USER",
+  "PET_OWNER",
   "HOSPITAL_ADMIN",
-  "RECEPTIONIST",
   "DOCTOR",
-  "LAB_TECH",
+  "RECEPTIONIST",
+  "GENERAL_STAFF",
+  "LAB_TECHNICIAN",
   "PHARMACIST",
   "GROOMER",
-  "BILLING_STAFF",
-  "PET_OWNER",
 ] as const;
 
 export type Role = (typeof ROLES)[number];
@@ -518,4 +521,28 @@ export interface PrescriptionPdf {
   filename: string;
   mimeType: string;
   contentBase64: string;
+}
+
+export interface HospitalSettings {
+  id: string;
+  hospitalId: string;
+  openingTime: string;
+  closingTime: string;
+  appointmentSlotDuration: number;
+  maxAdvanceBookingDays: number;
+  currency: string;
+  timezone: string;
+  paymentModes: string;
+  gstRate: number;
+}
+
+export interface HospitalSettingsRequest {
+  openingTime: string;
+  closingTime: string;
+  appointmentSlotDuration: number;
+  maxAdvanceBookingDays: number;
+  currency: string;
+  timezone: string;
+  paymentModes: string;
+  gstRate: number;
 }

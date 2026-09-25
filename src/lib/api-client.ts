@@ -103,21 +103,6 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<A
   });
 
   // --- MOCK INTERCEPTIONS ---
-  if (path.includes("/api/v1/appointments/slots/available") && method === "GET") {
-    const d = query?.date as string || new Date().toISOString().split("T")[0];
-    return {
-      success: true,
-      data: [
-        { startAt: `${d}T09:00:00Z`, available: true },
-        { startAt: `${d}T09:30:00Z`, available: true },
-        { startAt: `${d}T10:00:00Z`, available: true },
-        { startAt: `${d}T10:30:00Z`, available: true },
-        { startAt: `${d}T14:00:00Z`, available: true },
-        { startAt: `${d}T15:00:00Z`, available: true },
-        { startAt: `${d}T16:00:00Z`, available: true },
-      ] as unknown as T
-    } as ApiResponse<T>;
-  }
 
   if (path === "/api/v1/appointments" && method === "POST") {
     if (!lockTimeoutSimulated) {

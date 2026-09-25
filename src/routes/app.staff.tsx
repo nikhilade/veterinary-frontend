@@ -538,7 +538,9 @@ function StaffPage() {
                         onChange={(e) => setForm((s) => ({ ...s, role: e.target.value }))}
                       >
                         <option value="">Select role</option>
-                        {Object.entries(roleLabels).map(([val, label]) => (
+                        {Object.entries(roleLabels)
+                          .filter(([val]) => !["SUPER_ADMIN", "WEBSITE_ADMIN", "WEBSITE_STAFF", "PUBLIC_USER", "PET_OWNER"].includes(val))
+                          .map(([val, label]) => (
                           <option key={val} value={val}>{label}</option>
                         ))}
                       </select>
@@ -556,22 +558,29 @@ function StaffPage() {
                         onChange={(e) => setForm((s) => ({ ...s, joinDate: e.target.value }))}
                       />
                     </label>
-                    <div className="sm:col-span-3 flex justify-between items-center">
-                      <button
-                        type="button"
-                        onClick={create}
-                        className="rounded-full bg-forest px-6 py-2.5 text-sm text-primary-foreground"
-                      >
-                        {editingStaffId ? "Update staff member" : "Add staff member"}
-                      </button>
-                      {editingStaffId && (
+                    <div className="sm:col-span-3 flex flex-col gap-2">
+                      <div className="flex justify-between items-center">
                         <button
                           type="button"
-                          onClick={() => { setEditingStaffId(null); setForm(blank); setOpen(false); }}
-                          className="text-sm text-foreground/60 underline"
+                          onClick={create}
+                          className="rounded-full bg-forest px-6 py-2.5 text-sm text-primary-foreground"
                         >
-                          Cancel
+                          {editingStaffId ? "Update staff member" : "Add staff member"}
                         </button>
+                        {editingStaffId && (
+                          <button
+                            type="button"
+                            onClick={() => { setEditingStaffId(null); setForm(blank); setOpen(false); }}
+                            className="text-sm text-foreground/60 underline"
+                          >
+                            Cancel
+                          </button>
+                        )}
+                      </div>
+                      {!editingStaffId && (
+                        <p className="text-xs text-foreground/50">
+                          Creating a staff member will automatically generate a user account for them. They will receive an email to verify their account and set up their password.
+                        </p>
                       )}
                     </div>
                   </div>
@@ -599,8 +608,17 @@ function StaffPage() {
                         {filteredStaff.map((m) => (
                           <tr key={m.id} className="border-t border-border/60 hover:bg-muted/30 transition-colors">
                             <td className="py-4 pr-4">
-                              <p className="font-medium text-forest text-[15px]">{m.firstName} {m.lastName}</p>
-                              <p className="text-xs text-foreground/60 mt-0.5">{m.email}</p>
+                              <div className="flex items-center gap-2">
+                                <div>
+                                  <p className="font-medium text-forest text-[15px]">{m.firstName} {m.lastName}</p>
+                                  <p className="text-xs text-foreground/60 mt-0.5">{m.email}</p>
+                                </div>
+                                {m.userStatus === 'PENDING' && (
+                                  <span className="text-[10px] font-medium bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full whitespace-nowrap">
+                                    Pending Verification
+                                  </span>
+                                )}
+                              </div>
                             </td>
                             <td className="py-4 pr-4">
                               <p className="font-medium text-foreground/90">{m.departmentName || "—"}</p>
@@ -616,43 +634,49 @@ function StaffPage() {
                             <td className="py-4 pr-4">
                               <div className="flex flex-col gap-2">
                                 <div className="flex items-center gap-3">
-                                  <div className="min-w-[90px]">
-                                    {!todayAttendances[m.id] || todayAttendances[m.id].status !== "PRESENT" ? (
-                                      <button
-                                        type="button"
-                                        disabled={!canWrite}
-                                        onClick={() => handleCheckIn(m.id)}
-                                        className="rounded-full bg-forest px-4 py-1.5 text-xs font-medium text-primary-foreground disabled:opacity-60 shadow-sm transition-all hover:bg-forest/90 active:scale-95"
-                                      >
-                                        Check In
-                                      </button>
-                                    ) : !todayAttendances[m.id].checkOutTime ? (
-                                      <button
-                                        type="button"
-                                        disabled={!canWrite}
-                                        onClick={() => handleCheckOut(m.id, todayAttendances[m.id].id)}
-                                        className="rounded-full bg-amber-500 px-4 py-1.5 text-xs font-medium text-white disabled:opacity-60 shadow-sm transition-all hover:bg-amber-600 active:scale-95"
-                                      >
-                                        Check Out
-                                      </button>
-                                    ) : (
-                                      <span className="rounded-full bg-muted border border-border/50 px-4 py-1.5 text-xs font-medium text-foreground/60 shadow-sm">
-                                        Completed
-                                      </span>
-                                    )}
-                                  </div>
-                                  
-                                  {canWrite && (
-                                    <select
-                                      className="text-[11px] border border-border rounded-md px-2 py-1.5 bg-background shadow-sm text-foreground/80 outline-none focus:border-forest transition-colors"
-                                      value={todayAttendances[m.id]?.status || ""}
-                                      onChange={(e) => mark(m.id, e.target.value as AttendanceStatus)}
-                                    >
-                                      <option value="" disabled>Mark Manual</option>
-                                      {attendance.map(a => (
-                                        <option key={a} value={a}>{a.replace("_", " ")}</option>
-                                      ))}
-                                    </select>
+                                  {m.userStatus !== 'PENDING' ? (
+                                    <>
+                                      <div className="min-w-[90px]">
+                                        {!todayAttendances[m.id] || todayAttendances[m.id].status !== "PRESENT" ? (
+                                          <button
+                                            type="button"
+                                            disabled={!canWrite}
+                                            onClick={() => handleCheckIn(m.id)}
+                                            className="rounded-full bg-forest px-4 py-1.5 text-xs font-medium text-primary-foreground disabled:opacity-60 shadow-sm transition-all hover:bg-forest/90 active:scale-95"
+                                          >
+                                            Check In
+                                          </button>
+                                        ) : !todayAttendances[m.id].checkOutTime ? (
+                                          <button
+                                            type="button"
+                                            disabled={!canWrite}
+                                            onClick={() => handleCheckOut(m.id, todayAttendances[m.id].id)}
+                                            className="rounded-full bg-amber-500 px-4 py-1.5 text-xs font-medium text-white disabled:opacity-60 shadow-sm transition-all hover:bg-amber-600 active:scale-95"
+                                          >
+                                            Check Out
+                                          </button>
+                                        ) : (
+                                          <span className="rounded-full bg-muted border border-border/50 px-4 py-1.5 text-xs font-medium text-foreground/60 shadow-sm">
+                                            Completed
+                                          </span>
+                                        )}
+                                      </div>
+                                      
+                                      {canWrite && (
+                                        <select
+                                          className="text-[11px] border border-border rounded-md px-2 py-1.5 bg-background shadow-sm text-foreground/80 outline-none focus:border-forest transition-colors"
+                                          value={todayAttendances[m.id]?.status || ""}
+                                          onChange={(e) => mark(m.id, e.target.value as AttendanceStatus)}
+                                        >
+                                          <option value="" disabled>Mark Manual</option>
+                                          {attendance.map(a => (
+                                            <option key={a} value={a}>{a.replace("_", " ")}</option>
+                                          ))}
+                                        </select>
+                                      )}
+                                    </>
+                                  ) : (
+                                    <span className="text-xs text-foreground/50 italic">Must verify account</span>
                                   )}
                                 </div>
                                 

@@ -66,6 +66,7 @@ function TenantsPage() {
             renews_at: t.renews_at || t.renewsAt || null,
             mrr: Number(t.mrr ?? 0),
             createdAt: t.createdAt || t.created_at || "",
+            hospitalStatus: t.hospitalStatus || "ACTIVE",
           }));
           setTenants(mapped);
         } else {
@@ -143,7 +144,14 @@ function TenantsPage() {
                   {tenants.map((t) => (
                     <tr key={t.id} className="border-t border-border">
                       <td className="py-3 pr-4">
-                        <p className="font-medium text-forest">{t.name}</p>
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium text-forest">{t.name}</p>
+                          {t.hospitalStatus === 'PENDING' && (
+                            <span className="text-[10px] font-medium bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full whitespace-nowrap">
+                              Pending Verification
+                            </span>
+                          )}
+                        </div>
                         <p className="text-xs text-foreground/60">{t.city}</p>
                       </td>
                       <td className="py-3 pr-4">

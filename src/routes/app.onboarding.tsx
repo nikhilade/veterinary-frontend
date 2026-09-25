@@ -3,6 +3,7 @@ import { useEffect, useState, useMemo } from "react";
 import { Check, ChevronLeft, ChevronRight, PartyPopper } from "lucide-react";
 import { StaffLayout } from "@/components/app/StaffLayout";
 import { Panel } from "@/components/app/ui";
+import { toast } from "sonner";
 import { apiClient, ApiError } from "@/lib/api-client";
 import { endpoints } from "@/lib/api/endpoints";
 import type { SubscriptionPlan, Tenant } from "@/lib/api/tenancy-types";
@@ -182,7 +183,9 @@ function OnboardingPage() {
       const tenantData: Tenant = res?.tenant || res;
       setCreated(tenantData);
     } catch (e) {
-      setError(e instanceof ApiError ? e.message : "Provisioning failed. Try again.");
+      const errorMessage = e instanceof ApiError ? e.message : "Provisioning failed. Try again.";
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setSaving(false);
     }
@@ -204,10 +207,10 @@ function OnboardingPage() {
             <PartyPopper className="size-8 text-clay" />
             <h2 className="text-xl text-forest">{hospitalName} is live</h2>
             <p className="max-w-md text-sm text-foreground/60">
-              A 14-day trial has started on the {planName} plan. The
-              owner can sign in with {ownerEmail} to add branches and staff.
+              A 14-day trial has started on the {planName} plan. 
+              The owner (<span className="font-medium text-foreground">{ownerEmail}</span>) will receive an email to verify their account and set up their password.
             </p>
-            <div className="mt-2 flex flex-wrap justify-center gap-3">
+            <div className="mt-4 flex flex-wrap justify-center gap-3">
               <button
                 type="button"
                 onClick={() => navigate({ to: "/app/tenants" })}

@@ -79,12 +79,20 @@ function LoginPage() {
           </button>
         </form>
 
-        <p className="mt-6 text-sm text-foreground/70">
-          No account?{" "}
-          <Link to="/signup" className="font-medium text-clay">
-            Create one
-          </Link>
-        </p>
+        <div className="mt-6 flex flex-col gap-2 text-sm text-foreground/70">
+          <p>
+            No account?{" "}
+            <Link to="/signup" className="font-medium text-clay hover:underline">
+              Create one
+            </Link>
+          </p>
+          <p>
+            Have an OTP?{" "}
+            <Link to="/verify" className="font-medium text-clay hover:underline">
+              Verify Account
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );
