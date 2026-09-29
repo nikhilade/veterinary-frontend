@@ -34,6 +34,8 @@ import { RequireAuth } from "./RequireAuth";
 
 const navItems: { to: string; label: string; icon: typeof Users; permission: Permission }[] = [
   { to: "/app/dashboard", label: "Dashboard", icon: LayoutDashboard, permission: "staff:access" },
+  { to: "/app/tenants", label: "Hospitals", icon: Building2, permission: "tenants:manage" },
+  { to: "/app/onboarding", label: "Onboard Hospital", icon: Sparkles, permission: "tenants:manage" },
   { to: "/app/owners", label: "Pet Owners", icon: Users, permission: "owners:read" },
   { to: "/app/pets", label: "Pets", icon: Dog, permission: "pets:read" },
   { to: "/app/vaccinations", label: "Vaccinations", icon: Syringe, permission: "pets:read" },
@@ -57,10 +59,9 @@ const navItems: { to: string; label: string; icon: typeof Users; permission: Per
   { to: "/app/reports", label: "Reports", icon: BarChart3, permission: "reports:read" },
 
   { to: "/app/branches", label: "Branches", icon: Building2, permission: "branches:read" },
-  { to: "/app/staff", label: "Staff & Attendance", icon: IdCard, permission: "staff:read" },
+  { to: "/app/staff", label: "Staff", icon: IdCard, permission: "staff:read" },
+  { to: "/app/attendance", label: "Attendance", icon: CalendarDays, permission: "staff:read" },
   { to: "/app/master-data", label: "Master Data", icon: Database, permission: "masterdata:read" },
-  { to: "/app/tenants", label: "Hospitals", icon: Building2, permission: "tenants:manage" },
-  { to: "/app/onboarding", label: "Onboard Hospital", icon: Sparkles, permission: "tenants:manage" },
   { to: "/app/settings", label: "Settings", icon: Settings, permission: "settings:write" },
 ];
 

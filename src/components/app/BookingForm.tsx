@@ -4,6 +4,8 @@ import { endpoints } from "@/lib/api/endpoints";
 import type { Doctor, Pet } from "@/lib/api/types";
 import { Loading } from "./ui";
 
+import { useAuth } from "@/lib/auth/store";
+
 const SERVICES = [
   "Veterinary Care",
   "Grooming Services",
@@ -12,7 +14,9 @@ const SERVICES = [
   "Special Care Services",
 ];
 
-export function BookingForm({ ownerId = "own_1" }: { ownerId?: string }) {
+export function BookingForm({ ownerId: explicitOwnerId }: { ownerId?: string }) {
+  const { user } = useAuth();
+  const ownerId = explicitOwnerId || user?.id || "";
   const [pets, setPets] = useState<Pet[] | null>(null);
   const [doctors, setDoctors] = useState<Doctor[] | null>(null);
   const [form, setForm] = useState({ petId: "", doctorId: "", service: SERVICES[0], scheduledAt: "", notes: "" });

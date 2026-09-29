@@ -69,7 +69,11 @@ export function NewAppointmentForm({
           petId: pet.id,
           appointmentDate: slot.split("T")[0],
           startTime: slot.split("T")[1].substring(0, 8),
-          endTime: new Date(new Date(slot).getTime() + 30 * 60000).toISOString().split("T")[1].substring(0, 8),
+          endTime: (() => {
+            const d = new Date(slot);
+            d.setMinutes(d.getMinutes() + 30);
+            return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}:00`;
+          })(),
           sourceChannel: "WALK_IN",
           reason: service,
           notes,

@@ -165,7 +165,11 @@ function OnboardingPage() {
 
   function next() {
     const msg = validate(step);
-    if (msg) return setError(msg);
+    if (msg) {
+      setError(msg);
+      toast.error(msg);
+      return;
+    }
     setError("");
     setStep((s) => Math.min(steps.length - 1, s + 1));
   }
@@ -182,8 +186,9 @@ function OnboardingPage() {
 
       const tenantData: Tenant = res?.tenant || res;
       setCreated(tenantData);
-    } catch (e) {
-      const errorMessage = e instanceof ApiError ? e.message : "Provisioning failed. Try again.";
+      toast.success("Hospital onboarded successfully!");
+    } catch (e: any) {
+      const errorMessage = e instanceof ApiError ? e.message : (e?.message || "Provisioning failed. Try again.");
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {

@@ -47,9 +47,9 @@ function PortalDashboard() {
       ) : (
         <div className="space-y-6">
           <div className="grid grid-cols-2 gap-4">
-            <StatCard label="My pets" value={stats.pets.length} />
-            <StatCard label="Prescriptions" value={stats.active_prescriptions} />
-            <StatCard label="Open invoices" value={stats.open_invoices} />
+            <StatCard label="My pets" value={stats.pets?.length || 0} />
+            <StatCard label="Prescriptions" value={stats.active_prescriptions || 0} />
+            <StatCard label="Open invoices" value={stats.open_invoices || 0} />
             <StatCard label="Upcoming visits" value={stats.next_appointment ? 1 : 0} />
           </div>
 
@@ -75,7 +75,7 @@ function PortalDashboard() {
 
           <Panel title="My pets">
             <ul className="space-y-3">
-              {stats.pets.map((p) => (
+              {(stats.pets || []).map((p) => (
                 <li key={p.id} className="flex items-center justify-between rounded-[1.25rem] bg-muted px-4 py-3">
                   <span className="font-medium">{p.name || p.petName}</span>
                   <span className="text-sm text-foreground/60">

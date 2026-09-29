@@ -8,6 +8,7 @@ import { PetForm } from "@/components/app/kit/PetForm";
 import { apiClient } from "@/lib/api-client";
 import { endpoints } from "@/lib/api/endpoints";
 import type { Pet } from "@/lib/api/types";
+import { useAuth } from "@/lib/auth/store";
 
 export const Route = createFileRoute("/portal/my-pets")({
   head: () => ({
@@ -24,15 +25,19 @@ export const Route = createFileRoute("/portal/my-pets")({
   component: MyPets,
 });
 
-const OWNER_ID = "own_1";
-
 function MyPets() {
+  const { user } = useAuth();
+  const ownerId = user?.id || "";
   const [pets, setPets] = useState<Pet[] | null>(null);
   const [adding, setAdding] = useState(false);
 
   useEffect(() => {
-    apiClient.get<Pet[]>(endpoints.pets.byOwner(OWNER_ID)).then(setPets).catch(() => setPets([]));
-  }, []);
+    if (!ownerId) {
+      setPets([]);
+      return;
+    }
+    apiClient.get<Pet[]>(endpoints.pets.byOwner(ownerId)).then(setPets).catch(() => setPets([]));
+  }, [ownerId]);
 
   return (
     <PortalLayout title="My Pets">
@@ -43,7 +48,7 @@ function MyPets() {
           {adding ? (
             <Panel title="Add a pet">
               <PetForm
-                ownerId={OWNER_ID}
+                ownerId={ownerId}
                 onSaved={(pet) => {
                   setPets((p) => [...(p ?? []), pet]);
                   setAdding(false);

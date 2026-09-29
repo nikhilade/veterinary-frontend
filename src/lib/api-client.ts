@@ -165,7 +165,7 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<A
 
   payload = { ...raw, data: mapBackendResponse(raw?.data) } as ApiResponse<T>;
 
-  if (!payload.success && !res.ok) {
+  if (!res.ok || payload.success === false) {
     if (res.status === 401 && !options._retry && path !== "/api/auth/login" && path !== "/api/auth/refresh") {
       const refreshToken = readRefreshToken();
       if (refreshToken) {
@@ -240,9 +240,23 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<A
     }
 
     // Map Java backend response structure to the frontend expectations
-    let code = payload.error?.code ?? `HTTP_${res.status}`;
-    let message = payload.error?.message ?? payload.message ?? res.statusText ?? "Something went wrong.";
-    const data = payload.error?.data ?? {};
+    const backendData = (payload.data ?? (raw as any)?.data) as any;
+    const backendError = payload.error as any;
+
+    let code =
+      (typeof backendError === "object" && backendError?.code) ||
+      (typeof backendData === "object" && backendData?.code) ||
+      `HTTP_${res.status}`;
+
+    let message =
+      (typeof backendError === "string" ? backendError : backendError?.message) ||
+      payload.message ||
+      (typeof backendData === "string" ? backendData : backendData?.message || backendData?.error || backendData?.detail) ||
+      (typeof (raw as any)?.message === "string" ? (raw as any).message : "") ||
+      (res.statusText && res.statusText.trim() ? res.statusText : "") ||
+      "Something went wrong.";
+
+    const data = (typeof backendError === "object" ? backendError?.data : null) ?? (typeof backendData === "object" ? backendData : {}) ?? {};
 
     // Intercept backend double-booking message and convert to expected frontend code
     if (path === "/api/v1/appointments" && method === "POST" && message.includes("already booked")) {

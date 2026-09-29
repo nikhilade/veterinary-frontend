@@ -6,6 +6,7 @@ import { EmptyState, Loading, Panel, formatDate } from "@/components/app/ui";
 import { apiClient } from "@/lib/api-client";
 import { endpoints } from "@/lib/api/endpoints";
 import type { OwnerDocument, PetOwner } from "@/lib/api/types";
+import { useAuth } from "@/lib/auth/store";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/portal/profile")({
@@ -23,12 +24,13 @@ export const Route = createFileRoute("/portal/profile")({
   component: ProfilePage,
 });
 
-const OWNER_ID = "own_1";
 const field =
   "w-full rounded-2xl border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-forest";
 const MAX_DOC_SIZE_MB = 10;
 
 function ProfilePage() {
+  const { user } = useAuth();
+  const ownerId = user?.id || "";
   const [owner, setOwner] = useState<PetOwner | null>(null);
   const [docs, setDocs] = useState<OwnerDocument[]>([]);
   const [loading, setLoading] = useState(true);
@@ -36,9 +38,22 @@ function ProfilePage() {
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
+    if (!ownerId) {
+      setLoading(false);
+      return;
+    }
     Promise.all([
-      apiClient.get<PetOwner>(endpoints.petOwners.detail(OWNER_ID)),
-      apiClient.get<OwnerDocument[]>(endpoints.petOwners.documents(OWNER_ID)),
+      apiClient.get<PetOwner>(endpoints.petOwners.detail(ownerId)).catch(() => ({
+        id: ownerId,
+        firstName: user?.name?.split(" ")[0] || "",
+        lastName: user?.name?.split(" ").slice(1).join(" ") || "",
+        email: user?.email || "",
+        phone: "",
+        phoneNumber: "",
+        address: "",
+        createdAt: new Date().toISOString(),
+      } as PetOwner)),
+      apiClient.get<OwnerDocument[]>(endpoints.petOwners.documents(ownerId)).catch(() => []),
     ])
       .then(([o, d]) => {
         setOwner(o);
@@ -46,11 +61,12 @@ function ProfilePage() {
         setDraft({ firstName: o.name || o.firstName || "", email: o.email || "", phoneNumber: o.phone || o.phoneNumber || "", address: o.address || "" });
       })
       .finally(() => setLoading(false));
-  }, []);
+  }, [ownerId]);
 
   async function save() {
+    if (!ownerId) return;
     try {
-      const updated = await apiClient.patch<PetOwner>(endpoints.petOwners.update(OWNER_ID), draft);
+      const updated = await apiClient.patch<PetOwner>(endpoints.petOwners.update(ownerId), draft);
       setOwner(updated);
       setSaved(true);
       toast.success("Profile saved successfully!");
@@ -60,13 +76,13 @@ function ProfilePage() {
   }
 
   async function upload(file: File | undefined) {
-    if (!file) return;
+    if (!ownerId || !file) return;
     if (file.size > MAX_DOC_SIZE_MB * 1024 * 1024) {
       toast.error(`Document is too large (${(file.size / (1024 * 1024)).toFixed(1)}MB). Maximum allowed size is ${MAX_DOC_SIZE_MB}MB.`);
       return;
     }
     try {
-      const created = await apiClient.post<OwnerDocument>(endpoints.petOwners.documents(OWNER_ID), {
+      const created = await apiClient.post<OwnerDocument>(endpoints.petOwners.documents(ownerId), {
         name: file.name,
         type: "Other",
         sizeKb: Math.round(file.size / 1024),
