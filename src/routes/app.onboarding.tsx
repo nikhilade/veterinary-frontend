@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState, useMemo } from "react";
 import { Check, ChevronLeft, ChevronRight, PartyPopper } from "lucide-react";
 import { StaffLayout } from "@/components/app/StaffLayout";
-import { Panel } from "@/components/app/ui";
+import { Panel, FormTimeline } from "@/components/app/ui";
 import { toast } from "sonner";
 import { apiClient, ApiError } from "@/lib/api-client";
 import { endpoints } from "@/lib/api/endpoints";
@@ -246,25 +246,19 @@ function OnboardingPage() {
   return (
     <StaffLayout title="Onboard a Hospital" subtitle="Provision a new tenant" permission="tenants:manage">
       <Panel>
-        <ol className="mb-6 flex flex-wrap gap-2">
-          {steps.map((label, i) => (
-            <li
-              key={label}
-              className={`inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-xs ${
-                i === step
-                  ? "bg-forest text-primary-foreground"
-                  : i < step
-                    ? "bg-forest/10 text-forest"
-                    : "bg-muted text-foreground/60"
-              }`}
-            >
-              {i < step ? <Check className="size-3.5" /> : <span>{i + 1}</span>}
-              {label}
-            </li>
-          ))}
-        </ol>
-
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-8 lg:grid-cols-[240px_1fr]">
+          <div className="hidden lg:block">
+            <div className="sticky top-6">
+              <h3 className="mb-6 text-sm font-semibold text-foreground/70 uppercase tracking-wider">Setup Progress</h3>
+              <FormTimeline steps={steps} currentStep={step} />
+            </div>
+          </div>
+          <div>
+            <div className="lg:hidden mb-6">
+              <FormTimeline steps={steps} currentStep={step} />
+            </div>
+            
+            <div className="grid gap-4 sm:grid-cols-2">
           {step === 0 ? (
             <>
               <label className="space-y-1.5 text-sm">
@@ -406,7 +400,10 @@ function OnboardingPage() {
 
         {error ? <p className="mt-4 text-sm text-destructive">{error}</p> : null}
 
-        <div className="mt-6 flex items-center justify-between gap-3">
+            </div>
+          </div>
+          
+        <div className="mt-8 flex items-center justify-between gap-3 border-t border-border pt-6">
           <button
             type="button"
             disabled={step === 0}

@@ -61,6 +61,12 @@ export function SlotPicker({
   const load = useCallback(() => {
     let active = true;
     setSlots(null);
+    
+    if (!doctorId) {
+      setSlots([]);
+      return () => { active = false; };
+    }
+
     apiClient
       .get<AppointmentSlot[]>(endpoints.appointments.availableSlots, {
         branchId: branchId,

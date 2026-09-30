@@ -1,0 +1,1566 @@
+﻿
+
+VetCare HMS
+Hospital Management System
+
+BUSINESS REQUIREMENTS DOCUMENT
+Developer 4 â€” Business, Revenue &amp; Analytics Management
+
+Document Version
+1.1 (Architectural &amp; Compliance Addendum)
+Prepared By
+Developer 4 â€” Business &amp; Revenue Team
+Document Date
+June 23, 2026
+Project
+VetCare Hospital Management System
+Scope
+Modules 1â€“7: Inventory, Billing, Payment, Analytics, Subscription, Marketplace, Insurance
+Status
+Draft â€” Pending Stakeholder Review
+Classification
+CONFIDENTIAL â€” Internal Use Only
+
+1. Executive Summary
+This Business Requirements Document (BRD) defines the functional and non-functional requirements for Developer 4&apos;s scope within VetCare HMS â€” a comprehensive hospital management system designed for veterinary clinics and multi-specialty pet-care facilities.
+Developer 4 is responsible for all revenue-generating, financial-control, and business-intelligence modules. The deliverables span seven modules ranging from core operational needs (Inventory, Billing, Payments) to future SaaS monetisation (Subscription &amp; Marketplace) and compliance features (Insurance Management).
+
+1.1 Business Objectives
+Digitise and automate all inventory procurement and stock-movement workflows
+Generate accurate, GST-compliant invoices across all service verticals (consultation, lab, pharmacy, grooming)
+Support multi-mode payments and provide complete transaction audit trails
+Deliver real-time revenue analytics, KPI dashboards and exportable reports
+Build a scalable SaaS subscription engine to support multi-clinic onboarding
+Provide a future-ready marketplace for pet products and insurance integrations
+
+1.2 Stakeholders
+Role
+Responsibility
+Clinic Owner / Admin
+Revenue oversight, report consumption, policy approval
+Billing Staff
+Invoice creation, payment collection, refund initiation
+Pharmacist / Store Manager
+Inventory entries, stock adjustments, supplier management
+Doctor / Vet
+View own performance reports, lab and prescription linkage
+Finance Team
+GST filing data, revenue exports, reconciliation
+Developer 4 Team
+Build, test and maintain all modules in scope
+Anthropic / CTO
+Architecture approvals, integration standards
+
+2. Scope of Work
+The following modules are in scope for Developer 4. Each module is described in detail in subsequent sections.
+
+M#
+Module
+Sub-Modules (count)
+APIs
+Phase
+M1
+Inventory Management
+6 sub-modules
+4 APIs
+Phase 1
+M2
+Billing Management
+7 sub-modules
+4 APIs
+Phase 1
+M3
+Payment Management
+6 sub-modules
+4 APIs
+Phase 1
+M4
+Reporting &amp; Analytics
+7 sub-modules
+4 APIs
+Phase 1
+M5
+Subscription Management
+5 sub-modules
+4 APIs
+Phase 2 (SaaS)
+M6
+Marketplace Management
+6 sub-modules
+4 APIs
+Phase 3 (Future)
+M7
+Insurance Management
+4 sub-modules
+4 APIs
+Phase 3 (Future)
+
+3. Module Requirements
+3.1 Module 1 â€” Inventory Management
+Manages the complete lifecycle of clinic inventory including procurement, stock tracking, adjustments, inter-branch transfers, low-stock alerting, expiry control and supplier relationships.
+
+3.1.1 Functional Requirements
+Inventory Master: Maintain a master catalogue of all inventory items (medicines, consumables, grooming supplies, pet food). Each item tracks SKU, category, unit of measure, HSN code, tax rate and reorder level.
+Stock Entry: Record goods received from suppliers with batch numbers, MRP, purchase price, expiry date and quantity. Automatically update stock ledger on confirmation.
+Stock Adjustment: Allow authorised users to increase or decrease stock counts with a mandatory reason (damage, theft, audit correction). All adjustments logged with user and timestamp.
+Stock Transfer: Initiate and approve transfers between branches/locations. Transfer requests move through Pending â†’ Approved â†’ Dispatched â†’ Received states.
+Low Stock Alert: System automatically triggers alerts (in-app notification + email) when item quantity falls below the configured reorder level. Dashboard widget highlights critical items.
+Expiry Management: Daily batch job scans for items expiring within 30/60/90 days. Expired items are quarantined automatically and flagged for disposal or return to supplier.
+Supplier Management: Maintain supplier profiles with contact info, payment terms, lead time, GST number and product catalogue. Track purchase history per supplier.
+
+3.1.2 Non-Functional Requirements
+Stock updates must reflect within 2 seconds of entry confirmation.
+Audit log retained for minimum 7 years (compliance).
+Barcode / QR scanning support for stock entry and adjustment.
+
+3.2 Module 2 â€” Billing Management
+Provides a unified billing engine covering all revenue streams of the clinic. Generates GST-compliant invoices that can be printed, emailed or downloaded as PDF.
+
+3.2.1 Functional Requirements
+Consultation Billing: Auto-populate consultation fees from doctor tariff master. Support multi-visit billing within one encounter and package/bundle pricing.
+Lab Billing: Line-item billing for each diagnostic test ordered. Integration with Lab module to trigger test only after billing confirmation.
+Pharmacy Billing: Fetch dispensed items from prescriptions, apply pharmacy margin, compute GST (IGST/CGST/SGST based on supply state). Reduce inventory automatically.
+Grooming Billing: Itemise grooming services from the grooming module. Support add-on services and tip collection.
+Miscellaneous Charges: Handle OT charges, procedure fees, accommodation, oxygen charges etc. with configurable charge codes.
+GST Calculation: Auto-derive CGST+SGST or IGST based on customer GSTIN and clinic state. Apply correct tax slabs per HSN/SAC code. Generate GSTR-1 compatible data.
+Invoice Generation: Produce sequentially numbered invoices with clinic letterhead, QR code, payment summary, itemised breakdown and digital signature. PDF rendered server-side.
+
+3.3 Module 3 â€” Payment Management
+Handles all modes of payment collection, reconciliation and refunds. Integrates with payment gateways for digital transactions.
+
+3.3.1 Functional Requirements
+Cash Payment: Record cash collected, print receipt. Cashier reconciliation report at day-end.
+Card Payment: POS terminal integration via payment gateway SDK. Capture terminal reference for audit.
+UPI Payment: QR code generated per invoice. UPI gateway callback confirms payment and auto-updates invoice status.
+Online Payment: Payment link sent via SMS/email. Supports Razorpay/PayU/Stripe. Webhook-based status updates.
+Refund Management: Initiate full or partial refunds. Refund to original payment mode. Refund requires dual authorisation (billing staff + admin). Webhook confirms gateway refund.
+Transaction History: Immutable ledger of all transactions per patient, per day, per doctor and clinic-wide. Exportable to CSV/PDF.
+
+3.4 Module 4 â€” Reporting &amp; Analytics
+Provides real-time and scheduled business intelligence across all operational verticals. Supports custom date ranges, filters and multi-format exports.
+
+3.4.1 Report Catalogue
+Report
+Description
+Revenue Report
+Daily/weekly/monthly revenue by service type, doctor, and branch. Trend lines with MoM comparison.
+Appointment Report
+Appointment volume, cancellation rate, no-show rate, peak hours heatmap.
+Doctor Performance Report
+Per-doctor revenue generated, patient count, average visit value, satisfaction score.
+Inventory Report
+Stock levels, consumption trends, slow-moving items, expiry forecast.
+Vaccination Report
+Vaccination coverage, upcoming due dates, species-wise breakdowns.
+Grooming Report
+Grooming revenue, service popularity, repeat customer rate.
+Lab Report
+Test volumes, turnaround time, pending results, revenue per test category.
+
+3.5 Module 5 â€” Subscription Management (Phase 2 â€” SaaS)
+Enables the VetCare HMS to be offered as a multi-tenant SaaS platform. Clinic owners subscribe to a plan that controls feature access, user limits and storage quotas.
+
+Plan Management: Define plans (Starter, Professional, Enterprise) with feature flags, user seat counts, branch limits and monthly/annual pricing.
+Subscription Management: Onboard clinics, assign plans, track subscription lifecycle (Trial â†’ Active â†’ Grace â†’ Expired â†’ Cancelled).
+Trial Period: 14-day free trial with full feature access. Automated reminders at day 7, 12 and 14.
+Billing Cycle: Automated invoice generation on renewal date. Failed payment retry logic with 3 attempts over 5 days.
+Feature Access Control: Middleware-level feature flags enforce plan-based access. Graceful degradation with upgrade prompts for blocked features.
+
+3.6 Module 6 â€” Marketplace Management (Phase 3 â€” Future)
+An embedded e-commerce marketplace for pet products, food, accessories and veterinary consumables. Clinics can act as vendors or customers.
+
+Product Management: Full product catalogue with images, descriptions, variants (size/flavour), weight, dimensions and pricing.
+Product Categories: Hierarchical category tree (e.g., Food â†’ Dry Food â†’ Puppy). SEO-friendly slugs.
+Vendor Management: Onboard third-party vendors, review/approve catalogues, manage revenue-share commission.
+Cart Management: Persistent cart, quantity controls, apply coupon codes, display savings.
+Order Management: Order placement â†’ warehouse pick â†’ dispatch â†’ delivery tracking. Status push notifications.
+
+3.7 Module 7 â€” Insurance Management (Phase 3 â€” Future)
+Integrates with pet insurance providers to enable policy issuance, renewal and claim processing within the HMS workflow.
+
+Insurance Provider: Maintain a directory of integrated insurance companies with API credentials and product offerings.
+Policy Management: Link patient records to insurance policies. Track policy number, coverage limits, deductibles, expiry.
+Claim Management: Initiate claims linked to invoices. Attach supporting documents. Track claim status via insurer API.
+Claim Status: Real-time status polling or webhook push (Submitted â†’ Under Review â†’ Approved / Rejected â†’ Settled).
+
+4. Database Design
+All tables follow PostgreSQL conventions. UUIDs are used as primary keys. Soft-deletes via is_deleted flag. Every table includes created_at, updated_at and created_by audit columns (omitted below for brevity).
+
+Table: inventory_items
+Column
+Type
+PK/FK
+Nullable
+Description
+id
+UUID
+PK
+NOT NULL
+Unique identifier
+sku
+VARCHAR(50)
+
+NOT NULL
+Stock Keeping Unit code
+name
+VARCHAR(200)
+
+NOT NULL
+Item display name
+category
+VARCHAR(100)
+
+NOT NULL
+e.g., Medicine, Consumable, Grooming
+hsn_code
+VARCHAR(20)
+
+NULL
+HSN code for GST
+tax_rate
+DECIMAL(5,2)
+
+NOT NULL
+GST percentage
+unit
+VARCHAR(30)
+
+NOT NULL
+UOM: tablet, ml, kg, pack
+reorder_level
+INTEGER
+
+NOT NULL
+Min qty before low-stock alert
+current_stock
+DECIMAL(10,2)
+
+NOT NULL
+Real-time stock quantity
+is_active
+BOOLEAN
+
+NOT NULL
+Soft enable/disable
+
+Table: stock_entries
+Column
+Type
+PK/FK
+Nullable
+Description
+id
+UUID
+PK
+NOT NULL
+Entry ID
+item_id
+UUID
+FK
+NOT NULL
+Ref: inventory_items.id
+supplier_id
+UUID
+FK
+NULL
+Ref: suppliers.id
+batch_number
+VARCHAR(50)
+
+NOT NULL
+Supplier batch number
+quantity
+DECIMAL(10,2)
+
+NOT NULL
+Quantity received
+purchase_price
+DECIMAL(10,2)
+
+NOT NULL
+Cost per unit
+mrp
+DECIMAL(10,2)
+
+NOT NULL
+Maximum retail price
+expiry_date
+DATE
+
+NULL
+Expiry date of batch
+entry_type
+VARCHAR(20)
+
+NOT NULL
+PURCHASE / RETURN / OPENING
+notes
+TEXT
+
+NULL
+Additional remarks
+
+Table: invoices
+Column
+Type
+PK/FK
+Nullable
+Description
+id
+UUID
+PK
+NOT NULL
+Invoice ID
+invoice_number
+VARCHAR(30)
+
+NOT NULL
+Sequential formatted number
+patient_id
+UUID
+FK
+NOT NULL
+Ref: patients.id
+visit_id
+UUID
+FK
+NULL
+Ref: visits.id
+invoice_date
+TIMESTAMP
+
+NOT NULL
+Date/time of generation
+subtotal
+DECIMAL(12,2)
+
+NOT NULL
+Pre-tax total
+cgst
+DECIMAL(10,2)
+
+NOT NULL
+Central GST amount
+sgst
+DECIMAL(10,2)
+
+NOT NULL
+State GST amount
+igst
+DECIMAL(10,2)
+
+NOT NULL
+Integrated GST amount
+discount
+DECIMAL(10,2)
+
+NOT NULL
+Discount applied
+grand_total
+DECIMAL(12,2)
+
+NOT NULL
+Final payable amount
+status
+VARCHAR(20)
+
+NOT NULL
+DRAFT/PENDING/PAID/CANCELLED
+due_date
+DATE
+
+NULL
+Payment due date
+
+Table: invoice_items
+Column
+Type
+PK/FK
+Nullable
+Description
+id
+UUID
+PK
+NOT NULL
+Line item ID
+invoice_id
+UUID
+FK
+NOT NULL
+Ref: invoices.id
+item_type
+VARCHAR(30)
+
+NOT NULL
+CONSULTATION/LAB/PHARMACY/GROOMING/MISC
+description
+VARCHAR(300)
+
+NOT NULL
+Line item description
+quantity
+DECIMAL(8,2)
+
+NOT NULL
+Qty billed
+unit_price
+DECIMAL(10,2)
+
+NOT NULL
+Price per unit
+tax_rate
+DECIMAL(5,2)
+
+NOT NULL
+Applicable GST %
+tax_amount
+DECIMAL(10,2)
+
+NOT NULL
+Computed tax
+line_total
+DECIMAL(12,2)
+
+NOT NULL
+qty Ã— unit_price + tax
+
+Table: payments
+Column
+Type
+PK/FK
+Nullable
+Description
+id
+UUID
+PK
+NOT NULL
+Payment ID
+invoice_id
+UUID
+FK
+NOT NULL
+Ref: invoices.id
+payment_mode
+VARCHAR(30)
+
+NOT NULL
+CASH/CARD/UPI/ONLINE
+amount
+DECIMAL(12,2)
+
+NOT NULL
+Amount paid
+gateway_ref
+VARCHAR(100)
+
+NULL
+Payment gateway reference
+gateway
+VARCHAR(50)
+
+NULL
+Razorpay / PayU / Stripe
+status
+VARCHAR(20)
+
+NOT NULL
+PENDING/SUCCESS/FAILED/REFUNDED
+paid_at
+TIMESTAMP
+
+NULL
+Timestamp of successful payment
+remarks
+TEXT
+
+NULL
+Cashier notes
+
+Table: suppliers
+Column
+Type
+PK/FK
+Nullable
+Description
+id
+UUID
+PK
+NOT NULL
+Supplier ID
+name
+VARCHAR(200)
+
+NOT NULL
+Supplier company name
+contact_person
+VARCHAR(100)
+
+NULL
+Primary contact name
+phone
+VARCHAR(20)
+
+NOT NULL
+Contact phone
+email
+VARCHAR(100)
+
+NULL
+Contact email
+gstin
+VARCHAR(20)
+
+NULL
+GST registration number
+payment_terms
+VARCHAR(100)
+
+NULL
+e.g., Net 30
+lead_time_days
+INTEGER
+
+NULL
+Average delivery lead time
+is_active
+BOOLEAN
+
+NOT NULL
+Active status
+
+Table: subscription_plans
+Column
+Type
+PK/FK
+Nullable
+Description
+id
+UUID
+PK
+NOT NULL
+Plan ID
+name
+VARCHAR(100)
+
+NOT NULL
+Starter / Pro / Enterprise
+price_monthly
+DECIMAL(10,2)
+
+NOT NULL
+Monthly price (INR)
+price_annual
+DECIMAL(10,2)
+
+NOT NULL
+Annual price (INR)
+max_users
+INTEGER
+
+NOT NULL
+User seat limit
+max_branches
+INTEGER
+
+NOT NULL
+Branch limit
+feature_flags
+JSONB
+
+NOT NULL
+JSON of enabled features
+is_active
+BOOLEAN
+
+NOT NULL
+Whether plan is available
+
+
+5. API Design
+All APIs follow RESTful conventions. Base URL: /api/v1/. Authentication via Bearer JWT. Responses in JSON with envelope { success, data, error, meta }. Rate limiting: 1000 req/min per clinic tenant.
+
+5.1 Inventory APIs
+Endpoint
+Method
+Description
+Auth
+Module
+/inventory/items
+GET
+List all inventory items with filters
+JWT
+M1
+/inventory/items
+POST
+Add a new inventory item to master
+JWT + Admin
+M1
+/inventory/stock/entry
+POST
+Record stock received (goods receipt)
+JWT + Staff
+M1
+/inventory/stock/adjust
+POST
+Adjust stock with reason code
+JWT + Admin
+M1
+/inventory/stock/transfer
+POST
+Initiate inter-branch stock transfer
+JWT + Admin
+M1
+/inventory/low-stock
+GET
+Fetch items below reorder level
+JWT
+M1
+/inventory/expiry
+GET
+Items expiring within given days
+JWT
+M1
+/inventory/suppliers
+GET
+List all suppliers
+JWT
+M1
+/inventory/suppliers
+POST
+Create new supplier record
+JWT + Admin
+M1
+
+5.2 Billing APIs
+Endpoint
+Method
+Description
+Auth
+Module
+/billing/invoices
+POST
+Generate a new invoice
+JWT + Billing
+M2
+/billing/invoices/:id
+GET
+Get invoice details by ID
+JWT
+M2
+/billing/invoices/:id
+PUT
+Update draft invoice before finalisation
+JWT + Billing
+M2
+/billing/invoices/:id/download
+GET
+Download invoice as PDF
+JWT
+M2
+/billing/invoices/:id/cancel
+POST
+Cancel an invoice with reason
+JWT + Admin
+M2
+/billing/gst/report
+GET
+GST-wise tax report for filing
+JWT + Admin
+M2
+
+5.3 Payment APIs
+Endpoint
+Method
+Description
+Auth
+Module
+/payments
+POST
+Create a payment record / initiate gateway
+JWT + Billing
+M3
+/payments/:id/verify
+POST
+Verify gateway payment status
+JWT + Billing
+M3
+/payments/:id/refund
+POST
+Initiate refund (dual auth required)
+JWT + Admin
+M3
+/payments/history
+GET
+Paginated transaction history with filters
+JWT
+M3
+/payments/reconcile
+GET
+Day-end cash reconciliation report
+JWT + Admin
+M3
+
+5.4 Reporting &amp; Analytics APIs
+Endpoint
+Method
+Description
+Auth
+Module
+/reports/revenue
+GET
+Revenue summary with breakdown
+JWT + Admin
+M4
+/reports/appointments
+GET
+Appointment analytics
+JWT + Admin
+M4
+/reports/inventory
+GET
+Inventory movement analytics
+JWT + Admin
+M4
+/reports/doctor
+GET
+Doctor-wise performance metrics
+JWT + Admin
+M4
+/reports/export
+POST
+Export any report to PDF or CSV
+JWT + Admin
+M4
+
+5.5 Subscription APIs (Phase 2)
+Endpoint
+Method
+Description
+Auth
+Module
+/subscriptions/plans
+GET
+List all available plans
+Public
+M5
+/subscriptions/plans
+POST
+Create a new subscription plan
+JWT + SuperAdmin
+M5
+/subscriptions
+POST
+Assign plan to a clinic tenant
+JWT + SuperAdmin
+M5
+/subscriptions/:id
+GET
+Get subscription details
+JWT
+M5
+/subscriptions/:id/upgrade
+POST
+Upgrade to a higher tier plan
+JWT + Admin
+M5
+/subscriptions/:id/cancel
+POST
+Cancel a subscription
+JWT + Admin
+M5
+
+6. Entity Relationship Overview
+The following describes key entity relationships. A visual ERD is provided as a separate diagram artifact (ERD.png). Primary key columns are marked [PK], foreign keys [FK].
+
+Entity A
+Relationship
+inventory_items
+has many stock_entries (1:N)
+inventory_items
+has many invoice_items via billing (1:N)
+suppliers
+has many stock_entries (1:N)
+invoices
+has many invoice_items (1:N)
+invoices
+has many payments (1:N)
+patients
+has many invoices (1:N)
+visits
+has one invoice (1:1)
+clinics
+has many invoices via tenant_id (1:N)
+subscription_plans
+has many clinic_subscriptions (1:N)
+clinic_subscriptions
+belongs to one clinic (N:1)
+insurance_policies
+belongs to one patient (N:1)
+insurance_claims
+belongs to one invoice and one policy (N:1)
+
+7. Screen List
+All screens are web-responsive (desktop primary, tablet secondary). Mobile app views use the same data APIs with a native layout.
+
+#
+Screen Name
+Module
+Key Features
+Role
+1
+Inventory Dashboard
+Inventory
+Stock overview, low-stock widget, expiry alerts
+Admin / Staff
+2
+Inventory Item Master
+Inventory
+Add/edit items, bulk import CSV
+Admin
+3
+Stock Entry Form
+Inventory
+GRN form with barcode scan support
+Staff / Admin
+4
+Stock Adjustment Form
+Inventory
+Adjust qty with mandatory reason
+Admin
+5
+Stock Transfer
+Inventory
+Create/approve/receive transfer requests
+Admin
+6
+Expiry Management
+Inventory
+Expiry timeline, quarantine actions
+Admin / Staff
+7
+Supplier List &amp; Form
+Inventory
+CRUD for supplier profiles
+Admin
+8
+Billing Dashboard
+Billing
+Pending invoices, today&apos;s revenue
+Billing Staff
+9
+New Invoice
+Billing
+Multi-section invoice builder
+Billing Staff
+10
+Invoice Detail
+Billing
+View itemised invoice, download PDF
+All
+11
+Invoice List
+Billing
+Searchable, filterable invoice registry
+Billing / Admin
+12
+GST Report Screen
+Billing
+GSTR-1 data, tax summary by rate
+Admin / Finance
+13
+Payment Collection
+Payment
+POS-style payment screen (multi-mode)
+Billing Staff
+14
+Transaction History
+Payment
+Paginated ledger with filters
+Admin / Finance
+15
+Refund Request
+Payment
+Initiate and approve refunds
+Admin
+16
+Day-End Reconciliation
+Payment
+Cash vs system comparison
+Admin
+17
+Revenue Analytics
+Analytics
+Revenue KPIs, charts, date ranges
+Admin
+18
+Doctor Performance
+Analytics
+Per-doctor scorecard
+Admin
+19
+Inventory Analytics
+Analytics
+Consumption trends, slow movers
+Admin
+20
+Report Export
+Analytics
+Select report type and download
+Admin / Finance
+21
+Subscription Plans
+Subscription
+Plan cards with feature comparison
+SuperAdmin
+22
+Clinic Subscriptions
+Subscription
+Manage active subscriptions
+SuperAdmin
+23
+Billing Cycle Dashboard
+Subscription
+Renewal queue, failed payments
+SuperAdmin
+24
+Product Catalogue
+Marketplace
+Grid/list view with filters
+Vendor / Admin
+25
+Product Form
+Marketplace
+Add/edit product with image upload
+Vendor
+26
+Order Management
+Marketplace
+Order list, status updates
+Vendor / Admin
+27
+Insurance Providers
+Insurance
+Directory of integrated providers
+Admin
+28
+Policy Management
+Insurance
+Link patient to policy
+Admin / Staff
+29
+Claim Form
+Insurance
+Raise claim linked to invoice
+Billing Staff
+30
+Claim Status Tracker
+Insurance
+Real-time claim status timeline
+Admin / Staff
+
+8. Workflow Diagrams
+8.1 Billing Flow
+The billing flow describes how a clinic visit becomes a GST-compliant paid invoice.
+
+Step
+Action
+1
+Patient Check-In
+2
+Services Rendered
+3
+Billing Initiation
+4
+Review Line Items
+5
+GST Calculation
+6
+Invoice Preview
+7
+Confirm Invoice
+8
+Payment Collection
+9
+Payment Gateway
+10
+Payment Confirmed
+11
+Receipt / PDF
+
+8.2 Inventory Flow
+Step
+Action
+1
+Supplier Order Placed
+2
+Goods Received
+3
+QC Check
+4
+Stock Updated
+5
+Dispensing (Pharmacy)
+6
+Low Stock Trigger
+7
+Low Stock Alert
+8
+Expiry Scan (Daily)
+9
+Adjustment
+10
+Transfer
+
+8.3 Revenue Flow
+Step
+Revenue Source
+1
+Consultation Fee
+2
+Lab / Diagnostic Charges
+3
+Pharmacy Sales
+4
+Grooming Services
+5
+Miscellaneous Charges
+6
+Payment Collection
+7
+GST Collection
+8
+Refunds
+9
+Revenue Report
+10
+Analytics Dashboard
+
+9. Analytics Dashboard Design
+The Analytics Dashboard is the primary business intelligence surface for clinic owners and administrators. It aggregates data from all modules in real time.
+
+9.1 Dashboard Layout
+Zone
+Component
+Top KPI Row
+Today Revenue, Total Invoices, Outstanding, Refunds
+Top KPI Row
+Active Patients Today, New Registrations
+Revenue Chart
+Line chart: Daily revenue for last 30 days
+Revenue Chart
+Bar chart: Revenue by service type (donut centre = total)
+Doctor Performance
+Table: Doctor | Patients | Revenue | Avg Visit Value
+Inventory Widget
+Low stock items count, Expiring in 30 days count
+Payment Mode Split
+Pie chart: Cash / Card / UPI / Online percentages
+Appointment Heatmap
+Hour Ã— Day heatmap of appointment volume
+Pending Invoices
+List of top 10 oldest unpaid invoices with actions
+Quick Export
+Buttons: Export Revenue / Export GST / Export Inventory
+
+9.2 KPI Definitions
+KPI
+Formula
+Daily Revenue
+SUM(grand_total) WHERE status=PAID AND DATE(paid_at)=today
+Collection Rate
+Paid invoices / Total invoices Ã— 100
+Average Invoice Value
+SUM(grand_total) / COUNT(invoices)
+Refund Rate
+SUM(refunded amount) / SUM(total collected) Ã— 100
+Inventory Turnover
+Units consumed / Average stock on hand
+Doctor Revenue Share
+Doctor&apos;s revenue / Clinic total revenue Ã— 100
+Subscription MRR
+SUM(active subscription monthly values)
+Churn Rate
+Cancelled subs / Start-of-month active subs Ã— 100
+
+10. Non-Functional Requirements
+Category
+Requirement
+Performance
+API response time &lt; 300 ms for 95th percentile under normal load
+Performance
+Invoice PDF generation &lt; 3 seconds
+Scalability
+Architecture supports 500 concurrent clinic tenants (Phase 2)
+Availability
+99.9% uptime SLA for Phase 1 production environment
+Security
+AES-256 encryption for payment credentials at rest; TLS 1.3 in transit
+Security
+PCI-DSS Level 3 compliance for card payment handling
+Compliance
+GST data retention for 7 years as per Indian Tax Laws
+Compliance
+DPDP Act 2023 compliance for patient financial data
+Auditability
+All financial mutations logged with user ID, timestamp and before/after values
+Accessibility
+WCAG 2.1 AA compliant UI for all screens
+Internationalisation
+Multi-currency support in Phase 3 (Marketplace)
+Disaster Recovery
+RPO: 1 hour | RTO: 4 hours for financial data
+
+11. Assumptions &amp; Constraints
+11.1 Assumptions
+Patient, Doctor and Appointment master data is managed by Developer 1 (Clinical Module). Developer 4 will consume patient_id and visit_id as foreign references.
+Authentication and Role-Based Access Control (RBAC) is implemented by Developer 2 (Auth Module). Developer 4 endpoints will validate Bearer JWT tokens.
+Lab test results are managed by Developer 3. Lab billing in Module 2 will fetch ordered tests from Developer 3&apos;s API.
+Payment gateway credentials (Razorpay / PayU) are provisioned per clinic as environment variables. Developer 4 implements SDK integration.
+GST rates, HSN codes and SAC codes are configured in a shared master maintained by the Admin module.
+Phase 2 and Phase 3 modules (Subscription, Marketplace, Insurance) are design-ready but not deployed until corresponding milestones are approved.
+
+11.2 Constraints
+Invoice numbers must be sequential and non-repeating within a financial year (Aprilâ€“March) per GST requirements.
+Refunds exceeding â‚¹10,000 require SuperAdmin approval.
+Stock cannot go below zero in the system; negative stock must be blocked at API level.
+Payment gateway webhooks must be verified with HMAC signature before processing.
+All monetary values stored with 2 decimal places; rounding follows Indian rounding standard (round half up).
+
+12. Developer 4 Deliverable Checklist
+Deliverable
+Status
+Owner
+Business Requirements Document (this document)
+âœ… Complete
+Dev 4
+Database Design (ERD + Schema)
+âœ… In BRD Â§4
+Dev 4
+Entity Relationship Diagram (visual)
+â³ Pending
+Dev 4
+API Design Document
+âœ… In BRD Â§5
+Dev 4
+Screen List (30 screens)
+âœ… In BRD Â§7
+Dev 4
+Billing Flow Diagram
+âœ… In BRD Â§8.1
+Dev 4
+Inventory Flow Diagram
+âœ… In BRD Â§8.2
+Dev 4
+Revenue Flow Diagram
+âœ… In BRD Â§8.3
+Dev 4
+Analytics Dashboard Design
+âœ… In BRD Â§9
+Dev 4
+Workflow Diagram (visual)
+â³ Pending
+Dev 4
+Module 1 â€” Inventory (Dev + Test)
+â³ Backlog
+Dev 4
+Module 2 â€” Billing (Dev + Test)
+â³ Backlog
+Dev 4
+Module 3 â€” Payment (Dev + Test)
+â³ Backlog
+Dev 4
+Module 4 â€” Analytics (Dev + Test)
+â³ Backlog
+Dev 4
+Module 5 â€” Subscription (Phase 2)
+ðŸ“… Scheduled
+Dev 4
+Module 6 â€” Marketplace (Phase 3)
+ðŸ“… Future
+Dev 4
+Module 7 â€” Insurance (Phase 3)
+ðŸ“… Future
+Dev 4
+
+
+
+14. Architectural &amp; Compliance Addendum â€” v1.1
+This section addresses six critical architectural and compliance gaps identified during technical architecture review. These requirements are mandatory for all Phase 1 implementation and must be treated as acceptance criteria, not suggestions.
+
+14.1 Concurrency &amp; Idempotency (The Double-Click Problem)
+Risk
+Race conditions in financial and inventory operations can cause duplicate invoices, double-charges, and negative stock levels â€” all legally and operationally unacceptable.
+Impact
+Two pharmacists dispensing the last unit simultaneously, or a user double-clicking Pay Now, will corrupt financial state without mitigation.
+
+14.1.1 Idempotency Keys â€” Mandatory for All State-Mutating APIs
+Every POST endpoint that creates or mutates financial or inventory state MUST accept a client-generated Idempotency-Key header (UUID v4). The server must:
+Cache the response of the first successful request against the key for 24 hours (Redis with TTL).
+Return the cached response immediately for any duplicate request bearing the same key, without re-executing the operation.
+Return HTTP 422 with error code ERR_IDEMPOTENCY_CONFLICT if a key is reused with a different request body.
+
+Endpoint
+Idempotency Required
+POST /billing/invoices
+MANDATORY
+POST /payments
+MANDATORY
+POST /payments/:id/refund
+MANDATORY
+POST /inventory/stock/entry
+MANDATORY
+POST /inventory/stock/adjust
+MANDATORY
+
+14.1.2 Inventory Locking â€” Preventing Negative Stock
+The current_stock column in inventory_items requires strict concurrency control:
+Pessimistic Locking (Phase 1): Use SELECT ... FOR UPDATE NOWAIT when reading stock before dispensing. If lock cannot be acquired within 500ms, return HTTP 409 with ERR_STOCK_LOCK_TIMEOUT. Simple to implement in a monolithic deployment.
+Optimistic Locking (Phase 2 â€” Microservices): Add a version INTEGER column to inventory_items. All update queries must include WHERE version = :expected_version. If 0 rows updated, retry up to 3 times then return HTTP 409 with ERR_CONCURRENT_MODIFICATION.
+Hard Constraint: A CHECK constraint at the database level enforces current_stock &gt;= 0 as a last line of defence, regardless of application logic.
+
+Strategy
+Pessimistic Lock (Phase 1)
+Optimistic Lock (Phase 2)
+Mechanism
+SELECT FOR UPDATE NOWAIT
+version column + conditional UPDATE
+Best For
+Monolith, low concurrency
+Microservices, high concurrency
+Failure Response
+HTTP 409 ERR_STOCK_LOCK_TIMEOUT
+HTTP 409 ERR_CONCURRENT_MODIFICATION
+
+14.2 Inter-Service Communication Strategy
+14.2.1 Deployment Architecture Decision
+The team will adopt a Modular Monolith for Phase 1, transitioning to Event-Driven Microservices in Phase 2. This balances development velocity with architectural correctness.
+
+Phase
+Architecture
+Phase 1 (Core HMS)
+Modular Monolith
+Phase 2 (SaaS)
+Microservices + Event Bus
+Phase 3 (Marketplace/Insurance)
+Full Microservices
+
+14.2.2 Phase 1 â€” In-Process Module Contracts
+In the monolith, Developer 4 will NOT make HTTP calls to other Developer modules. Instead, each module exposes a typed Service Interface:
+PatientService.getPatientById(patient_id) â€” provided by Dev 1
+LabOrderService.getOrdersByVisit(visit_id) â€” provided by Dev 3
+AuthService.validateToken(jwt) â€” provided by Dev 2
+These interfaces are versioned and documented in a shared internal contracts package. Breaking changes require a migration plan signed off by all affected developers.
+
+14.2.3 Phase 2 â€” Event-Driven Integration (Kafka / RabbitMQ)
+When modules are extracted into microservices, all cross-domain communication moves to asynchronous events. Dev 4 will act as Consumer for the following events and Publisher for billing/payment events:
+
+Role
+Event Topic
+Publisher
+Consumer
+Trigger Action
+CONSUME
+lab.test.completed
+Dev 3 (Lab)
+Dev 4 (Billing)
+Add to billing queue
+CONSUME
+appointment.checked_in
+Dev 1 (Clinical)
+Dev 4 (Billing)
+Open billing session
+CONSUME
+prescription.dispensed
+Dev 3 (Pharmacy)
+Dev 4 (Inventory)
+Decrement stock
+PUBLISH
+invoice.generated
+Dev 4 (Billing)
+Dev 1, Dev 3
+Link invoice to visit
+PUBLISH
+payment.confirmed
+Dev 4 (Payment)
+Dev 1, Notification
+Trigger receipt
+PUBLISH
+stock.low
+Dev 4 (Inventory)
+Notification Svc
+Send alert
+Consumer services must be idempotent (re-processing the same event must not cause duplicate state changes). Use event_id as deduplication key stored in a processed_events table with TTL.
+
+14.3 Database Scalability &amp; Data Archival
+14.3.1 Table Partitioning Strategy
+For 500 concurrent clinic tenants with 7-year retention, unpartitioned tables will degrade query performance within 18â€“24 months of production. The following partitioning strategy is mandatory:
+
+Table
+Partition Type
+Partition Key
+Rationale
+invoices
+RANGE + LIST
+(tenant_id, invoice_date) monthly
+High query volume; most queries filter by clinic + date range
+invoice_items
+RANGE
+invoice_date monthly
+Inherits invoice date; co-locate with parent for JOIN performance
+stock_entries
+RANGE
+entry_date monthly
+Time-series access pattern; old data rarely queried
+payments
+RANGE
+paid_at monthly
+Financial audit queries are always date-bounded
+audit_logs
+RANGE
+created_at yearly
+Compliance retention only; never queried in OLTP path
+
+14.3.2 Archival Policy
+Hot Data (0â€“12 months): Primary PostgreSQL cluster. All OLTP queries. Full indexing.
+Warm Data (1â€“3 years): Read-replica or separate schema. Available for reporting queries with 30-second SLA (not 300ms). Indexes pruned to report-access patterns only.
+Cold Data (3â€“7 years): Exported to partitioned Parquet files on object storage (S3/GCS). Queryable via Athena/BigQuery for compliance audits. Not accessible via standard HMS APIs.
+Deletion: No financial data deleted within 7-year window. After 7 years, secure deletion with audit trail of the deletion action retained for 1 additional year.
+
+14.4 Financial Edge Cases â€” GST Credit Notes
+14.4.1 Legal Requirement
+Under the Indian GST Act (Section 34), a registered supplier must issue a Credit Note when: (a) the taxable value or tax on a supply is found to exceed the actual amount, or (b) goods are returned by the recipient. A Credit Note is a legally required document â€” a simple refund record is not sufficient for GST compliance.
+
+14.4.2 Credit Note Workflow
+Refund initiated by billing staff and approved by admin (existing dual-auth flow).
+System validates: is the original invoice finalised and GST-submitted? If yes, Credit Note is mandatory.
+System generates Credit Note with: unique sequential credit_note_number (CN-YYYY-NNNN), reference to original invoice_number, line-item-wise reversal of GST (CGST/SGST/IGST), reason code, and authorised signatory.
+Credit Note is linked to the original invoice in the database.
+Credit Note is included in GSTR-1 return for the relevant tax period.
+Payment refund is processed only after Credit Note is generated.
+
+14.4.3 New Database Table: credit_notes
+Table: credit_notes
+Column
+Type
+PK/FK
+Nullable
+Description
+id
+UUID
+PK
+NOT NULL
+Credit Note ID
+credit_note_number
+VARCHAR(30)
+
+NOT NULL
+Sequential CN-YYYY-NNNN
+original_invoice_id
+UUID
+FK
+NOT NULL
+Ref: invoices.id
+payment_id
+UUID
+FK
+NOT NULL
+Ref: payments.id (the refund payment)
+issue_date
+DATE
+
+NOT NULL
+Date of credit note issuance
+reason_code
+VARCHAR(50)
+
+NOT NULL
+SERVICE_ERROR / GOODS_RETURN / DUPLICATE / OTHER
+reason_description
+TEXT
+
+NULL
+Free-text reason
+subtotal_reversal
+DECIMAL(12,2)
+
+NOT NULL
+Pre-tax amount being reversed
+cgst_reversal
+DECIMAL(10,2)
+
+NOT NULL
+CGST being reversed
+sgst_reversal
+DECIMAL(10,2)
+
+NOT NULL
+SGST being reversed
+igst_reversal
+DECIMAL(10,2)
+
+NOT NULL
+IGST being reversed
+total_reversal
+DECIMAL(12,2)
+
+NOT NULL
+Total credit amount
+status
+VARCHAR(20)
+
+NOT NULL
+DRAFT / ISSUED / FILED
+approved_by
+UUID
+FK
+NOT NULL
+Ref: users.id (admin who approved)
+
+The refund flow in Section 8.1 (Billing Flow) is updated: Step 9 now reads: Refund Approved â†’ Generate Credit Note â†’ Process Payment Refund â†’ Update Invoice Status to CREDIT_NOTE_ISSUED.
+
+14.5 Security â€” PCI-DSS Tokenisation (Revised)
+14.5.1 Corrected Position: No Raw Card Data on VetCare Servers
+The v1.0 statement &apos;AES-256 encryption for payment credentials at rest&apos; is retracted and replaced with the following mandatory policy:
+
+Data Element
+v1.0 (INCORRECT)
+v1.1 (MANDATORY)
+PAN (Card Number)
+Encrypted at rest with AES-256
+NEVER touches VetCare servers. Collected via gateway-hosted fields (Razorpay.js / Stripe.js) and tokenised at source.
+CVV / CVC
+Encrypted at rest
+NEVER stored under any circumstance. Not even encrypted. Gateway purges after authorisation.
+Cardholder Name
+Stored in payments table
+Optional. If stored for display, store only last 4 digits of PAN as masked_pan (e.g., **** **** **** 4242).
+Payment Token
+â€”
+Stored in payments.gateway_token. Opaque reference used for refunds and recurring charges. Non-reversible to original PAN.
+Gateway Reference
+Stored
+Stored in payments.gateway_ref. Audit linkage to gateway transaction.
+
+14.5.2 Updated payments Table
+The payments table (Section 4) is updated: remove the implied credential storage. Add the following columns:
+masked_pan VARCHAR(25) NULL â€” Display-only (e.g., **** **** **** 4242)
+gateway_token VARCHAR(200) NULL â€” Opaque tokenised card reference from gateway
+card_brand VARCHAR(20) NULL â€” VISA / MASTERCARD / RUPAY (from gateway response)
+Remove: Any column implying storage of full PAN, CVV, or raw card data. The gateway_ref column is retained.
+PCI-DSS scope is now SAQ A (the lowest and simplest compliance tier), as no raw card data transits or is stored on VetCare infrastructure.
+
+14.6 API Pagination &amp; Standardised Error Codes
+14.6.1 Pagination Strategy
+All list endpoints must support Cursor-based pagination as the default. Offset-based pagination is available as a fallback for export/reporting endpoints only.
+
+Method
+Mechanism
+Cursor-based (DEFAULT)
+?after=&lt;opaque_cursor&gt;&amp;limit=50
+Offset-based (REPORTING ONLY)
+?page=3&amp;per_page=50
+
+Cursor value is a Base64-encoded opaque string containing the sort key and record ID. It is NOT a record ID or timestamp directly â€” this prevents clients from reverse-engineering pagination state.
+
+Standard list response envelope:
+Field
+Type
+success
+boolean
+data
+array
+meta.total_count
+integer
+meta.has_next_page
+boolean
+meta.next_cursor
+string | null
+meta.limit
+integer
+error
+object | null
+
+14.6.2 Standardised Error Code Glossary
+All errors return HTTP 4xx/5xx with the following JSON structure in the error field: { code, message, field (optional), request_id }.
+
+Error Code
+HTTP
+Description &amp; Resolution
+ERR_INSUFFICIENT_STOCK
+409
+Item quantity would drop below zero. Client should refresh stock and re-attempt or select alternate item.
+ERR_STOCK_LOCK_TIMEOUT
+409
+Concurrent stock operation in progress. Client should retry after 1 second.
+ERR_CONCURRENT_MODIFICATION
+409
+Optimistic lock version mismatch. Client must fetch latest record version and retry.
+ERR_DUPLICATE_INVOICE
+409
+Invoice already exists for this visit_id. Returns existing invoice in error.data.
+ERR_IDEMPOTENCY_CONFLICT
+422
+Idempotency-Key reused with different request body. New key must be generated.
+ERR_GATEWAY_TIMEOUT
+504
+Payment gateway did not respond within 10 seconds. Payment status is UNKNOWN â€” do not retry without verifying status first.
+ERR_GATEWAY_DECLINED
+402
+Payment declined by gateway. Error.data contains gateway_decline_code.
+ERR_INVOICE_NOT_EDITABLE
+422
+Invoice is in PAID or CANCELLED status and cannot be modified.
+ERR_REFUND_LIMIT_EXCEEDED
+403
+Refund amount exceeds SuperAdmin threshold. Escalation required.
+ERR_CREDIT_NOTE_REQUIRED
+422
+Cannot process refund on GST invoice without generating Credit Note first.
+ERR_SUBSCRIPTION_EXPIRED
+403
+Clinic subscription has expired or is in grace period. Feature access denied.
+ERR_FEATURE_NOT_IN_PLAN
+403
+Requested feature is not included in the clinic&apos;s current subscription plan.
+ERR_INVALID_GST_NUMBER
+422
+GSTIN format validation failed or GSTIN not found in GST portal lookup.
+ERR_EXPORT_TOO_LARGE
+413
+Export request exceeds 50,000 rows. Use date range filters to reduce dataset.
+ERR_RATE_LIMIT_EXCEEDED
+429
+API rate limit of 1,000 req/min exceeded. Retry-After header indicates reset time.
+
+14.6.3 ERR_GATEWAY_TIMEOUT â€” Special Handling Required
+Gateway timeout is the most operationally dangerous error in a payment system. The system MUST NOT treat it as a failed payment. The correct flow:
+Payment request sent to gateway â€” no response within 10 seconds.
+System sets payment status to UNKNOWN (new status in addition to PENDING/SUCCESS/FAILED).
+System returns ERR_GATEWAY_TIMEOUT to client with the internal payment_id.
+Client UI displays &apos;Payment status unknown â€” do not retry. Please check payment status.&apos; with a Check Status button.
+Background job polls gateway for payment_id status every 30 seconds for up to 10 minutes.
+On confirmed SUCCESS or FAILED, system updates payment record and pushes notification to billing staff.
+Under no circumstances should the client UI allow a re-submission of the same payment without first confirming UNKNOWN status is resolved.
+
+
+15. Revision History
+Version
+Date
+v1.0
+June 23, 2026
+v1.1
+June 23, 2026
+
+16. Document Approval
+Role
+Name
+Developer 4 Lead
+
+Technical Architect
+
+Product Manager
+
+Clinic Stakeholder
+
+
+End of Document â€” VetCare HMS | Developer 4 BRD v1.1 | CONFIDENTIAL

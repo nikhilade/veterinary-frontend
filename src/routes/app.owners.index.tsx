@@ -4,8 +4,8 @@ import { Plus, Trash2, Users, Loader2 } from "lucide-react";
 import { StaffLayout } from "@/components/app/StaffLayout";
 import { AdminHospitalSelector } from "@/components/app/AdminHospitalSelector";
 
-import { EmptyState, Panel } from "@/components/app/ui";
-import { DataTable, type DataTableColumn } from "@/components/app/kit/DataTable";
+import { EmptyState, Panel, InitialsAvatar } from "@/components/app/ui";
+import { DataGrid } from "@/components/app/kit/DataGrid";
 import { apiClient, ApiError } from "@/lib/api-client";
 import { endpoints } from "@/lib/api/endpoints";
 import type { PetOwner } from "@/lib/api/types";
@@ -144,12 +144,45 @@ function OwnersPage() {
             }
           />
         ) : (
-          <DataTable
+          <DataGrid
             key={`${applied}-${refreshKey}`}
-            columns={columns}
             rowKey={(o) => o.id}
             fetchPage={fetchPage}
-            emptyMessage={`No owners match “${applied}”. Try a phone number, or add a new owner.`}
+            emptyMessage={`No owners match "${applied}". Try a phone number, or add a new owner.`}
+            renderCard={(o) => (
+              <div className="flex flex-col justify-between h-full gap-4 rounded-[1.5rem] border border-border bg-card p-5 transition-shadow hover:shadow-sm">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <InitialsAvatar name={`${o.firstName} ${o.lastName || ''}`} className="size-12 text-lg" />
+                    <div>
+                      <Link to="/app/owners/$id" params={{ id: o.id }} className="font-semibold text-forest underline-offset-4 hover:underline">
+                        {o.firstName} {o.lastName || ""}
+                      </Link>
+                      <p className="text-xs text-foreground/60 mt-0.5">{o.pets?.length || o.petsCount || 0} pet(s)</p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setOwnerToDelete(o)}
+                    title="Delete owner"
+                    className="inline-flex shrink-0 items-center justify-center size-8 rounded-full text-destructive/70 hover:text-destructive hover:bg-destructive/10 transition-colors cursor-pointer"
+                  >
+                    <Trash2 className="size-4" />
+                  </button>
+                </div>
+                
+                <div className="flex flex-col gap-2 rounded-xl bg-muted p-3 text-xs text-foreground/70">
+                  <div className="flex items-center justify-between">
+                    <span>Phone</span>
+                    <span className="font-medium text-foreground">{o.phoneNumber}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>Email</span>
+                    <span className="font-medium text-foreground truncate max-w-[140px]">{o.email || ""}</span>
+                  </div>
+                </div>
+              </div>
+            )}
           />
         )}
       </Panel>

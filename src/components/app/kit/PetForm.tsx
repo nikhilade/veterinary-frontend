@@ -81,41 +81,11 @@ export function PetForm({ ownerId, pet = null, onSaved, submitLabel = "Save pet"
         const formData = new FormData();
         formData.append("file", photoFile);
         formData.append("folder", "pets");
-        
-        const rawToken = window.localStorage.getItem("petgood.auth");
-        const token = rawToken ? JSON.parse(rawToken).token : "";
-        
         try {
-          const res = await fetch(endpoints.files.upload, {
-            method: "POST",
-            body: formData,
-            headers: {
-              "Authorization": `Bearer ${token}`
-            }
-          });
-          
-          if (!res.ok) {
-            let errorMsg = "Failed to upload photo to server";
-            try {
-              const errJson = await res.json();
-              if (errJson.message) errorMsg = errJson.message;
-            } catch {
-              if (res.status === 400) {
-                errorMsg = "Upload failed (400 Bad Request): File format not supported or file too large.";
-              } else if (res.status === 413) {
-                errorMsg = `Photo exceeds maximum allowed size on server (${MAX_IMAGE_SIZE_MB}MB limit).`;
-              }
-            }
-            throw new Error(errorMsg);
-          }
-          
-          const json = await res.json();
-          finalPhotoUrl = json.data?.fileUrl || json.fileUrl || finalPhotoUrl;
+          const res = await apiClient.post<any>(endpoints.files.upload, formData);
+          finalPhotoUrl = res?.fileUrl || res?.data?.fileUrl || res?.url || finalPhotoUrl;
         } catch (uploadErr: any) {
-          const isNetworkErr = uploadErr.message?.includes("Failed to fetch") || uploadErr.message?.includes("NetworkError");
-          const msg = isNetworkErr
-            ? `Photo upload failed: Connection reset. The file exceeds the server limit of ${MAX_IMAGE_SIZE_MB}MB.`
-            : (uploadErr.message || "Failed to upload photo.");
+          const msg = uploadErr.message || "Failed to upload photo.";
           toast.error(msg);
           throw new Error(msg);
         }
@@ -124,8 +94,12 @@ export function PetForm({ ownerId, pet = null, onSaved, submitLabel = "Save pet"
       const payload = {
         ...form,
         ownerId: ownerId,
+        gender: form.gender || "Male",
+        status: form.status || "Active",
+        speciesId: form.speciesId?.trim() || null,
+        breedId: form.breedId?.trim() || null,
         age: Number(form.age) || 0,
-        weightKg: Number(form.weightKg) || 0,
+        weight: Number(form.weightKg) || 0,
         photoUrl: finalPhotoUrl,
         microchipNumber: form.microchipNumber?.trim() || null,
         color: form.color?.trim() || null,

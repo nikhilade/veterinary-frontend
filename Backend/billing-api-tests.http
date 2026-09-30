@@ -1,0 +1,91 @@
+### Authentication
+# @name login
+POST http://localhost:8080/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@pawcare.com", 
+  "password": "password123" 
+}
+
+> {%
+    client.global.set("auth_token", response.body.data.token);
+%}
+
+### ----------------------------------------------------
+### BILLING MODULE APIs
+### ----------------------------------------------------
+
+### 1. List all Invoices (with Pagination)
+# @name listInvoices
+GET http://localhost:8080/api/v1/billing/invoices?page=0&size=10
+Authorization: Bearer {{auth_token}}
+
+> {%
+    // Save the ID of the first invoice to use in subsequent requests
+    if (response.body.data.content.length > 0) {
+        client.global.set("invoice_id", response.body.data.content[0].id);
+    }
+%}
+
+
+### 2. Get Invoice by ID
+GET http://localhost:8080/api/v1/billing/invoices/{{invoice_id}}
+Authorization: Bearer {{auth_token}}
+
+
+### 3. Download Invoice PDF
+# To view this properly, you should open the URL in a browser or 
+# click "Save Response to File" if your HTTP client supports it.
+GET http://localhost:8080/api/v1/billing/invoices/{{invoice_id}}/download
+Authorization: Bearer {{auth_token}}
+Accept: application/pdf
+
+
+### 4. Create a New Invoice
+POST http://localhost:8080/api/v1/billing/invoices
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "patientId": "REPLACE_WITH_VALID_PATIENT_UUID",
+  "visitId": "REPLACE_WITH_VALID_VISIT_UUID",
+  "items": [
+    {
+      "itemType": "SERVICE",
+      "description": "General Checkup",
+      "quantity": 1,
+      "unitPrice": 100.00,
+      "taxRate": 18.00
+    },
+    {
+      "itemType": "PRODUCT",
+      "description": "Painkillers",
+      "quantity": 2,
+      "unitPrice": 25.00,
+      "taxRate": 12.00
+    }
+  ],
+  "discount": 10.00,
+  "dueDate": "2026-08-01"
+}
+
+
+### 5. Update an Invoice (Assuming it's not PAID yet)
+PUT http://localhost:8080/api/v1/billing/invoices/{{invoice_id}}
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "status": "PAID"
+}
+
+
+### 6. Cancel an Invoice
+POST http://localhost:8080/api/v1/billing/invoices/{{invoice_id}}/cancel?reason=Client_requested_cancellation
+Authorization: Bearer {{auth_token}}
+
+
+### 7. Get GST Report
+GET http://localhost:8080/api/v1/billing/gst/report?startDate=2026-01-01&endDate=2026-12-31
+Authorization: Bearer {{auth_token}}

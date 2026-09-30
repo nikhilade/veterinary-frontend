@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { Building2, Search } from "lucide-react";
 import { StaffLayout } from "@/components/app/StaffLayout";
-import { EmptyState, Loading, Panel, StatCard, formatDate } from "@/components/app/ui";
+import { EmptyState, Loading, Panel, StatCard, formatDate, InitialsAvatar } from "@/components/app/ui";
 import { apiClient } from "@/lib/api-client";
 import { endpoints } from "@/lib/api/endpoints";
 import { SUBSCRIPTION_STATUSES, type SubscriptionStatus, type Tenant } from "@/lib/api/tenancy-types";
@@ -126,56 +126,54 @@ function TenantsPage() {
           ) : tenants.length === 0 ? (
             <EmptyState icon={<Building2 className="size-6" />} message="No hospitals match this filter." />
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[860px] text-left text-sm">
-                <thead className="text-xs uppercase text-foreground/50">
-                  <tr>
-                    <th className="pb-3 pr-4">Hospital</th>
-                    <th className="pb-3 pr-4">Owner</th>
-                    <th className="pb-3 pr-4">Plan</th>
-                    <th className="pb-3 pr-4">Status</th>
-                    <th className="pb-3 pr-4">Branches</th>
-                    <th className="pb-3 pr-4">Staff</th>
-                    <th className="pb-3 pr-4">Renews / trial ends</th>
-                    <th className="pb-3 text-right">MRR</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {tenants.map((t) => (
-                    <tr key={t.id} className="border-t border-border">
-                      <td className="py-3 pr-4">
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              {tenants.map((t) => (
+                <div key={t.id} className="flex flex-col gap-4 rounded-[1.5rem] border border-border bg-card p-5 transition-shadow hover:shadow-sm">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <InitialsAvatar name={t.name} className="size-12 text-lg" />
+                      <div>
                         <div className="flex items-center gap-2">
-                          <p className="font-medium text-forest">{t.name}</p>
+                          <p className="font-semibold text-forest">{t.name}</p>
                           {t.hospitalStatus === 'PENDING' && (
                             <span className="text-[10px] font-medium bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full whitespace-nowrap">
-                              Pending Verification
+                              Pending
                             </span>
                           )}
                         </div>
                         <p className="text-xs text-foreground/60">{t.city}</p>
-                      </td>
-                      <td className="py-3 pr-4">
-                        <p>{t.ownerName}</p>
-                        <p className="text-xs text-foreground/60">{t.owner_email}</p>
-                      </td>
-                      <td className="py-3 pr-4">{t.plan_name}</td>
-                      <td className="py-3 pr-4">
-                        <SubscriptionBadge status={t.subscription_status} />
-                      </td>
-                      <td className="py-3 pr-4">{t.branches_count}</td>
-                      <td className="py-3 pr-4">{t.staff_count}</td>
-                      <td className="py-3 pr-4 text-xs text-foreground/70">
-                        {t.trial_ends_at
-                          ? `Trial ends ${formatDate(t.trial_ends_at)}`
-                          : t.renews_at
-                            ? formatDate(t.renews_at)
-                            : "—"}
-                      </td>
-                      <td className="py-3 text-right">₹{(t.mrr || 0).toLocaleString("en-IN")}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                      </div>
+                    </div>
+                    <SubscriptionBadge status={t.subscription_status} />
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div className="rounded-xl bg-muted p-3">
+                      <p className="text-[10px] font-semibold uppercase tracking-wider text-foreground/50">Plan</p>
+                      <p className="mt-0.5 font-medium truncate">{t.plan_name}</p>
+                    </div>
+                    <div className="rounded-xl bg-muted p-3">
+                      <p className="text-[10px] font-semibold uppercase tracking-wider text-foreground/50">MRR</p>
+                      <p className="mt-0.5 font-medium truncate">₹{(t.mrr || 0).toLocaleString("en-IN")}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-2 rounded-xl border border-border/50 p-3 text-xs text-foreground/70">
+                    <div className="flex items-center justify-between">
+                      <span>Owner</span>
+                      <span className="font-medium text-foreground truncate max-w-[120px]">{t.ownerName}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>Email</span>
+                      <span className="font-medium text-foreground truncate max-w-[120px]">{t.owner_email}</span>
+                    </div>
+                    <div className="mt-1 flex items-center justify-between border-t border-border/50 pt-2">
+                      <span>Staff</span>
+                      <span className="font-medium text-foreground">{t.staff_count} member(s)</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
         </Panel>

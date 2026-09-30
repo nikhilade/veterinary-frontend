@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ArrowLeft, CheckCircle2, Loader2 } from "lucide-react";
 import { StaffLayout } from "@/components/app/StaffLayout";
-import { Panel } from "@/components/app/ui";
+import { Panel, FormTimeline } from "@/components/app/ui";
 import { PetForm } from "@/components/app/kit/PetForm";
 import { apiClient, ApiError } from "@/lib/api-client";
 import { endpoints } from "@/lib/api/endpoints";
@@ -97,7 +97,20 @@ function NewOwnerPage() {
         <ArrowLeft className="size-4" /> Back to owners
       </Link>
 
-      <div className="grid gap-5 lg:grid-cols-2">
+      <Panel>
+        <div className="grid gap-8 lg:grid-cols-[240px_1fr]">
+          <div className="hidden lg:block">
+            <div className="sticky top-6">
+              <h3 className="mb-6 text-sm font-semibold text-foreground/70 uppercase tracking-wider">Registration</h3>
+              <FormTimeline steps={['Phone number', 'Owner details']} currentStep={match || checked ? 1 : 0} />
+            </div>
+          </div>
+          <div className="flex flex-col gap-8">
+            <div className="lg:hidden">
+              <FormTimeline steps={['Phone number', 'Owner details']} currentStep={match || checked ? 1 : 0} />
+            </div>
+            
+            <div className="grid gap-5 lg:grid-cols-1">
         <Panel title="Step 1 — Phone number">
           <label className="mb-1.5 block text-xs font-medium text-foreground/60">Mobile number</label>
           <input
@@ -193,7 +206,10 @@ function NewOwnerPage() {
             </div>
           </Panel>
         )}
-      </div>
+            </div>
+          </div>
+        </div>
+      </Panel>
     </StaffLayout>
   );
 }

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Pencil, Plus, Trash2, UserRound, X } from "lucide-react";
+import { Pencil, Plus, Trash2, UserRound, X, ChevronDown } from "lucide-react";
 import { StaffLayout } from "@/components/app/StaffLayout";
 import { AdminHospitalSelector } from "@/components/app/AdminHospitalSelector";
 import { EmptyState, Loading, Panel, StatCard } from "@/components/app/ui";
@@ -88,6 +88,8 @@ function StaffPage() {
   const [departmentFilter, setDepartmentFilter] = useState("");
   const [designationFilter, setDesignationFilter] = useState("");
   const [editingStaffId, setEditingStaffId] = useState<string | null>(null);
+  const [isDeptListExpanded, setIsDeptListExpanded] = useState(false);
+  const [isDesigListExpanded, setIsDesigListExpanded] = useState(false);
 
   const headers = undefined; // Automatically handled by apiClient using adminHospitalId
 
@@ -382,234 +384,6 @@ function StaffPage() {
     <StaffLayout title="Staff" subtitle="Directory and Staff Management" permission="staff:read">
       <AdminHospitalSelector />
       <div className="space-y-6">
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <StatCard label="Team members" value={summary.total} />
-        </div>
-
-        <div className="mt-6">
-          <Panel
-            title="Departments"
-            action={
-              canWrite ? (
-                <button
-                  type="button"
-                  onClick={() => setDeptOpen((v) => !v)}
-                  className="inline-flex items-center gap-2 rounded-full bg-forest px-4 py-2 text-sm text-primary-foreground"
-                >
-                  {deptOpen ? <X className="size-4" /> : <Plus className="size-4" />}
-                  {deptOpen ? "Close" : "Add department"}
-                </button>
-              ) : null
-            }
-          >
-            {deptOpen && canWrite ? (
-              <div className="mb-5 grid gap-3 rounded-[1.25rem] bg-muted p-4 sm:grid-cols-3">
-                <label className="space-y-1.5 text-sm">
-                  <span className="text-foreground/70">Department Name</span>
-                  <input
-                    className={field}
-                    value={deptForm.name}
-                    onChange={(e) => setDeptForm((s) => ({ ...s, name: e.target.value }))}
-                    placeholder="e.g. Surgery"
-                  />
-                </label>
-                <label className="space-y-1.5 text-sm">
-                  <span className="text-foreground/70">Department Code</span>
-                  <input
-                    className={field}
-                    value={deptForm.code}
-                    onChange={(e) => setDeptForm((s) => ({ ...s, code: e.target.value }))}
-                    placeholder="e.g. SUR"
-                  />
-                </label>
-                <div className="flex items-end pb-[2px] gap-2">
-                  <button
-                    type="button"
-                    onClick={createDepartment}
-                    className="rounded-full bg-forest px-6 py-2.5 text-sm text-primary-foreground"
-                  >
-                    {editingDeptId ? "Update" : "Save"}
-                  </button>
-                  {editingDeptId && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setEditingDeptId(null);
-                        setDeptForm({ name: "", code: "" });
-                        setDeptOpen(false);
-                      }}
-                      className="text-sm text-foreground/60 underline pb-3"
-                    >
-                      Cancel
-                    </button>
-                  )}
-                </div>
-                {deptError ? (
-                  <p className="col-span-3 text-sm text-destructive">{deptError}</p>
-                ) : null}
-              </div>
-            ) : null}
-
-            {departments.length === 0 ? (
-              <EmptyState message="No departments added yet." />
-            ) : (
-              <div className="flex flex-wrap gap-2">
-                {departments.map((d: any) => (
-                  <div
-                    key={d.id || d.departmentId || Math.random()}
-                    className="group flex items-center gap-2 rounded-full border border-border pl-4 pr-2 py-1.5 text-sm bg-background"
-                  >
-                    <span>
-                      {d.name ||
-                        d.departmentName ||
-                        d.title ||
-                        `Unnamed (${d.id || d.departmentId})`}
-                    </span>
-                    {canWrite && (
-                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button
-                          onClick={() => startEditDepartment(d)}
-                          className="p-1 hover:text-forest hover:bg-forest/10 rounded-full text-foreground/60"
-                        >
-                          <Pencil className="size-3" />
-                        </button>
-                        <button
-                          onClick={() => deleteDepartment(d.id || d.departmentId)}
-                          className="p-1 hover:text-destructive hover:bg-destructive/10 rounded-full text-foreground/60"
-                        >
-                          <Trash2 className="size-3" />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-          </Panel>
-        </div>
-
-        <div className="mt-6">
-          <Panel
-            title="Designations"
-            action={
-              canWrite ? (
-                <button
-                  type="button"
-                  onClick={() => setDesigOpen((v) => !v)}
-                  className="inline-flex items-center gap-2 rounded-full bg-forest px-4 py-2 text-sm text-primary-foreground"
-                >
-                  {desigOpen ? <X className="size-4" /> : <Plus className="size-4" />}
-                  {desigOpen ? "Close" : "Add designation"}
-                </button>
-              ) : null
-            }
-          >
-            {desigOpen && canWrite ? (
-              <div className="mb-5 grid gap-3 rounded-[1.25rem] bg-muted p-4 sm:grid-cols-4">
-                <label className="space-y-1.5 text-sm">
-                  <span className="text-foreground/70">Name</span>
-                  <input
-                    className={field}
-                    value={desigForm.name}
-                    onChange={(e) => setDesigForm((s) => ({ ...s, name: e.target.value }))}
-                    placeholder="e.g. Surgeon"
-                  />
-                </label>
-                <label className="space-y-1.5 text-sm">
-                  <span className="text-foreground/70">Code</span>
-                  <input
-                    className={field}
-                    value={desigForm.code}
-                    onChange={(e) => setDesigForm((s) => ({ ...s, code: e.target.value }))}
-                    placeholder="e.g. SRG"
-                  />
-                </label>
-                <label className="space-y-1.5 text-sm">
-                  <span className="text-foreground/70">Department</span>
-                  <select
-                    className={field}
-                    value={desigForm.departmentId}
-                    onChange={(e) => setDesigForm((s) => ({ ...s, departmentId: e.target.value }))}
-                  >
-                    <option value="">Select department</option>
-                    {departments.map((d: any) => (
-                      <option
-                        key={d.id || d.departmentId || Math.random()}
-                        value={d.id || d.departmentId}
-                      >
-                        {d.name ||
-                          d.departmentName ||
-                          d.title ||
-                          `Unnamed (${d.id || d.departmentId})`}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <div className="flex items-end pb-[2px] gap-2">
-                  <button
-                    type="button"
-                    onClick={createDesignation}
-                    className="rounded-full bg-forest px-6 py-2.5 text-sm text-primary-foreground"
-                  >
-                    {editingDesigId ? "Update" : "Save"}
-                  </button>
-                  {editingDesigId && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setEditingDesigId(null);
-                        setDesigForm({ name: "", code: "", departmentId: "" });
-                        setDesigOpen(false);
-                      }}
-                      className="text-sm text-foreground/60 underline pb-3"
-                    >
-                      Cancel
-                    </button>
-                  )}
-                </div>
-                {desigError ? (
-                  <p className="col-span-4 text-sm text-destructive">{desigError}</p>
-                ) : null}
-              </div>
-            ) : null}
-
-            {designations.length === 0 ? (
-              <EmptyState message="No designations added yet." />
-            ) : (
-              <div className="flex flex-wrap gap-2">
-                {designations.map((d: any) => (
-                  <div
-                    key={d.id || d.designationId || Math.random()}
-                    className="group flex items-center gap-2 rounded-full border border-border pl-4 pr-2 py-1.5 text-sm bg-background"
-                  >
-                    <span>
-                      {d.name ||
-                        d.designationName ||
-                        d.title ||
-                        `Unnamed (${d.id || d.designationId})`}
-                    </span>
-                    {canWrite && (
-                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button
-                          onClick={() => startEditDesignation(d)}
-                          className="p-1 hover:text-forest hover:bg-forest/10 rounded-full text-foreground/60"
-                        >
-                          <Pencil className="size-3" />
-                        </button>
-                        <button
-                          onClick={() => deleteDesignation(d.id || d.designationId)}
-                          className="p-1 hover:text-destructive hover:bg-destructive/10 rounded-full text-foreground/60"
-                        >
-                          <Trash2 className="size-3" />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-          </Panel>
-        </div>
         <div className="mt-6">
           <Panel
             title="Staff directory"
@@ -633,6 +407,273 @@ function StaffPage() {
               ) : null
             }
           >
+            <div className="mb-8">
+              <div className="grid gap-6 lg:grid-cols-3 items-start">
+                <div>
+                  <div className="rounded-[1.5rem] border border-border/50 bg-background/50 p-5 h-full">
+                    <p className="text-sm text-foreground/60">Team members</p>
+                    <p className="mt-2 text-3xl font-bold text-forest">{summary.total}</p>
+                  </div>
+                </div>
+
+                <div className="rounded-[1.5rem] border border-border/50 bg-background/50 overflow-hidden transition-all duration-300 shadow-sm">
+                  <div className="p-5 flex justify-between items-start cursor-pointer hover:bg-muted/30 transition-colors" onClick={() => {
+                    setIsDeptListExpanded(v => {
+                      if (v) setDeptOpen(false);
+                      return !v;
+                    });
+                  }}>
+                    <div>
+                            <p className="text-sm text-foreground/60">Departments</p>
+                            <p className="mt-2 text-3xl font-bold text-forest">{departments.length}</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      {canWrite && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (!isDeptListExpanded) setIsDeptListExpanded(true);
+                            setDeptOpen((v) => !v);
+                          }}
+                          className="inline-flex items-center gap-1.5 rounded-full bg-forest/10 hover:bg-forest px-3 py-1.5 text-xs font-medium text-forest hover:text-primary-foreground transition-colors"
+                        >
+                          {deptOpen ? <X className="size-3.5" /> : <Plus className="size-3.5" />}
+                          {deptOpen ? "Close" : "Add"}
+                        </button>
+                      )}
+                      <ChevronDown className={`size-5 text-foreground/50 transition-transform ${isDeptListExpanded ? 'rotate-180' : ''}`} />
+                    </div>
+                  </div>
+                  {isDeptListExpanded && (
+                    <div className="px-5 pb-5 border-t border-border/50 pt-5">
+                            {deptOpen && canWrite ? (
+                    <div className="mb-5 flex flex-col gap-4 rounded-[1.25rem] bg-muted p-5">
+                            <label className="space-y-1.5 text-sm">
+                              <span className="text-foreground/70">Name</span>
+                              <input
+                                className={field}
+                                value={deptForm.name}
+                                onChange={(e) => setDeptForm((s) => ({ ...s, name: e.target.value }))}
+                                placeholder="e.g. Surgery"
+                              />
+                            </label>
+                            <label className="space-y-1.5 text-sm">
+                              <span className="text-foreground/70">Code</span>
+                              <input
+                                className={field}
+                                value={deptForm.code}
+                                onChange={(e) => setDeptForm((s) => ({ ...s, code: e.target.value }))}
+                                placeholder="e.g. SUR"
+                              />
+                            </label>
+                            <div className="flex items-center justify-end gap-3 mt-2">
+                              {editingDeptId && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                          setEditingDeptId(null);
+                                          setDeptForm({ name: "", code: "" });
+                                          setDeptOpen(false);
+                                  }}
+                                  className="text-sm text-foreground/60 hover:text-foreground transition-colors"
+                                >
+                                  Cancel
+                                </button>
+                              )}
+                              <button
+                                type="button"
+                                onClick={createDepartment}
+                                className="rounded-full bg-forest px-5 py-2 text-sm text-primary-foreground hover:bg-forest/90 transition-colors"
+                              >
+                                {editingDeptId ? "Update" : "Save"}
+                              </button>
+                            </div>
+                            {deptError ? (
+                              <p className="text-sm text-destructive">{deptError}</p>
+                            ) : null}
+                    </div>
+                  ) : null}
+
+                  {departments.length === 0 ? (
+                    <EmptyState message="No departments added yet." />
+                  ) : (
+                    <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto pr-2">
+                            {departments.map((d: any) => (
+                              <div
+                                key={d.id || d.departmentId || Math.random()}
+                                className="group flex items-center gap-1.5 rounded-full border border-border/50 pl-3 pr-1.5 py-1 text-xs bg-background"
+                              >
+                                <span>
+                                  {d.name ||
+                                          d.departmentName ||
+                                          d.title ||
+                                          `Unnamed (${d.id || d.departmentId})`}
+                                </span>
+                                {canWrite && (
+                                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                          <button
+                                            onClick={() => startEditDepartment(d)}
+                                            className="p-1 hover:text-forest hover:bg-forest/10 rounded-full text-foreground/60"
+                                          >
+                                            <Pencil className="size-3" />
+                                          </button>
+                                          <button
+                                            onClick={() => deleteDepartment(d.id || d.departmentId)}
+                                            className="p-1 hover:text-destructive hover:bg-destructive/10 rounded-full text-foreground/60"
+                                          >
+                                            <Trash2 className="size-3" />
+                                          </button>
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                    </div>
+                  )}
+                    </div>
+                  )}
+                </div>
+
+                <div className="rounded-[1.5rem] border border-border/50 bg-background/50 overflow-hidden transition-all duration-300 shadow-sm">
+                  <div className="p-5 flex justify-between items-start cursor-pointer hover:bg-muted/30 transition-colors" onClick={() => {
+                    setIsDesigListExpanded(v => {
+                      if (v) setDesigOpen(false);
+                      return !v;
+                    });
+                  }}>
+                    <div>
+                            <p className="text-sm text-foreground/60">Designations</p>
+                            <p className="mt-2 text-3xl font-bold text-forest">{designations.length}</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      {canWrite && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (!isDesigListExpanded) setIsDesigListExpanded(true);
+                            setDesigOpen((v) => !v);
+                          }}
+                          className="inline-flex items-center gap-1.5 rounded-full bg-forest/10 hover:bg-forest px-3 py-1.5 text-xs font-medium text-forest hover:text-primary-foreground transition-colors"
+                        >
+                          {desigOpen ? <X className="size-3.5" /> : <Plus className="size-3.5" />}
+                          {desigOpen ? "Close" : "Add"}
+                        </button>
+                      )}
+                      <ChevronDown className={`size-5 text-foreground/50 transition-transform ${isDesigListExpanded ? 'rotate-180' : ''}`} />
+                    </div>
+                  </div>
+                  {isDesigListExpanded && (
+                    <div className="px-5 pb-5 border-t border-border/50 pt-5">
+                            {desigOpen && canWrite ? (
+                    <div className="mb-5 flex flex-col gap-4 rounded-[1.25rem] bg-muted p-5">
+                            <label className="space-y-1.5 text-sm">
+                              <span className="text-foreground/70">Name</span>
+                              <input
+                                className={field}
+                                value={desigForm.name}
+                                onChange={(e) => setDesigForm((s) => ({ ...s, name: e.target.value }))}
+                                placeholder="e.g. Surgeon"
+                              />
+                            </label>
+                            <label className="space-y-1.5 text-sm">
+                              <span className="text-foreground/70">Code</span>
+                              <input
+                                className={field}
+                                value={desigForm.code}
+                                onChange={(e) => setDesigForm((s) => ({ ...s, code: e.target.value }))}
+                                placeholder="e.g. SRG"
+                              />
+                            </label>
+                            <label className="space-y-1.5 text-sm">
+                              <span className="text-foreground/70">Department</span>
+                              <select
+                                className={field}
+                                value={desigForm.departmentId}
+                                onChange={(e) => setDesigForm((s) => ({ ...s, departmentId: e.target.value }))}
+                              >
+                                <option value="">Select department</option>
+                                {departments.map((d: any) => (
+                                  <option
+                                          key={d.id || d.departmentId || Math.random()}
+                                          value={d.id || d.departmentId}
+                                  >
+                                          {d.name ||
+                                            d.departmentName ||
+                                            d.title ||
+                                            `Unnamed (${d.id || d.departmentId})`}
+                                  </option>
+                                ))}
+                              </select>
+                            </label>
+                            <div className="flex items-center justify-end gap-3 mt-2">
+                              {editingDesigId && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                          setEditingDesigId(null);
+                                          setDesigForm({ name: "", code: "", departmentId: "" });
+                                          setDesigOpen(false);
+                                  }}
+                                  className="text-sm text-foreground/60 hover:text-foreground transition-colors"
+                                >
+                                  Cancel
+                                </button>
+                              )}
+                              <button
+                                type="button"
+                                onClick={createDesignation}
+                                className="rounded-full bg-forest px-5 py-2 text-sm text-primary-foreground hover:bg-forest/90 transition-colors"
+                              >
+                                {editingDesigId ? "Update" : "Save"}
+                              </button>
+                            </div>
+                            {desigError ? (
+                              <p className="text-sm text-destructive">{desigError}</p>
+                            ) : null}
+                    </div>
+                  ) : null}
+
+                  {designations.length === 0 ? (
+                    <EmptyState message="No designations added yet." />
+                  ) : (
+                    <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto pr-2">
+                            {designations.map((d: any) => (
+                              <div
+                                key={d.id || d.designationId || Math.random()}
+                                className="group flex items-center gap-1.5 rounded-full border border-border/50 pl-3 pr-1.5 py-1 text-xs bg-background"
+                              >
+                                <span>
+                                  {d.name ||
+                                          d.designationName ||
+                                          d.title ||
+                                          `Unnamed (${d.id || d.designationId})`}
+                                </span>
+                                {canWrite && (
+                                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                          <button
+                                            onClick={() => startEditDesignation(d)}
+                                            className="p-1 hover:text-forest hover:bg-forest/10 rounded-full text-foreground/60"
+                                          >
+                                            <Pencil className="size-3" />
+                                          </button>
+                                          <button
+                                            onClick={() => deleteDesignation(d.id || d.designationId)}
+                                            className="p-1 hover:text-destructive hover:bg-destructive/10 rounded-full text-foreground/60"
+                                          >
+                                            <Trash2 className="size-3" />
+                                          </button>
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                    </div>
+                  )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
             <div className="mb-6 flex flex-col sm:flex-row gap-4 items-end bg-background/50 p-4 rounded-2xl border border-border/50">
               <div className="flex-1 min-w-[200px]">
                 <label className="text-xs text-foreground/60 mb-1.5 block font-medium">

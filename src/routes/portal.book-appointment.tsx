@@ -9,6 +9,7 @@ import { apiClient } from "@/lib/api-client";
 import { endpoints } from "@/lib/api/endpoints";
 import { bookingErrorCopy, createAppointment } from "@/lib/booking";
 import type { Appointment, Branch, Doctor, Pet } from "@/lib/api/types";
+import { useAuth } from "@/lib/auth/store";
 
 export const Route = createFileRoute("/portal/book-appointment")({
   head: () => ({
@@ -31,6 +32,9 @@ const field =
 const SERVICES = ["Consultation", "Vaccination", "Dental Cleaning", "Grooming", "Lab Work"];
 
 function PortalBooking() {
+  const { user } = useAuth();
+  const ownerId = user?.id || "";
+
   const [branches, setBranches] = useState<Branch[]>([]);
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [pets, setPets] = useState<Pet[]>([]);
@@ -50,10 +54,11 @@ function PortalBooking() {
   const [confirmed, setConfirmed] = useState<Appointment | null>(null);
 
   useEffect(() => {
+    if (!ownerId) return;
     Promise.all([
       apiClient.get<Branch[]>(endpoints.branches.list),
       apiClient.get<Doctor[]>(endpoints.doctors.list),
-      apiClient.get<Pet[]>(endpoints.pets.list),
+      apiClient.get<Pet[]>(endpoints.pets.byOwner(ownerId)),
     ])
       .then(([b, d, p]) => {
         setBranches(b);
@@ -64,7 +69,27 @@ function PortalBooking() {
         if (d.length > 0) setDoctorId(d[0].id);
       })
       .catch(() => undefined);
-  }, []);
+  }, [ownerId]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("animate");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: "0px 0px -5% 0px" }
+    );
+
+    document.querySelectorAll(".animate-on-scroll").forEach((el) => {
+      observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, [branches, doctors, pets]);
 
   const branch = branches.find((b) => b.id === branchId) ?? null;
 
@@ -117,7 +142,7 @@ function PortalBooking() {
   if (confirmed) {
     return (
       <PortalLayout title="Booking confirmed">
-        <Panel>
+        <Panel className="gradient-border">
           <div className="flex flex-col items-center gap-3 py-8 text-center">
             <CheckCircle2 className="size-10 text-forest" />
             <h2 className="text-xl">You're booked!</h2>
@@ -149,9 +174,9 @@ function PortalBooking() {
 
   return (
     <PortalLayout title="Book Appointment">
-      <Panel>
+      <Panel className="gradient-border">
         <div className="space-y-5">
-          <div>
+          <div className="animate-on-scroll [animation:animationIn_0.6s_ease-out_0.1s_both]">
             <label className="mb-1.5 block text-xs font-medium text-foreground/60">1 · Branch</label>
             <select value={branchId} onChange={(e) => setBranchId(e.target.value)} className={field}>
               {branches.map((b) => (
@@ -162,7 +187,7 @@ function PortalBooking() {
             </select>
           </div>
 
-          <div>
+          <div className="animate-on-scroll [animation:animationIn_0.6s_ease-out_0.2s_both]">
             <label className="mb-1.5 block text-xs font-medium text-foreground/60">2 · Doctor (optional)</label>
             <select value={doctorId} onChange={(e) => setDoctorId(e.target.value)} className={field}>
               {doctors.map((d) => (
@@ -173,7 +198,7 @@ function PortalBooking() {
             </select>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid gap-3 sm:grid-cols-2 animate-on-scroll [animation:animationIn_0.6s_ease-out_0.3s_both]">
             <div>
               <label className="mb-1.5 block text-xs font-medium text-foreground/60">Pet</label>
               <select value={petId} onChange={(e) => setPetId(e.target.value)} className={field}>
@@ -194,7 +219,7 @@ function PortalBooking() {
             </div>
           </div>
 
-          <div>
+          <div className="animate-on-scroll [animation:animationIn_0.6s_ease-out_0.4s_both]">
             <p className="mb-1.5 text-xs font-medium text-foreground/60">3 · Date & time</p>
             <SlotPicker
               branchId={branchId}
@@ -213,13 +238,15 @@ function PortalBooking() {
             />
           </div>
 
-          <textarea
-            rows={2}
-            value={notes}
-            placeholder="Anything the vet should know? (optional)"
-            onChange={(e) => setNotes(e.target.value)}
-            className={field}
-          />
+          <div className="animate-on-scroll [animation:animationIn_0.6s_ease-out_0.5s_both]">
+            <textarea
+              rows={2}
+              value={notes}
+              placeholder="Anything the vet should know? (optional)"
+              onChange={(e) => setNotes(e.target.value)}
+              className={field}
+            />
+          </div>
 
           {retrying ? (
             <p className="flex items-center gap-2 text-sm text-clay">
@@ -232,9 +259,11 @@ function PortalBooking() {
             </p>
           ) : null}
 
-          <IdempotentSubmitButton onSubmit={submit} disabled={!petId || !slot}>
-            4 · Confirm booking
-          </IdempotentSubmitButton>
+          <div className="animate-on-scroll [animation:animationIn_0.6s_ease-out_0.6s_both]">
+            <IdempotentSubmitButton onSubmit={submit} disabled={!petId || !slot}>
+              4 · Confirm booking
+            </IdempotentSubmitButton>
+          </div>
         </div>
       </Panel>
     </PortalLayout>
