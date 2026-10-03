@@ -244,7 +244,12 @@ function OnboardingPage() {
   const currentPlan = plans.find((p) => p.id === form.plan_id) ?? plans[0];
 
   return (
-    <StaffLayout title="Onboard a Hospital" subtitle="Provision a new tenant" permission="tenants:manage">
+    <StaffLayout 
+      title="Onboard a Hospital" 
+      subtitle="Provision a new tenant" 
+      permission="tenants:manage"
+      breadcrumbs={[{ label: "Hospitals", to: "/app/tenants" }, { label: "Onboard Hospital" }]}
+    >
       <Panel>
         <div className="grid gap-8 lg:grid-cols-[240px_1fr]">
           <div className="hidden lg:block">

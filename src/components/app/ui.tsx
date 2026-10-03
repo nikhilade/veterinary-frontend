@@ -1,13 +1,14 @@
 import type { ReactNode } from "react";
+import { Link } from "@tanstack/react-router";
 import { LineChart, Line, ResponsiveContainer } from "recharts";
-import { TrendingUp, TrendingDown, Minus, Check } from "lucide-react";
+import { TrendingUp, TrendingDown, Minus, Check, Home, ChevronRight, type LucideIcon } from "lucide-react";
 
 export function Panel({ title, action, children, className }: { title?: string; action?: ReactNode; children: ReactNode; className?: string }) {
   return (
-    <section className={`rounded-[1.75rem] border border-border bg-card p-5 lg:p-6 ${className || ''}`}>
+    <section className={`admin-panel rounded-lg border border-border bg-card p-5 shadow-sm lg:p-6 ${className || ''}`}>
       {(title || action) && (
         <div className="mb-4 flex items-center justify-between gap-3">
-          {title ? <h2 className="text-lg">{title}</h2> : <span />}
+          {title ? <h2 className="text-base font-bold">{title}</h2> : <span />}
           {action}
         </div>
       )}
@@ -23,7 +24,9 @@ export function StatCard({
   className,
   trend,
   trendDirection,
-  sparklineData
+  sparklineData,
+  icon: Icon,
+  accent = false,
 }: { 
   label: string; 
   value: string | number; 
@@ -32,17 +35,22 @@ export function StatCard({
   trend?: string;
   trendDirection?: 'up' | 'down' | 'neutral';
   sparklineData?: number[];
+  icon?: LucideIcon;
+  accent?: boolean;
 }) {
   const chartData = sparklineData?.map((val, i) => ({ value: val, index: i }));
 
   return (
-    <div className={`relative overflow-hidden rounded-[1.5rem] border border-border bg-card p-5 flex flex-col justify-between ${className || ''}`}>
+    <div className={`admin-stat group relative flex min-h-36 flex-col justify-between overflow-hidden rounded-lg border p-5 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md ${accent ? 'border-forest bg-forest text-primary-foreground' : 'border-border bg-card'} ${className || ''}`}>
       <div className="relative z-10">
-        <p className="text-sm font-medium text-foreground/60">{label}</p>
+        <div className="flex items-start justify-between gap-3">
+          <p className={`text-[11px] font-semibold uppercase tracking-[0.1em] ${accent ? 'text-primary-foreground/65' : 'text-muted-foreground'}`}>{label}</p>
+          {Icon ? <span className={`flex size-8 items-center justify-center rounded-md ${accent ? 'bg-primary-foreground/12 text-primary-foreground' : 'bg-sage text-forest'}`}><Icon className="size-4" /></span> : null}
+        </div>
         <div className="mt-2 flex items-baseline gap-3">
-          <p className="text-3xl font-bold text-forest">{value}</p>
+          <p className={`text-3xl font-bold ${accent ? 'text-primary-foreground' : 'text-forest'}`}>{value}</p>
           {trend && (
-            <span className={`flex items-center text-xs font-semibold ${trendDirection === 'up' ? 'text-forest' : trendDirection === 'down' ? 'text-destructive' : 'text-foreground/50'}`}>
+            <span className={`flex items-center text-xs font-semibold ${accent ? 'text-primary-foreground/75' : trendDirection === 'up' ? 'text-forest' : trendDirection === 'down' ? 'text-destructive' : 'text-foreground/50'}`}>
               {trendDirection === 'up' && <TrendingUp className="mr-1 size-3" />}
               {trendDirection === 'down' && <TrendingDown className="mr-1 size-3" />}
               {trendDirection === 'neutral' && <Minus className="mr-1 size-3" />}
@@ -50,17 +58,17 @@ export function StatCard({
             </span>
           )}
         </div>
-        {hint ? <p className="mt-1 text-xs text-foreground/50">{hint}</p> : null}
+        {hint ? <p className={`mt-1 text-xs ${accent ? 'text-primary-foreground/60' : 'text-foreground/50'}`}>{hint}</p> : null}
       </div>
       
       {chartData && chartData.length > 0 && (
-        <div className="absolute bottom-0 left-0 right-0 h-16 opacity-20 pointer-events-none">
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 opacity-15">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData}>
               <Line 
                 type="monotone" 
                 dataKey="value" 
-                stroke="var(--color-forest)" 
+                stroke={accent ? "var(--color-primary-foreground)" : "var(--color-forest)"}
                 strokeWidth={3} 
                 dot={false}
                 isAnimationActive={false}
@@ -81,7 +89,7 @@ export function StatusPill({ status }: { status: string }) {
         ? "bg-destructive/10 text-destructive"
         : "bg-clay/15 text-clay";
   return (
-    <span className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${tone}`}>
+    <span className={`inline-flex rounded-md px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.08em] ${tone}`}>
       {status.replace(/_/g, " ").toLowerCase()}
     </span>
   );
@@ -99,7 +107,7 @@ export function EmptyState({
   icon?: ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-center gap-3 rounded-[1.25rem] bg-muted px-5 py-10 text-center">
+    <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed border-border bg-muted/60 px-5 py-10 text-center">
       {icon ? <div className="text-clay">{icon}</div> : null}
       {title ? <p className="text-lg font-medium text-forest">{title}</p> : null}
       <p className="max-w-sm text-sm text-foreground/60">{message}</p>
@@ -177,5 +185,40 @@ export function FormTimeline({ steps, currentStep }: { steps: string[]; currentS
         );
       })}
     </div>
+  );
+}
+
+export function Breadcrumbs({ paths }: { paths: { label: string; to?: string }[] }) {
+  return (
+    <nav aria-label="Breadcrumb" className="flex items-center space-x-1 text-[13px] sm:space-x-2">
+      <Link
+        to="/app/dashboard"
+        className="flex items-center text-muted-foreground transition-colors hover:text-foreground"
+        title="Dashboard"
+      >
+        <Home className="size-4" />
+      </Link>
+      
+      {paths.map((path, idx) => {
+        const isLast = idx === paths.length - 1;
+        return (
+          <div key={idx} className="flex items-center">
+            <ChevronRight className="mx-1 size-3.5 text-muted-foreground/50" />
+            {isLast || !path.to ? (
+              <span className="font-semibold text-forest">
+                {path.label}
+              </span>
+            ) : (
+              <Link
+                to={path.to}
+                className="font-medium text-muted-foreground transition-colors hover:text-foreground"
+              >
+                {path.label}
+              </Link>
+            )}
+          </div>
+        );
+      })}
+    </nav>
   );
 }

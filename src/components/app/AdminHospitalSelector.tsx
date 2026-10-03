@@ -36,10 +36,11 @@ export function AdminHospitalSelector() {
   if (role !== "SUPER_ADMIN" || hospitals.length === 0) return null;
 
   return (
-    <div className="mb-6 flex items-center gap-3">
-      <label className="text-sm font-medium text-foreground/80">Hospital Context:</label>
+    <div className="mb-6 flex flex-wrap items-center gap-3 rounded-lg border border-border bg-card px-4 py-3 shadow-sm">
+      <span className="size-2 rounded-full bg-forest" />
+      <label className="text-[11px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">Hospital context</label>
       <select
-        className="rounded-full border border-border px-4 py-1.5 text-sm bg-background hover:bg-background/80 transition-colors outline-none focus:border-forest shadow-sm cursor-pointer"
+        className="min-w-56 rounded-md border border-border bg-background px-3 py-2 text-sm font-medium outline-none transition-colors hover:bg-muted focus:border-forest"
         value={adminHospitalId || ""}
         onChange={(e) => authStore.setAdminHospital(e.target.value)}
       >

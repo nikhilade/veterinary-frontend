@@ -120,7 +120,12 @@ function OwnerDetailPage() {
   }
 
   return (
-    <StaffLayout title={owner ? `${owner.firstName} ${owner.lastName}` : "Owner"} subtitle="Client profile" permission="owners:read">
+    <StaffLayout 
+      title={owner ? `${owner.firstName} ${owner.lastName}` : "Owner"} 
+      subtitle="Client profile" 
+      permission="owners:read"
+      breadcrumbs={[{ label: "Pet Owners", to: "/app/owners" }, { label: owner ? `${owner.firstName} ${owner.lastName}` : "Profile" }]}
+    >
       <Link to="/app/owners" className="mb-4 inline-flex items-center gap-1.5 text-sm text-forest">
         <ArrowLeft className="size-4" /> Back to owners
       </Link>

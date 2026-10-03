@@ -91,7 +91,12 @@ function PetDetailPage() {
   }
 
   return (
-    <StaffLayout title={pet?.petName ?? "Patient"} subtitle="Patient record" permission="pets:read">
+    <StaffLayout 
+      title={pet?.petName ?? "Patient"} 
+      subtitle="Patient record" 
+      permission="pets:read"
+      breadcrumbs={[{ label: "Patients", to: "/app/pets" }, { label: pet?.petName ?? "Patient" }]}
+    >
       <Link to="/app/pets" className="mb-4 inline-flex items-center gap-1.5 text-sm text-forest">
         <ArrowLeft className="size-4" /> Back to patients
       </Link>

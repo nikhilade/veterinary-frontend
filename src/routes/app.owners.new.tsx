@@ -92,7 +92,12 @@ function NewOwnerPage() {
   }
 
   return (
-    <StaffLayout title="Add Owner" subtitle="Phone number is checked first to avoid duplicates" permission="owners:write">
+    <StaffLayout 
+      title="Add Owner" 
+      subtitle="Phone number is checked first to avoid duplicates" 
+      permission="owners:write"
+      breadcrumbs={[{ label: "Pet Owners", to: "/app/owners" }, { label: "Add Owner" }]}
+    >
       <Link to="/app/owners" className="mb-4 inline-flex items-center gap-1.5 text-sm text-forest">
         <ArrowLeft className="size-4" /> Back to owners
       </Link>

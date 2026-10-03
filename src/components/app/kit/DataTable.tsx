@@ -70,7 +70,7 @@ export function DataTable<T>({ columns, fetchPage, rowKey, emptyMessage = "Nothi
 
   return (
     <div className="space-y-3">
-      <div className="overflow-hidden rounded-2xl border border-border">
+      <div className="overflow-hidden rounded-lg border border-border bg-card shadow-sm">
         <Table>
           <TableHeader>
             <TableRow>
@@ -82,7 +82,7 @@ export function DataTable<T>({ columns, fetchPage, rowKey, emptyMessage = "Nothi
                     {c.sortValue ? (
                       <button
                         type="button"
-                        className="inline-flex items-center gap-1"
+                        className="inline-flex items-center gap-1.5 font-semibold transition-colors hover:text-forest"
                         onClick={() =>
                           setSort((s) =>
                             s?.key === c.key ? { key: c.key, dir: s.dir === "asc" ? "desc" : "asc" } : { key: c.key, dir: "asc" },
@@ -132,7 +132,7 @@ export function DataTable<T>({ columns, fetchPage, rowKey, emptyMessage = "Nothi
             type="button"
             onClick={loadMore}
             disabled={loading}
-            className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm text-forest disabled:opacity-60"
+            className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-4 py-2 text-sm font-semibold text-forest transition-colors hover:bg-muted disabled:opacity-60"
           >
             {loading ? <Loader2 className="size-4 animate-spin" /> : null} Load more
           </button>
