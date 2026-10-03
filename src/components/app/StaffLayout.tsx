@@ -80,6 +80,7 @@ const navGroups = [
 export function StaffLayout({
   title,
   subtitle,
+  breadcrumbs,
   children,
   permission = "staff:access",
 }: {
